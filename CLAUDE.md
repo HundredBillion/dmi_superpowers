@@ -1,6 +1,6 @@
 # dmi_superpowers — Repo Notes
 
-This is David Lee's (DMI) personal consolidation of the superpowers plugin and Matt Pocock's skills. It is a private skills plugin, not a public project accepting external contributions.
+This is David Lee's (DMI) personal consolidation of the superpowers plugin and Matt Pocock's skills. It is a public, self-owned skills plugin maintained by David Lee — not a community project soliciting external contributions, and there is no upstream fork relationship.
 
 ## For AI Agents Working in This Repo
 
