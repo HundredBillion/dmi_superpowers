@@ -18,6 +18,22 @@
 - Only `README.md` enumerates skills by name; the plugin manifests auto-discover `./skills/`, so no manifest edits are required.
 - Commit after each task. Branch: `say-skill` (already checked out).
 
+**Verification approach (read before running any scenario) — see ADR 0002.** The runtime
+loads skills from the plugin *cache*, not this repo's working tree, and only at session
+startup. So a skill created/edited here is **not invokable in this session** — not even by
+dispatched subagents. Verification is therefore two-stage:
+
+- **In-session (this TSP):** (a) *static checks* — frontmatter and `grep` for inserted
+  directives; (b) *content-simulation* — establish a **RED** baseline by prompting a
+  subagent with no skill, then a **GREEN** run by pasting the relevant `SKILL.md` body into
+  the subagent's prompt as its instructions, and confirm the output shape changes. This
+  tests whether the skill *content* moves behaviour — it does **not** test triggering.
+- **Post-merge (manual, Task 5):** reinstall the plugin and start a fresh session to confirm
+  real triggering and cross-skill invocation.
+
+Never prefix a GREEN prompt with "Use the dmi-superpowers:say skill" expecting the runtime
+to load it — paste the skill body instead.
+
 ---
 
 ### Task 1: Create the `say` skill
@@ -147,17 +163,23 @@ Use when drafting or rewriting a message addressed to a human reader. Plain, con
 Run: `head -4 skills/say/SKILL.md`
 Expected: a `---` line, `name: say`, a `description:` line beginning `Use when`, and a closing `---`.
 
-- [ ] **Step 5: Run the GREEN scenarios (skill present)**
+- [ ] **Step 5: Run the GREEN scenarios via content-simulation**
 
-Re-dispatch both subagents from Steps 1–2, this time prefixing each prompt with:
+Do NOT rely on the runtime to load the skill (see Verification approach). Instead,
+re-dispatch both subagents from Steps 1–2, prefixing each prompt with the **full body of
+`skills/say/SKILL.md`** (everything below the frontmatter) wrapped as:
 
-> Use the dmi-superpowers:say skill. <original prompt>
+> Follow these instructions exactly:
+> <paste the entire SKILL.md body here>
+>
+> Now do this: <original prompt from Step 1 / Step 2>
 
-Expected GREEN:
-- Code-findings scenario: output has all four beats — **Headline**, **What this code does**, **What's wrong** split into *Plain* and *Technical* (naming `charge()` and the discarded exception), and **Your call** with at least two options each pairing a plain choice with a technical action.
+Expected GREEN (compare against the RED baselines):
+- Code-findings scenario: output now has all four beats — **Headline**, **What this code does**, **What's wrong** split into *Plain* and *Technical* (naming `charge()` and the discarded exception), and **Your call** with at least two options each pairing a plain choice with a technical action.
 - General-prose scenario: plain, ready-to-paste Slack message that keeps Krypton, Argon, and Helium, drops code-level detail, and has no "Here's a draft:" preamble.
 
-If either fails, refine SKILL.md wording to close the gap, then re-run.
+The meaningful signal is the **delta from RED to GREEN** — the content changed behaviour. If
+either GREEN output still matches its RED baseline, refine the SKILL.md wording and re-run.
 
 - [ ] **Step 6: Commit**
 
@@ -211,15 +233,20 @@ Insert immediately after it (new blank line, then):
 Run: `grep -n "dmi-superpowers:say" skills/systematic-debugging/SKILL.md`
 Expected: exactly two matches — one in Phase 3, one in Phase 5.
 
-- [ ] **Step 4: Run the GREEN scenario**
+- [ ] **Step 4: Content-simulate the reporting moment**
 
-Dispatch a subagent (Agent tool, `general-purpose`), prompt verbatim:
+Real triggering (does `systematic-debugging` actually invoke `say`?) cannot be tested
+in-session — it is deferred to Task 5's post-merge check. What we verify now is that the
+*combination* of the two inserted directives plus the `say` body produces the right output
+shape. Dispatch a subagent (Agent tool, `general-purpose`), prompt:
 
-> Use the dmi-superpowers:systematic-debugging skill. You are at Phase 3 with these confirmed facts: `OrderService.submit()` (lines 88–95) writes the order to the DB before the payment is confirmed, so unpaid orders appear as placed. Present your ranked hypotheses to the user, then report the root cause.
+> Follow these instructions exactly:
+> <paste the two inserted directive paragraphs from Steps 1–2 of this task>
+> <paste the entire `skills/say/SKILL.md` body>
+>
+> Now do this: You are debugging. Confirmed facts: `OrderService.submit()` (lines 88–95) writes the order to the DB before the payment is confirmed, so unpaid orders appear as placed. Present your ranked hypotheses to the user, then report the root cause.
 
-Expected GREEN: hypotheses and root cause are reported in `say` style — a plain headline plus a *Plain* / *Technical* split naming `OrderService.submit()` lines 88–95, and a "Your call" with paired options. Process narration ("running the loop") is NOT four-beated.
-
-If it does not invoke `say`, strengthen the imperative wording (make it a directive sentence at the reporting moment) and re-run.
+Expected GREEN: hypotheses and root cause are reported in `say` four-beat style — a plain headline plus a *Plain* / *Technical* split naming `OrderService.submit()` lines 88–95, and a "Your call" with paired options.
 
 - [ ] **Step 5: Commit**
 
@@ -264,15 +291,19 @@ When a question requires explaining a piece of code first, format that explanati
 Run: `grep -n "dmi-superpowers:say" skills/grilling/SKILL.md`
 Expected: exactly one match.
 
-- [ ] **Step 4: Run the GREEN scenario**
+- [ ] **Step 4: Content-simulate the explanatory preamble**
 
-Dispatch a subagent (Agent tool, `general-purpose`), prompt verbatim:
+Real triggering is deferred to Task 5. Now we verify the inserted directive plus the `say`
+body produces the right preamble shape. Dispatch a subagent (Agent tool, `general-purpose`),
+prompt:
 
-> Use the dmi-superpowers:grilling skill. The plan reuses `AuthMiddleware.verify()` (lines 20–34), which currently trusts an unsigned header. Grill me about whether to keep using it — ask your first question.
+> Follow these instructions exactly:
+> <paste the inserted directive paragraph from Step 2 of this task>
+> <paste the entire `skills/say/SKILL.md` body>
+>
+> Now do this: The plan reuses `AuthMiddleware.verify()` (lines 20–34), which currently trusts an unsigned header. Grill me about whether to keep using it — ask your first question.
 
 Expected GREEN: before asking, the agent explains in plain terms what `AuthMiddleware.verify()` does and what is happening (the unsigned-header risk), paired with the file/function reference — then asks one question. The question itself is NOT formatted as a four-beat finding.
-
-If it does not invoke `say`, strengthen the imperative and re-run.
 
 - [ ] **Step 5: Commit**
 
@@ -336,6 +367,21 @@ Expected: matches in `skills/systematic-debugging/SKILL.md` (2) and `skills/gril
 Run: `ls -d skills/*/ | wc -l`
 Expected: 23 (was 22). The plugin manifests point at `./skills/`, so the new directory is auto-discovered — no manifest edit needed.
 
-- [ ] **Step 3: Flag the out-of-repo deletion (manual, do NOT commit)**
+- [ ] **Step 3: Post-merge triggering checklist (manual, after plugin reinstall + fresh session)**
+
+In-session content-simulation proved the *content* works; this step proves *triggering*
+(see ADR 0002). After the branch is merged, reinstall/sync the plugin and start a fresh
+session, then confirm:
+- **Standalone auto-trigger:** ask "explain this finding to me" about a real bug with no
+  mention of `say` → `say` fires and produces the four-beat. (PRD §11 success criterion.)
+- **systematic-debugging integration:** run a debug session to a root cause → it reports the
+  root cause in `say` four-beat style.
+- **grilling integration:** run a grilling session that must explain a piece of code → the
+  explanatory preamble uses paired registers.
+
+If any does not fire, the fix is to strengthen the imperative reference wording (Tasks 2–3)
+or the `say` `description` (Task 1) — then reinstall and re-check.
+
+- [ ] **Step 4: Flag the out-of-repo deletion (manual, do NOT commit)**
 
 Report to the user: the personal global command `~/.claude/commands/say.md` should be deleted by hand to complete the clean cutover (PRD §8). This file is outside this repo and is intentionally left to the user — and a delegating shim was rejected so the original author's `/say` stays intact. After deletion, invoke the skill via `/dmi-superpowers:say` or rely on auto-trigger.
