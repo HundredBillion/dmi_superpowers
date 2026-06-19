@@ -47,7 +47,7 @@ The agent never just starts coding. It steps back, refines requirements, validat
 | `to-prd` | Convert rough ideas to structured PRDs |
 | `to-issues` | Convert specs/PRDs to issue lists |
 | `triage` | Investigate and prioritize issues |
-| `say` | Draft/rewrite prose for human readers |
+| `say` | Communicate code findings in plain + technical pairs, and rewrite prose for human readers |
 | `deep-research` | Multi-source fact-checked research |
 | `jav-story` | Generate story artifacts |
 
