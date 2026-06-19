@@ -51,8 +51,8 @@ Two layers of change across the 8 superpowers SKILL.md files that mention these 
 `writing-skills`):
 
 - **Doc paths:**
-  - `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` → `docs/dmi/prds/YYYY-MM-DD-<topic>.md`
-  - `docs/superpowers/plans/YYYY-MM-DD-<feature>.md` → `docs/dmi/tsps/YYYY-MM-DD-<feature>.md`
+  - `docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md` → `docs/PRDs/MM-DD-YYYY-<topic>.md`
+  - `docs/superpowers/plans/YYYY-MM-DD-<feature>.md` → `docs/TSPs/MM-DD-YYYY-<feature>.md`
 - **Prose/vocabulary:** "spec" → "PRD", "plan" → "TSP" in bodies, checklists, and the
   embedded flow diagrams (graphviz node labels).
 
