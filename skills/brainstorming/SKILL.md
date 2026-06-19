@@ -29,7 +29,8 @@ You MUST create a task for each of these items and complete them in order:
 6. **Write PRD** — save to `docs/PRDs/MM-DD-YYYY-<topic>.md` and commit
 7. **PRD self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
 8. **User reviews written PRD** — ask user to review the PRD file before proceeding
-9. **Transition to implementation** — invoke writing-plans skill to create TSP
+9. **Harden PRD** — invoke `dmi-superpowers:grill-with-docs` to stress-test the PRD against the domain model
+10. **Transition to implementation** — invoke `dmi-superpowers:writing-plans` to create TSP
 
 ## Process Flow
 
@@ -43,6 +44,7 @@ digraph brainstorming {
     "Write PRD" [shape=box];
     "PRD self-review\n(fix inline)" [shape=box];
     "User reviews PRD?" [shape=diamond];
+    "Invoke grill-with-docs\n(harden PRD)" [shape=doublecircle];
     "Invoke writing-plans skill" [shape=doublecircle];
 
     "Explore project context" -> "Ask clarifying questions";
@@ -54,11 +56,12 @@ digraph brainstorming {
     "Write PRD" -> "PRD self-review\n(fix inline)";
     "PRD self-review\n(fix inline)" -> "User reviews PRD?";
     "User reviews PRD?" -> "Write PRD" [label="changes requested"];
-    "User reviews PRD?" -> "Invoke writing-plans skill" [label="approved"];
+    "User reviews PRD?" -> "Invoke grill-with-docs\n(harden PRD)" [label="approved"];
+    "Invoke grill-with-docs\n(harden PRD)" -> "Invoke writing-plans skill";
 }
 ```
 
-**The terminal state is invoking writing-plans.** Do NOT invoke frontend-design, mcp-builder, or any other implementation skill. The ONLY skill you invoke after brainstorming is writing-plans.
+**The terminal state is invoking grill-with-docs, then writing-plans.** After the user approves the PRD, invoke `dmi-superpowers:grill-with-docs` to harden the PRD against the domain model, then invoke `dmi-superpowers:writing-plans` to create the TSP. Do NOT invoke frontend-design, mcp-builder, or any other skill. The ONLY skills you invoke after brainstorming are grill-with-docs (first) and then writing-plans.
 
 ## The Process
 
@@ -127,8 +130,9 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 **Implementation:**
 
-- Invoke the writing-plans skill to create a detailed TSP
-- Do NOT invoke any other skill. writing-plans is the next step.
+- Invoke `dmi-superpowers:grill-with-docs` to harden the PRD against the domain model
+- Then invoke `dmi-superpowers:writing-plans` to create a detailed TSP
+- Do NOT invoke any other skill. grill-with-docs then writing-plans are the next steps.
 
 ## Key Principles
 

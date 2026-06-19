@@ -153,9 +153,13 @@ After writing the complete TSP, look at the PRD with fresh eyes and check the TS
 
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a PRD requirement with no task, add the task.
 
+## Harden TSP
+
+After saving the TSP and completing the self-review, invoke `dmi-superpowers:grill-with-docs` to stress-test the TSP against the domain model before handing off to execution.
+
 ## Execution Handoff
 
-After saving the TSP, offer execution choice:
+After the grill-with-docs session completes, offer execution choice:
 
 **"TSP complete and saved to `docs/TSPs/<filename>.md`. Two execution options:**
 
