@@ -1,218 +1,242 @@
 ---
 name: systematic-debugging
-description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes
+description: Use when encountering any bug, test failure, unexpected behavior, or performance regression, before proposing fixes — a disciplined diagnosis loop (orient → build a feedback loop → reproduce + minimise → hypothesise → instrument → fix + regression-test → cleanup). Triggers when the user says "diagnose"/"debug this", reports something broken/throwing/failing/slow, or asks for a fix.
 ---
 
 # Systematic Debugging
 
-## Overview
+A discipline for hard bugs and performance regressions. Random fixes waste time and create new bugs; quick patches mask underlying issues. Skip phases only when you can explicitly justify it.
 
-Random fixes waste time and create new bugs. Quick patches mask underlying issues.
-
-**Core principle:** ALWAYS find root cause before attempting fixes. Symptom fixes are failure.
+When exploring the codebase, read `CONTEXT.md` (if it exists) to build a clear mental model of the relevant modules, and check ADRs in the area you're touching.
 
 **Violating the letter of this process is violating the spirit of debugging.**
 
-## The Iron Law
+## The Two Iron Laws
+
+These two gates are **sequential, not contradictory** — you must pass through both, in order:
 
 ```
-NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
+1. No hypothesis without a feedback loop
+2. No fix without root cause
 ```
 
-If you haven't completed Phase 1, you cannot propose fixes.
+- **Law 1 (Phase 1):** You may not start theorising about the cause until you have a tight, red-capable feedback loop — one command that catches *this* bug. Jumping straight to a hypothesis is the exact failure this skill prevents.
+- **Law 2 (Phases 3–5):** You may not propose or apply a fix until you have traced the root cause. Symptom fixes are failure.
 
-## When to Use
+If you catch yourself reading code to build a theory before a feedback loop exists, **stop** — you have violated Law 1. If you catch yourself proposing a fix before you understand *why* the bug happens, **stop** — you have violated Law 2.
 
-Use for ANY technical issue:
-- Test failures
-- Bugs in production
-- Unexpected behavior
-- Performance problems
-- Build failures
-- Integration issues
+## Phase 0 — Orient
 
-**Use this ESPECIALLY when:**
-- Under time pressure (emergencies make guessing tempting)
-- "Just one quick fix" seems obvious
-- You've already tried multiple fixes
-- Previous fix didn't work
-- You don't fully understand the issue
+Before anything else, get your bearings. **Orientation only — this does NOT license a fix.**
 
-**Don't skip when:**
-- Issue seems simple (simple bugs have root causes too)
-- You're in a hurry (rushing guarantees rework)
-- Manager wants it fixed NOW (systematic is faster than thrashing)
+1. **Read error messages and stack traces completely.**
+   - Don't skip past errors or warnings; they often contain the exact solution.
+   - Note line numbers, file paths, error codes.
 
-## The Four Phases
+2. **Check recent changes.**
+   - What changed that could cause this? `git diff`, recent commits.
+   - New dependencies, config changes, environmental differences.
 
-You MUST complete each phase before proceeding to the next.
+3. **Read `CONTEXT.md` and relevant ADRs** for the modules you're touching, to ground your mental model before you start probing.
 
-### Phase 1: Root Cause Investigation
+Orientation gives you the shape of the problem. It does **not** entitle you to a fix — proceed to Phase 1 to build a loop.
 
-**BEFORE attempting ANY fix:**
+## Phase 1 — Build a feedback loop
 
-1. **Read Error Messages Carefully**
-   - Don't skip past errors or warnings
-   - They often contain the exact solution
-   - Read stack traces completely
-   - Note line numbers, file paths, error codes
+**This is the skill.** Everything else is mechanical. If you have a **tight** pass/fail signal for the bug — one that goes red on _this_ bug — you will find the cause; bisection, hypothesis-testing, and instrumentation all just consume it. If you don't have one, no amount of staring at code will save you.
 
-2. **Reproduce Consistently**
-   - Can you trigger it reliably?
-   - What are the exact steps?
-   - Does it happen every time?
-   - If not reproducible → gather more data, don't guess
+Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give up.**
 
-3. **Check Recent Changes**
-   - What changed that could cause this?
-   - Git diff, recent commits
-   - New dependencies, config changes
-   - Environmental differences
+### Ways to construct one — try them in roughly this order
 
-4. **Gather Evidence in Multi-Component Systems**
+1. **Failing test** at whatever seam reaches the bug — unit, integration, e2e.
+2. **Curl / HTTP script** against a running dev server.
+3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
+4. **Headless browser script** (Playwright / Puppeteer) — drives the UI, asserts on DOM/console/network.
+5. **Replay a captured trace.** Save a real network request / payload / event log to disk; replay it through the code path in isolation.
+6. **Throwaway harness.** Spin up a minimal subset of the system (one service, mocked deps) that exercises the bug code path with a single function call.
+7. **Property / fuzz loop.** If the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
+8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
+9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
+10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
 
-   **WHEN system has multiple components (CI → build → signing, API → service → database):**
+Build the right feedback loop, and the bug is 90% fixed.
 
-   **BEFORE proposing fixes, add diagnostic instrumentation:**
-   ```
-   For EACH component boundary:
-     - Log what data enters component
-     - Log what data exits component
-     - Verify environment/config propagation
-     - Check state at each layer
+### Locating *where* it breaks in a multi-component system
 
-   Run once to gather evidence showing WHERE it breaks
-   THEN analyze evidence to identify failing component
-   THEN investigate that specific component
-   ```
+A sub-technique for building the loop when the bug spans **multiple components** (CI → build → signing, API → service → database). Before you can assert on the symptom, you often need to find which boundary fails. Add diagnostic instrumentation at each component boundary, then run **once** to gather evidence showing *where* it breaks:
 
-   **Example (multi-layer system):**
-   ```bash
-   # Layer 1: Workflow
-   echo "=== Secrets available in workflow: ==="
-   echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
+```
+For EACH component boundary:
+  - Log what data enters component
+  - Log what data exits component
+  - Verify environment/config propagation
+  - Check state at each layer
 
-   # Layer 2: Build script
-   echo "=== Env vars in build script: ==="
-   env | grep IDENTITY || echo "IDENTITY not in environment"
+Run once to gather evidence showing WHERE it breaks
+THEN analyze evidence to identify failing component
+THEN narrow the feedback loop to that specific component
+```
 
-   # Layer 3: Signing script
-   echo "=== Keychain state: ==="
-   security list-keychains
-   security find-identity -v
+**Example (multi-layer system):**
+```bash
+# Layer 1: Workflow
+echo "=== Secrets available in workflow: ==="
+echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
 
-   # Layer 4: Actual signing
-   codesign --sign "$IDENTITY" --verbose=4 "$APP"
-   ```
+# Layer 2: Build script
+echo "=== Env vars in build script: ==="
+env | grep IDENTITY || echo "IDENTITY not in environment"
 
-   **This reveals:** Which layer fails (secrets → workflow ✓, workflow → build ✗)
+# Layer 3: Signing script
+echo "=== Keychain state: ==="
+security list-keychains
+security find-identity -v
 
-5. **Trace Data Flow**
+# Layer 4: Actual signing
+codesign --sign "$IDENTITY" --verbose=4 "$APP"
+```
 
-   **WHEN error is deep in call stack:**
+**This reveals:** which layer fails (secrets → workflow ✓, workflow → build ✗) — letting you point the feedback loop at the right component.
 
-   See `root-cause-tracing.md` in this directory for the complete backward tracing technique.
+### Tighten the loop
 
-   **Quick version:**
-   - Where does bad value originate?
-   - What called this with bad value?
-   - Keep tracing up until you find the source
-   - Fix at source, not at symptom
+Treat the loop as a product. Once you have _a_ loop, **tighten** it:
 
-### Phase 2: Pattern Analysis
+- Can I make it faster? (Cache setup, skip unrelated init, narrow the test scope.)
+- Can I make the signal sharper? (Assert on the specific symptom, not "didn't crash".)
+- Can I make it more deterministic? (Pin time, seed RNG, isolate filesystem, freeze network.)
 
-**Find the pattern before fixing:**
+A 30-second flaky loop is barely better than no loop; a 2-second deterministic one is tight — a debugging superpower.
 
-1. **Find Working Examples**
-   - Locate similar working code in same codebase
-   - What works that's similar to what's broken?
+### Non-deterministic bugs
 
-2. **Compare Against References**
-   - If implementing pattern, read reference implementation COMPLETELY
-   - Don't skim - read every line
-   - Understand the pattern fully before applying
+The goal is not a clean repro but a **higher reproduction rate**. Loop the trigger 100×, parallelise, add stress, narrow timing windows, inject sleeps. A 50%-flake bug is debuggable; 1% is not — keep raising the rate until it's debuggable.
 
-3. **Identify Differences**
-   - What's different between working and broken?
-   - List every difference, however small
-   - Don't assume "that can't matter"
+### When you genuinely cannot build a loop
 
-4. **Understand Dependencies**
-   - What other components does this need?
-   - What settings, config, environment?
-   - What assumptions does it make?
+Stop and say so explicitly. List what you tried. Ask the user for: (a) access to whatever environment reproduces it, (b) a captured artifact (HAR file, log dump, core dump, screen recording with timestamps), or (c) permission to add temporary production instrumentation. Do **not** proceed to hypothesise without a loop.
 
-### Phase 3: Hypothesis and Testing
+### Completion criterion — a tight loop that goes red
 
-**Scientific method:**
+Phase 1 is done when the loop is **tight** and **red-capable**: you can name **one command** — a script path, a test invocation, a curl — that you have **already run at least once** (paste the invocation and its output), and that is:
 
-1. **Form Single Hypothesis**
-   - State clearly: "I think X is the root cause because Y"
-   - Write it down
-   - Be specific, not vague
+- [ ] **Red-capable** — it drives the actual bug code path and asserts the **user's exact symptom**, so it can go red on this bug and green once fixed. Not "runs without erroring" — it must be able to _catch this specific bug_.
+- [ ] **Deterministic** — same verdict every run (flaky bugs: a pinned, high reproduction rate, per above).
+- [ ] **Fast** — seconds, not minutes.
+- [ ] **Agent-runnable** — you can run it unattended; a human in the loop only via `scripts/hitl-loop.template.sh`.
 
-2. **Test Minimally**
-   - Make the SMALLEST possible change to test hypothesis
-   - One variable at a time
-   - Don't fix multiple things at once
+If you catch yourself reading code to build a theory before this command exists, **stop — jumping straight to a hypothesis is the exact failure this skill prevents (Iron Law 1).** No red-capable command, no Phase 2.
 
-3. **Verify Before Continuing**
-   - Did it work? Yes → Phase 4
-   - Didn't work? Form NEW hypothesis
-   - DON'T add more fixes on top
+## Phase 2 — Reproduce + minimise
 
-4. **When You Don't Know**
-   - Say "I don't understand X"
-   - Don't pretend to know
-   - Ask for help
-   - Research more
+Run the loop. Watch it go red — the bug appears.
 
-### Phase 4: Implementation
+Confirm:
 
-**Fix the root cause, not the symptom:**
+- [ ] The loop produces the failure mode the **user** described — not a different failure that happens to be nearby. Wrong bug = wrong fix.
+- [ ] The failure is reproducible across multiple runs (or, for non-deterministic bugs, reproducible at a high enough rate to debug against).
+- [ ] You have captured the exact symptom (error message, wrong output, slow timing) so later phases can verify the fix actually addresses it.
 
-1. **Create Failing Test Case**
-   - Simplest possible reproduction
-   - Automated test if possible
-   - One-off test script if no framework
-   - MUST have before fixing
-   - Use the `superpowers:test-driven-development` skill for writing proper failing tests
+### Minimise
 
-2. **Implement Single Fix**
-   - Address the root cause identified
-   - ONE change at a time
-   - No "while I'm here" improvements
-   - No bundled refactoring
+Once it's red, shrink the repro to the **smallest scenario that still goes red**. Cut inputs, callers, config, data, and steps **one at a time**, re-running the loop after each cut — keep only what's load-bearing for the failure.
 
-3. **Verify Fix**
-   - Test passes now?
-   - No other tests broken?
-   - Issue actually resolved?
+Why bother: a minimal repro shrinks the hypothesis space in Phase 3 (fewer moving parts left to suspect) and becomes the clean regression test in Phase 5.
 
-4. **If Fix Doesn't Work**
-   - STOP
-   - Count: How many fixes have you tried?
-   - If < 3: Return to Phase 1, re-analyze with new information
-   - **If ≥ 3: STOP and question the architecture (step 5 below)**
-   - DON'T attempt Fix #4 without architectural discussion
+Done when **every remaining element is load-bearing** — removing any one of them makes the loop go green.
 
-5. **If 3+ Fixes Failed: Question Architecture**
+Do not proceed until you have reproduced **and** minimised.
 
-   **Pattern indicating architectural problem:**
-   - Each fix reveals new shared state/coupling/problem in different place
-   - Fixes require "massive refactoring" to implement
-   - Each fix creates new symptoms elsewhere
+## Phase 3 — Hypothesise
 
-   **STOP and question fundamentals:**
-   - Is this pattern fundamentally sound?
-   - Are we "sticking with it through sheer inertia"?
-   - Should we refactor architecture vs. continue fixing symptoms?
+Generate **3–5 ranked hypotheses** before testing any of them. Single-hypothesis generation anchors on the first plausible idea.
 
-   **Discuss with your human partner before attempting more fixes**
+Each hypothesis must be **falsifiable**: state the prediction it makes.
 
-   This is NOT a failed hypothesis - this is a wrong architecture.
+> Format: "If <X> is the cause, then <changing Y> will make the bug disappear / <changing Z> will make it worse."
 
-## Red Flags - STOP and Follow Process
+If you cannot state the prediction, the hypothesis is a vibe — discard or sharpen it.
+
+### Pattern Analysis — feed hypothesis generation
+
+Use these to *generate* and *sharpen* candidate hypotheses (not to replace the ranked list):
+
+1. **Find working examples.** Locate similar working code in the same codebase. What works that's similar to what's broken?
+2. **Compare against references.** If implementing a pattern, read the reference implementation **completely** — every line, not a skim — before applying.
+3. **Identify differences.** What's different between working and broken? List every difference, however small. Don't assume "that can't matter".
+4. **Understand dependencies.** What other components, settings, config, environment does this need? What assumptions does it make?
+
+Each difference you find is a candidate hypothesis. For bugs deep in the call stack, trace the bad value backward to its origin — see **`root-cause-tracing.md`** in this directory for the complete backward-tracing technique. Fix at the source, not at the symptom.
+
+### Show the ranked list to the user before testing
+
+They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it — proceed with your ranking if the user is AFK.
+
+## Phase 4 — Instrument
+
+Each probe must map to a specific prediction from Phase 3. **Change one variable at a time.**
+
+Tool preference:
+
+1. **Debugger / REPL inspection** if the env supports it. One breakpoint beats ten logs.
+2. **Targeted logs** at the boundaries that distinguish hypotheses.
+3. Never "log everything and grep".
+
+**Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single grep. Untagged logs survive; tagged logs die.
+
+**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
+
+When the bug involves waiting on a condition (timeouts, races, "it works if I add a sleep"), replace arbitrary timeouts with condition polling — see **`condition-based-waiting.md`** in this directory.
+
+## Phase 5 — Fix + regression test
+
+Write the regression test **before the fix** — but only if there is a **correct seam** for it.
+
+A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
+
+**If no correct seam exists, that itself is the finding.** Note it. The codebase architecture is preventing the bug from being locked down. Flag this for Phase 6.
+
+If a correct seam exists:
+
+1. Turn the minimised repro into a failing test at that seam.
+2. Watch it fail.
+3. Apply the fix — address the **root cause**, ONE change at a time. No "while I'm here" improvements, no bundled refactoring.
+4. Watch it pass.
+5. Re-run the Phase 1 feedback loop against the original (un-minimised) scenario.
+
+After finding the root cause, consider whether validation belongs at more than one layer — see **`defense-in-depth.md`** in this directory.
+
+### If the fix doesn't work — count your attempts
+
+- **STOP.** Count: how many fixes have you tried?
+- **If < 3:** return to Phase 3, re-rank hypotheses with the new information. Don't pile fixes on top.
+- **If ≥ 3:** STOP and **question the architecture**. Do not attempt fix #4 without an architectural discussion.
+
+**Pattern indicating an architectural problem:**
+- Each fix reveals new shared state / coupling / problem in a different place.
+- Fixes require "massive refactoring" to implement.
+- Each fix creates new symptoms elsewhere.
+
+**Then question fundamentals:** Is this pattern fundamentally sound? Are we sticking with it through sheer inertia? Should we refactor the architecture instead of continuing to fix symptoms? **Discuss with your human partner before attempting more fixes.** This is NOT a failed hypothesis — this is a wrong architecture.
+
+## Phase 6 — Cleanup + post-mortem
+
+Required before declaring done:
+
+- [ ] Original repro no longer reproduces (re-run the Phase 1 loop)
+- [ ] Regression test passes (or absence of a correct seam is documented)
+- [ ] All `[DEBUG-...]` instrumentation removed (`grep` the prefix)
+- [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
+- [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns
+
+**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling), hand off to the **improve-codebase-architecture** skill with the specifics. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.
+
+## Guardrails (always-on)
+
+These apply at every phase, not just at the end.
+
+### Red Flags — STOP and follow the process
 
 If you catch yourself thinking:
 - "Quick fix for now, investigate later"
@@ -223,74 +247,60 @@ If you catch yourself thinking:
 - "I don't fully understand but this might work"
 - "Pattern says X but I'll adapt it differently"
 - "Here are the main problems: [lists fixes without investigation]"
-- Proposing solutions before tracing data flow
+- Proposing solutions before building a feedback loop or tracing data flow
 - **"One more fix attempt" (when already tried 2+)**
-- **Each fix reveals new problem in different place**
+- **Each fix reveals new problem in a different place**
 
-**ALL of these mean: STOP. Return to Phase 1.**
+**ALL of these mean: STOP.** Return to Phase 1 (no loop yet) or Phase 3 (loop exists, no confirmed root cause).
 
-**If 3+ fixes failed:** Question the architecture (see Phase 4.5)
+**If 3+ fixes failed:** question the architecture (see Phase 5).
 
-## your human partner's Signals You're Doing It Wrong
+### Your human partner's signals you're doing it wrong
 
 **Watch for these redirections:**
-- "Is that not happening?" - You assumed without verifying
-- "Will it show us...?" - You should have added evidence gathering
-- "Stop guessing" - You're proposing fixes without understanding
-- "Ultra-think this" - Question fundamentals, not just symptoms
-- "We're stuck?" (frustrated) - Your approach isn't working
+- "Is that not happening?" — you assumed without verifying
+- "Will it show us...?" — you should have added evidence gathering
+- "Stop guessing" — you're proposing fixes without understanding
+- "Ultra-think this" — question fundamentals, not just symptoms
+- "We're stuck?" (frustrated) — your approach isn't working
 
 **When you see these:** STOP. Return to Phase 1.
 
-## Common Rationalizations
+### Common Rationalizations
 
 | Excuse | Reality |
 |--------|---------|
 | "Issue is simple, don't need process" | Simple issues have root causes too. Process is fast for simple bugs. |
 | "Emergency, no time for process" | Systematic debugging is FASTER than guess-and-check thrashing. |
 | "Just try this first, then investigate" | First fix sets the pattern. Do it right from the start. |
-| "I'll write test after confirming fix works" | Untested fixes don't stick. Test first proves it. |
+| "I'll read code to form a theory, then build a loop" | Backwards. No hypothesis without a feedback loop (Iron Law 1). |
+| "I'll write the test after confirming the fix works" | Untested fixes don't stick. Test-first proves it. |
 | "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
 | "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
-| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question pattern, don't fix again. |
+| "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question the pattern, don't fix again. |
 
-## Quick Reference
+### When the process reveals "no root cause"
 
-| Phase | Key Activities | Success Criteria |
-|-------|---------------|------------------|
-| **1. Root Cause** | Read errors, reproduce, check changes, gather evidence | Understand WHAT and WHY |
-| **2. Pattern** | Find working examples, compare | Identify differences |
-| **3. Hypothesis** | Form theory, test minimally | Confirmed or new hypothesis |
-| **4. Implementation** | Create test, fix, verify | Bug resolved, tests pass |
+If systematic investigation reveals the issue is truly environmental, timing-dependent, or external:
 
-## When Process Reveals "No Root Cause"
-
-If systematic investigation reveals issue is truly environmental, timing-dependent, or external:
-
-1. You've completed the process
-2. Document what you investigated
-3. Implement appropriate handling (retry, timeout, error message)
-4. Add monitoring/logging for future investigation
+1. You've completed the process.
+2. Document what you investigated.
+3. Implement appropriate handling (retry, timeout, error message).
+4. Add monitoring/logging for future investigation.
 
 **But:** 95% of "no root cause" cases are incomplete investigation.
 
-## Supporting Techniques
+## Supporting files
 
-These techniques are part of systematic debugging and available in this directory:
-
-- **`root-cause-tracing.md`** - Trace bugs backward through call stack to find original trigger
-- **`defense-in-depth.md`** - Add validation at multiple layers after finding root cause
-- **`condition-based-waiting.md`** - Replace arbitrary timeouts with condition polling
+In this directory:
+- **`root-cause-tracing.md`** — trace bugs backward through the call stack to the original trigger (Phase 3).
+- **`condition-based-waiting.md`** (+ `condition-based-waiting-example.ts`) — replace arbitrary timeouts with condition polling (Phase 4).
+- **`defense-in-depth.md`** — add validation at multiple layers after finding the root cause (Phase 5).
+- **`scripts/hitl-loop.template.sh`** — structured human-in-the-loop reproduction harness (Phase 1, last resort).
+- **`find-polluter.sh`** — locate a test that pollutes shared state for a later test.
 
 **Related skills:**
-- **superpowers:test-driven-development** - For creating failing test case (Phase 4, Step 1)
-- **superpowers:verification-before-completion** - Verify fix worked before claiming success
-
-## Real-World Impact
-
-From debugging sessions:
-- Systematic approach: 15-30 minutes to fix
-- Random fixes approach: 2-3 hours of thrashing
-- First-time fix rate: 95% vs 40%
-- New bugs introduced: Near zero vs common
+- **superpowers:test-driven-development** — for creating the failing regression test (Phase 5).
+- **superpowers:verification-before-completion** — verify the fix worked before claiming success.
+- **improve-codebase-architecture** — hand-off target when the post-mortem reveals an architectural cause (Phase 6).
