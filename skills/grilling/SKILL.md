@@ -8,3 +8,5 @@ Interview me relentlessly about every aspect of this plan until we reach a share
 Ask the questions one at a time, waiting for feedback on each question before continuing. Asking multiple questions at once is bewildering.
 
 If a question can be answered by exploring the codebase, explore the codebase instead.
+
+When a question requires explaining a piece of code first, format that explanation with `dmi-superpowers:say` (code-findings mode, explanatory beats only): say in plain terms what the code does and what is happening, paired with the exact file/function, then ask your question. Do not wrap the question itself in the four-beat — the question is your "Your call".
