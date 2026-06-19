@@ -1,7 +1,7 @@
 # Skill changes are verified by content-simulation in-session; live triggering is verified post-reinstall
 
 The runtime loads skills from the plugin cache
-(`~/.claude/plugins/cache/superpowers-dev/dmi-superpowers/<version>/skills/`), a copy of
+(`~/.claude/plugins/cache/dmi-marketplace/dmi-superpowers/<version>/skills/`), a copy of
 this repo populated at install time, and a session loads skills only at startup. So edits
 to `skills/` in the working tree are **not** invokable in the current session — not even by
 dispatched subagents, which inherit the parent session's already-loaded skills.
