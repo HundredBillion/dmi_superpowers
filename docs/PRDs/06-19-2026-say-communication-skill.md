@@ -35,20 +35,32 @@ strips out the anchors a developer needs to act.
 | # | Decision |
 |---|----------|
 | 1 | One skill, **two modes**: code-findings mode and general-prose mode. |
-| 2 | Slug = `say`; replaces the personal global `/say` command. |
+| 2 | Slug = `say`; replaces the personal global `/say` command via **clean cutover** (delete it, no shim). |
 | 3 | Standalone-invokable **and** referenced by other skills (like `tdd`, `brainstorming`). |
-| 4 | Code-findings mode follows a fixed **four-beat** structure. |
+| 4 | `say` is a **communication style layered onto each skill**, not a rigid template. Four-beat is its full form; grilling uses only the explanatory beats. |
 | 5 | Governing principle for code findings: **pair, don't pick** — every finding carries both registers. |
-| 6 | General-prose mode is **plain-only** (no technical register), audience = non-developer. |
-| 7 | Wire `grilling`, `grill-with-docs`, `systematic-debugging` to reference `say`. |
-| 8 | Built using the `writing-skills` skill. |
+| 6 | General-prose mode is **plain-only** (no code-level detail), readable by a non-developer. |
+| 7 | **Audience/destination selects the mode**, not subject matter. |
+| 8 | Wire `grilling`, `grill-with-docs`, `systematic-debugging` via an **imperative reference at the exact reporting moment** — no inline duplication. |
+| 9 | Built using the `writing-skills` skill. |
 
 ## 4. Two modes
 
+`say` is a **communication style layered onto each skill**, not a rigid template each
+skill must adopt wholesale. Each referenced skill keeps its own structure and invokes
+`say` only at the moment it communicates about code. Concretely:
+
+- **systematic-debugging** reports *findings* (root cause, hypothesis) → uses the full
+  **four-beat**.
+- **grilling / grill-with-docs** ask *questions* → "Your call" is already the question
+  itself, so the four-beat would collapse. They use only the **explanatory beats**
+  (beats 2–3: "what this code does" / "what's happening", paired registers) to set up a
+  question, then their own question-and-recommended-answer format takes over.
+
 ### 4a. Code-findings mode
 
-Active when explaining something about code — during `grilling` / `grill-with-docs` /
-`systematic-debugging`, or when invoked standalone on a finding. Every finding follows
+Active when explaining something about code *to the developer, in-session, so they can
+decide* — during `systematic-debugging` (or standalone on a finding). The full form is
 this four-beat structure:
 
 1. **Headline** — the plain-language bottom line: what it means for the product/user.
@@ -86,7 +98,23 @@ Active when drafting/rewriting a message addressed to a human (Slack, Jira, PR, 
 High-level, non-technical prose a non-developer understands. Carries forward `/say`'s ten
 plain-language rules as its foundation (write for the reader, main point first, active
 voice, short sentences, common words, no hidden verbs, define jargon, cut hedging,
-concrete over abstract, read it aloud). **No technical register** — keep it high-level.
+concrete over abstract, read it aloud).
+
+**"No technical register" means no code-level detail** — no file / function / line
+numbers, no `charge()`-style anchors. It does **not** mean omitting scope or impact:
+which systems are affected, what you're doing, and what the reader should do are *content*
+the reader needs and stay in.
+
+**Worked example** — a rough braindump rewritten for a team Slack channel:
+
+> *Input:* "i found a bug in krypton and i'm fixing it now but there's a chance that it
+> will impact argon, and helium"
+>
+> *Output:* **Heads up:** I found a bug in Krypton and I'm fixing it now. There's a chance
+> the fix touches Argon and Helium too — I'll flag here if either is affected. No action
+> needed from anyone yet.
+
+(Argon and Helium stay — naming the affected systems is content, not jargon.)
 
 Input/output behavior is inherited from today's `/say`:
 - Brief/topic → generate a fresh draft. Existing text → rewrite in place.
@@ -107,20 +135,34 @@ technical actions. Both are served at once.
 
 ## 6. Mode selection
 
-The skill picks by output type:
-- *A finding about code* → code-findings mode.
-- *A message addressed to a person* → general-prose mode.
+**Audience/destination selects the mode, not subject matter.** *Where the message is
+going* decides — not what it is about:
+- *Explaining to the developer, in-session, to decide on* → code-findings mode (four-beat,
+  paired registers).
+- *A message addressed to a person on a human channel* (Slack/Jira/PR/email) →
+  general-prose mode — **even when its subject is a bug**. The Krypton example in §4b is
+  about a bug, yet it routes to prose mode because it is sent to a channel.
 
-When ambiguous, it asks one short clarifying question (mirroring how `/say` handles
-unclear input today).
+When genuinely ambiguous, the skill asks one short clarifying question (mirroring how
+`/say` handles unclear input today).
 
 ## 7. Integration / wiring
 
 - New `skills/say/SKILL.md`, authored using the `writing-skills` skill.
-- Add one reference line to each of `grilling`, `grill-with-docs`, and
-  `systematic-debugging` SKILL.md, pointing to `say` as the communication style for
-  reporting findings to the user. This is light-touch: `grilling` is only ~10 lines and
-  takes a single added line cleanly.
+- Wire each of `grilling`, `grill-with-docs`, and `systematic-debugging` with an
+  **imperative reference placed at the exact moment a finding is reported** — not a soft
+  "see also." Worded as a hard instruction, e.g. *"When you report a root cause or
+  hypothesis to the user, format it with `dmi-superpowers:say`."* Anchor points:
+  - `systematic-debugging`: the root-cause report, and any hypothesis presented for a decision.
+  - `grilling` / `grill-with-docs`: the code explanation that sets up a question (not the
+    running commentary). `grilling` is ~10 lines and takes a single added line cleanly.
+- **The boundary for when the imperative fires:** *understand-or-decide vs.
+  status-narration.* If the message tells the user something about the code they must grasp
+  or decide on → use `say`. If it just narrates what the agent is doing ("running tests",
+  "reading the file") → don't.
+- **No inline duplication.** `say` is the single source of truth; the skills reference it.
+  If the imperative reference proves flaky in practice, the fallback (deferred, not in this
+  PRD) is a short inline echo in each skill. See ADR 0001.
 - Register the skill in the README inventory (currently "22 skills" → 23) and any other
   manifest that lists skills.
 
@@ -130,7 +172,15 @@ explicitly covers them").
 
 ## 8. Deprecating `/say`
 
-Delete `~/.claude/commands/say.md` once `dmi-superpowers:say` covers both modes.
+**Clean cutover.** Delete `~/.claude/commands/say.md` once `dmi-superpowers:say` covers
+both modes. After cutover, invoke the skill via `/dmi-superpowers:say` or rely on
+auto-trigger; the bare `/say` command goes away (whether a bare `/say` *alias* to the skill
+survives is a Claude Code behaviour we did not rely on).
+
+**No shim.** We explicitly rejected replacing `~/.claude/commands/say.md` with a one-line
+delegating stub. The `/say` command originates from another author; overwriting it to
+delegate would clobber their work. We leave the original `/say` concept untouched for
+anyone else and simply stop using our local copy.
 
 ⚠️ **Out-of-repo step.** That file lives in David's personal global `~/.claude`, not in
 this repository. Its deletion is a manual step flagged at hand-off — it is **not** a
