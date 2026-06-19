@@ -17,7 +17,7 @@
 - PRD/TSP doc paths: `docs/PRDs/MM-DD-YYYY-<topic>.md` and `docs/TSPs/MM-DD-YYYY-<feature>.md`.
 - Version reset to `0.1.0` across all 7 manifests listed in `.version-bump.json`.
 - Author metadata → `David Lee <dalee@dminc.com>`; homepage/repository → DMI's repo URL (placeholder `https://github.com/dminc/dmi_superpowers` until confirmed).
-- Final skill inventory = exactly 21 skills (see PRD §5).
+- Final skill inventory = exactly 22 skills (see PRD §5): 14 superpowers directories (incl. `dispatching-parallel-agents`, `test-driven-development` with Matt's content, and the merged `systematic-debugging`) + 8 added Matt directories.
 - Commit after every task. Use `git -c user.name="David Lee" -c user.email="dalee@dminc.com"`.
 - DO NOT copy: upstream `.git`, `docs/` (upstream specs/plans/notes), `evals/`, `node_modules/`, `tests/` (eval harness is out of scope per PRD §10).
 
@@ -30,7 +30,7 @@
 - Create (in target): the above, minus exclusions in Global Constraints
 
 **Interfaces:**
-- Produces: a working tree under `dmi_superpowers/` containing all 15 superpowers skills, packaging, hooks, scripts — still un-rebranded. Later tasks mutate this in place.
+- Produces: a working tree under `dmi_superpowers/` containing all 14 superpowers skills, packaging, hooks, scripts — still un-rebranded. Later tasks mutate this in place.
 
 - [ ] **Step 1: Write the check** — define what "base copied" means.
 
@@ -69,7 +69,7 @@ rm -rf ./tests
 - [ ] **Step 4: Run check to confirm it passes**
 
 Run the check from Step 1. Expected: `PASS`.
-Also confirm 15 skills copied: `ls skills | wc -l` → expect `15`.
+Also confirm 14 skills copied: `ls skills | wc -l` → expect `14`.
 
 - [ ] **Step 5: Commit**
 
@@ -136,7 +136,7 @@ git add -A && git -c user.name="David Lee" -c user.email="dalee@dminc.com" \
 - Source: `matt_pocock_skills/skills/engineering/*` (7 of them) and `matt_pocock_skills/skills/productivity/grilling`
 
 **Interfaces:**
-- Produces: 8 new skill directories. Combined with the 11 kept + 1 merged + test-driven-development, this completes the 21-skill inventory.
+- Produces: 8 new skill directories. Combined with the 14 superpowers directories from Task 1 (incl. the swapped `test-driven-development` and merged `systematic-debugging`), this completes the 22-skill inventory.
 
 - [ ] **Step 1: Write the check**
 
@@ -166,9 +166,9 @@ rsync -a "$MPROD/grilling/" "skills/grilling/"
 
 - [ ] **Step 4: Run check to confirm it passes**
 
-Run Step 1 check → `PASS`. Confirm total inventory: `ls skills | wc -l` → expect `23` (15 base + 8 added; the merge in Task 4 will remove `diagnosing-bugs` isn't present, so see note). 
+Run Step 1 check → `PASS`. Confirm total inventory: `ls skills | wc -l` → expect `22` (14 base + 8 added).
 
-> **Note on count:** base has 15 skills incl. `test-driven-development` and `systematic-debugging`. Adding 8 = 23 directories. Final target is 21 *logical* skills because `test-driven-development` now holds Matt's TDD (1 dir, counted once) and `systematic-debugging` is the merge (1 dir). The 23-vs-21 difference is because PRD §5 counts `tdd` as "from Matt" replacing superpowers' TDD (same single directory). **Directory count after this task = 23; no directories are removed later.** PRD §5's "21" counts the swapped TDD once. This is expected — verify by directory list, not arithmetic.
+> **Note on count:** the base copied 14 superpowers skill directories (Task 1). Adding 8 Matt directories = 22 directories total, which equals the 22 logical skills in PRD §5. Matt's `tdd` does NOT become a new directory — its content was swapped into the existing `test-driven-development` dir in Task 2. No directories are removed in later tasks.
 
 - [ ] **Step 5: Commit**
 
@@ -451,7 +451,7 @@ git add -A && git -c user.name="David Lee" -c user.email="dalee@dminc.com" \
 **Files (modify):** `README.md`, `CLAUDE.md`, `AGENTS.md` (symlink — verify target), `RELEASE-NOTES.md`, `GEMINI.md`, `package.json` (`name` field), `gemini-extension.json` (`contextFileName` stays `GEMINI.md`).
 
 **Interfaces:**
-- Produces: top-level docs that describe dmi_superpowers (purpose, install, the PRD/TSP workflow, the 21 skills), with upstream-specific governance (94%-rejection PR policy, Prime Radiant sales) removed or replaced.
+- Produces: top-level docs that describe dmi_superpowers (purpose, install, the PRD/TSP workflow, the 22 skills), with upstream-specific governance (94%-rejection PR policy, Prime Radiant sales) removed or replaced.
 
 - [ ] **Step 1: Write the check**
 
@@ -468,7 +468,7 @@ Expected: `FAIL` (README is upstream superpowers').
 
 - [ ] **Step 3: Rewrite the docs**
 
-- `README.md`: replace with a dmi_superpowers overview — what it is, the PRD→TSP→TDD workflow, the 21 skills (table grouped: kept / swapped / added / merged), multi-harness install commands rebranded, and a pointer to `docs/PRDs/`. Remove Prime Radiant commercial blurb.
+- `README.md`: replace with a dmi_superpowers overview — what it is, the PRD→TSP→TDD workflow, the 22 skills (table grouped: kept / swapped / added / merged), multi-harness install commands rebranded, and a pointer to `docs/PRDs/`. Remove Prime Radiant commercial blurb.
 - `CLAUDE.md` / `AGENTS.md`: replace upstream contributor governance with dmi's own (or trim to a short "this is a personal/DMI skills repo" note). If `AGENTS.md` is a symlink to `CLAUDE.md`, leave the symlink.
 - `RELEASE-NOTES.md`: reset to a single `v0.1.0 — initial dmi_superpowers consolidation` entry.
 - `package.json`: set `name`→`dmi-superpowers` (Task 7 may have done this; confirm).
@@ -493,18 +493,18 @@ git add -A && git -c user.name="David Lee" -c user.email="dalee@dminc.com" \
 **Interfaces:**
 - Consumes: the whole repo. Produces: a green end-to-end verification.
 
-- [ ] **Step 1: Skill inventory present (23 dirs / 21 logical skills)**
+- [ ] **Step 1: Skill inventory present (22 dirs / 22 logical skills)**
 
 ```bash
 ls skills | sort | tee /tmp/skills.txt
-ls skills | wc -l    # expect 23 directories
-# Confirm the four PRD-named groups exist:
+ls skills | wc -l    # expect 22 directories
+# Confirm all 22 expected skills exist:
 for s in brainstorming writing-plans executing-plans subagent-driven-development \
-  requesting-code-review receiving-code-review finishing-a-development-branch \
-  using-git-worktrees verification-before-completion writing-skills using-superpowers \
-  systematic-debugging test-driven-development codebase-design domain-modeling \
-  improve-codebase-architecture prototype resolving-merge-conflicts to-prd \
-  grill-with-docs grilling; do
+  dispatching-parallel-agents requesting-code-review receiving-code-review \
+  finishing-a-development-branch using-git-worktrees verification-before-completion \
+  writing-skills using-superpowers systematic-debugging test-driven-development \
+  codebase-design domain-modeling improve-codebase-architecture prototype \
+  resolving-merge-conflicts to-prd grill-with-docs grilling; do
   test -d "skills/$s" || echo "MISSING: $s"
 done
 ```
