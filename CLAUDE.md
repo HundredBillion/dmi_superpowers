@@ -14,5 +14,5 @@ This is David Lee's (DMI) personal consolidation of the superpowers plugin and M
 ## General
 
 - Branch for active work: `consolidation`
-- Skill namespace: `superpowers:` (kept for harness compatibility)
+- Skill namespace: `dmi-superpowers:` (rebranded from upstream `superpowers:`)
 - 22 skills total — see README for the full inventory
