@@ -379,7 +379,8 @@ git add -A && git -c user.name="David Lee" -c user.email="dalee@dminc.com" \
 
 ```bash
 # No 'superpowers:' namespace refs remain in skills (brand-name prose mentions are fine, but the colon form must be gone):
-! grep -rn 'superpowers:' skills hooks .pi .opencode && \
+# NOTE: plain 'superpowers:' also matches 'dmi-superpowers:' as a substring — must exclude the dmi- prefix.
+! grep -rnE '(^|[^-])superpowers:' skills hooks .pi .opencode && \
 jq -e '.name=="dmi-superpowers" and .version=="0.1.0"' .claude-plugin/plugin.json >/dev/null && \
 echo "PASS" || echo "FAIL"
 ```
@@ -392,17 +393,20 @@ Expected: `FAIL` (many `superpowers:` refs; plugin.json name still `superpowers`
 
 ```bash
 cd /Users/davidlee/Projects/dmi_superpowers
-# Replace the namespaced skill refs everywhere they appear (colon form only — safe):
-grep -rl 'superpowers:' skills hooks .pi .opencode | while read -r f; do
-  perl -pi -e 's/\bsuperpowers:/dmi-superpowers:/g' "$f"
+# Replace the bare upstream namespace with dmi-superpowers.
+# CRITICAL: use a negative lookbehind (?<!-) so we do NOT match the 'superpowers:'
+# already inside existing 'dmi-superpowers:' refs (Task 6 added some) — otherwise
+# they corrupt to 'dmi-dmi-superpowers:'. Select files with the same anchored pattern.
+grep -rlE '(^|[^-])superpowers:' skills hooks .pi .opencode | while read -r f; do
+  perl -pi -e 's/(?<!-)superpowers:/dmi-superpowers:/g' "$f"
 done
-# Normalize Matt's bare slash refs to the namespaced form (in the 9 added skills):
-for s in tdd improve-codebase-architecture grill-with-docs; do
+# Normalize Matt's bare slash refs to the namespaced form (in the added skills that use them):
+for s in test-driven-development improve-codebase-architecture grill-with-docs; do
   perl -pi -e 's{(?<![\w-])/(codebase-design|domain-modeling|grilling)\b}{dmi-superpowers:$1}g' "skills/$s/SKILL.md" 2>/dev/null || true
 done
 ```
 
-> Handle `dmi-superpowers:code-reviewer` and `dmi-superpowers:skill-name`: `code-reviewer` is an agent reference — confirm whether dmi ships that agent; if not, leave the rebranded ref but note it in Task 9. `skill-name` is a placeholder in `writing-skills` examples — leave as-is (now `dmi-superpowers:skill-name`).
+> `code-reviewer` is only a template *filename* (`requesting-code-review/code-reviewer.md`), NOT a namespaced skill/agent — there is no `superpowers:code-reviewer` token to rebrand, so leave those file references alone. `skill-name` in `writing-skills` examples is a placeholder — after the rebrand it reads `dmi-superpowers:skill-name`, which is fine.
 
 - [ ] **Step 3b: Update the 7 manifests + version**
 
@@ -435,7 +439,7 @@ git mv .opencode/plugins/superpowers.js .opencode/plugins/dmi-superpowers.js
 
 - [ ] **Step 4: Run check to confirm it passes**
 
-Run Step 1 check → `PASS`. Spot-check: `grep -rn 'superpowers:' .pi .opencode` returns nothing; `jq .version .claude-plugin/plugin.json` → `"0.1.0"`.
+Run Step 1 check → `PASS`. Spot-check: `grep -rnE '(^|[^-])superpowers:' .pi .opencode` returns nothing; `jq .version .claude-plugin/plugin.json` → `"0.1.0"`.
 
 - [ ] **Step 5: Commit**
 
@@ -523,7 +527,7 @@ done
 - [ ] **Step 3: No stale vocabulary or namespace leaks**
 
 ```bash
-! grep -rn 'superpowers:' skills hooks .pi .opencode && echo "namespace clean"
+! grep -rnE '(^|[^-])superpowers:' skills hooks .pi .opencode && echo "namespace clean"
 ! grep -rn 'docs/superpowers/' skills && echo "paths clean"
 ```
 
