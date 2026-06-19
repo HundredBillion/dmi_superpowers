@@ -230,7 +230,7 @@ Required before declaring done:
 - [ ] Throwaway prototypes deleted (or moved to a clearly-marked debug location)
 - [ ] The hypothesis that turned out correct is stated in the commit / PR message — so the next debugger learns
 
-**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling), hand off to the **improve-codebase-architecture** skill with the specifics. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.
+**Then ask: what would have prevented this bug?** If the answer involves architectural change (no good test seam, tangled callers, hidden coupling), hand off to the **dmi-superpowers:improve-codebase-architecture** skill with the specifics. Make the recommendation **after** the fix is in, not before — you have more information now than when you started.
 
 ## Guardrails (always-on)
 
@@ -303,4 +303,4 @@ In this directory:
 **Related skills:**
 - **dmi-superpowers:test-driven-development** — for creating the failing regression test (Phase 5).
 - **dmi-superpowers:verification-before-completion** — verify the fix worked before claiming success.
-- **improve-codebase-architecture** — hand-off target when the post-mortem reveals an architectural cause (Phase 6).
+- **dmi-superpowers:improve-codebase-architecture** — hand-off target when the post-mortem reveals an architectural cause (Phase 6).

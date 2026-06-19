@@ -109,7 +109,7 @@ digraph brainstorming {
 - Write the validated design (PRD) to `docs/PRDs/MM-DD-YYYY-<topic>.md`
   - (User preferences for PRD location override this default)
 - Use elements-of-style:writing-clearly-and-concisely skill if available
-- Commit the design document to git
+- Commit the PRD to git
 
 **PRD Self-Review:**
 After writing the PRD, look at it with fresh eyes:

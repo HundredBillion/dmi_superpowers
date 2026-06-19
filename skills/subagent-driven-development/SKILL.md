@@ -169,7 +169,7 @@ final whole-branch review. When you fill a reviewer template:
   ignore or not flag a specific issue. If you believe a finding would be a
   false positive, let the reviewer raise it and adjudicate it in the review
   loop. If the prompt you are writing contains "do not flag," "don't treat X
-  as a defect," "at most Minor," or "the plan chose" — stop: you are
+  as a defect," "at most Minor," or "the TSP chose" — stop: you are
   pre-judging, usually to spare yourself a review loop.
 - The global-constraints block you hand the reviewer is its attention
   lens. Copy the binding requirements verbatim from the TSP's Global
