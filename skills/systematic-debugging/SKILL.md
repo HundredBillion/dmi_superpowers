@@ -173,6 +173,8 @@ Each difference you find is a candidate hypothesis. For bugs deep in the call st
 
 They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it — proceed with your ranking if the user is AFK.
 
+**When you present the ranked hypotheses to the user, format each with `dmi-superpowers:say` (code-findings mode):** plain headline, what the suspect code does, and the *Plain* / *Technical* split — so the user can re-rank on meaning, not jargon.
+
 ## Phase 4 — Instrument
 
 Each probe must map to a specific prediction from Phase 3. **Change one variable at a time.**
@@ -196,6 +198,8 @@ Write the regression test **before the fix** — but only if there is a **correc
 A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
 
 **If no correct seam exists, that itself is the finding.** Note it. The codebase architecture is preventing the bug from being locked down. Flag this for Phase 6.
+
+**When you report the confirmed root cause to the user, format it with `dmi-superpowers:say` (the full four-beat):** Headline → What this code does → What's wrong (*Plain* / *Technical*, naming the exact file/function/lines) → Your call. This is a finding the user must understand and decide on — not status narration.
 
 If a correct seam exists:
 
