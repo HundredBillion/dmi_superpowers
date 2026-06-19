@@ -10,7 +10,7 @@ Add superpowers to the `plugin` array in your `opencode.json` (global or project
 
 ```json
 {
-  "plugin": ["superpowers@git+https://github.com/obra/superpowers.git"]
+  "plugin": ["dmi-superpowers@git+https://github.com/dminc/dmi_superpowers.git"]
 }
 ```
 
@@ -28,7 +28,7 @@ If you previously installed superpowers using `git clone` and symlinks, remove t
 
 ```bash
 # Remove old symlinks
-rm -f ~/.config/opencode/plugins/superpowers.js
+rm -f ~/.config/opencode/plugins/dmi-superpowers.js
 rm -rf ~/.config/opencode/skills/superpowers
 
 # Optionally remove the cloned repo
@@ -59,7 +59,7 @@ To pin a specific version:
 
 ```json
 {
-  "plugin": ["superpowers@git+https://github.com/obra/superpowers.git#v5.0.3"]
+  "plugin": ["dmi-superpowers@git+https://github.com/dminc/dmi_superpowers.git#v0.1.0"]
 }
 ```
 
@@ -80,14 +80,14 @@ the plugin, try installing with system npm and pointing OpenCode at the local
 package:
 
 ```powershell
-npm install superpowers@git+https://github.com/obra/superpowers.git --prefix "$HOME\.config\opencode"
+npm install dmi-superpowers@git+https://github.com/dminc/dmi_superpowers.git --prefix "$HOME\.config\opencode"
 ```
 
 Then use the installed package path in `opencode.json`:
 
 ```json
 {
-  "plugin": ["~/.config/opencode/node_modules/superpowers"]
+  "plugin": ["~/.config/opencode/node_modules/dmi-superpowers"]
 }
 ```
 
@@ -111,5 +111,5 @@ Skills speak in actions ("create a todo", "dispatch a subagent", "read a file").
 
 ## Getting Help
 
-- Report issues: https://github.com/obra/superpowers/issues
-- Full documentation: https://github.com/obra/superpowers/blob/main/docs/README.opencode.md
+- Report issues: https://github.com/dminc/dmi_superpowers/issues
+- Full documentation: https://github.com/dminc/dmi_superpowers/blob/main/docs/README.opencode.md
