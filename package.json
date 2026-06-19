@@ -1,9 +1,9 @@
 {
-  "name": "superpowers",
-  "version": "6.0.3",
+  "name": "dmi-superpowers",
+  "version": "0.1.0",
   "description": "Superpowers skills and runtime bootstrap for coding agents",
   "type": "module",
-  "main": ".opencode/plugins/superpowers.js",
+  "main": ".opencode/plugins/dmi-superpowers.js",
   "keywords": [
     "pi-package",
     "skills",
@@ -14,10 +14,16 @@
   ],
   "pi": {
     "extensions": [
-      "./.pi/extensions/superpowers.ts"
+      "./.pi/extensions/dmi-superpowers.ts"
     ],
     "skills": [
       "./skills"
     ]
-  }
+  },
+  "author": {
+    "name": "David Lee",
+    "email": "dalee@dminc.com"
+  },
+  "homepage": "https://github.com/dminc/dmi_superpowers",
+  "repository": "https://github.com/dminc/dmi_superpowers"
 }

@@ -1,13 +1,13 @@
 {
-  "name": "superpowers",
-  "description": "Core skills library for Claude Code: TDD, debugging, collaboration patterns, and proven techniques",
-  "version": "6.0.3",
+  "name": "dmi-superpowers",
+  "description": "DMI core skills library: brainstorm→PRD→TSP→TDD workflow, merged debugging, collaboration patterns",
+  "version": "0.1.0",
   "author": {
-    "name": "Jesse Vincent",
-    "email": "jesse@fsck.com"
+    "name": "David Lee",
+    "email": "dalee@dminc.com"
   },
-  "homepage": "https://github.com/obra/superpowers",
-  "repository": "https://github.com/obra/superpowers",
+  "homepage": "https://github.com/dminc/dmi_superpowers",
+  "repository": "https://github.com/dminc/dmi_superpowers",
   "license": "MIT",
   "keywords": [
     "skills",

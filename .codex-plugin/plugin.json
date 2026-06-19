@@ -1,14 +1,13 @@
 {
-  "name": "superpowers",
-  "version": "6.0.3",
+  "name": "dmi-superpowers",
+  "version": "0.1.0",
   "description": "An agentic skills framework & software development methodology that works: planning, TDD, debugging, and collaboration workflows.",
   "author": {
-    "name": "Jesse Vincent",
-    "email": "jesse@fsck.com",
-    "url": "https://github.com/obra"
+    "name": "David Lee",
+    "email": "dalee@dminc.com"
   },
-  "homepage": "https://github.com/obra/superpowers",
-  "repository": "https://github.com/obra/superpowers",
+  "homepage": "https://github.com/dminc/dmi_superpowers",
+  "repository": "https://github.com/dminc/dmi_superpowers",
   "license": "MIT",
   "keywords": [
     "brainstorming",

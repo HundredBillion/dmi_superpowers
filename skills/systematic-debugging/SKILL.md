@@ -301,6 +301,6 @@ In this directory:
 - **`find-polluter.sh`** — locate a test that pollutes shared state for a later test.
 
 **Related skills:**
-- **superpowers:test-driven-development** — for creating the failing regression test (Phase 5).
-- **superpowers:verification-before-completion** — verify the fix worked before claiming success.
+- **dmi-superpowers:test-driven-development** — for creating the failing regression test (Phase 5).
+- **dmi-superpowers:verification-before-completion** — verify the fix worked before claiming success.
 - **improve-codebase-architecture** — hand-off target when the post-mortem reveals an architectural cause (Phase 6).
