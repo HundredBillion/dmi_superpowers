@@ -1,7 +1,7 @@
 {
   "name": "dmi-superpowers",
   "description": "DMI core skills library: brainstorm→PRD→TSP→TDD workflow, merged debugging, collaboration patterns",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "David Lee",
     "email": "dalee@dminc.com"

@@ -1,6 +1,6 @@
 {
   "name": "dmi-superpowers",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Superpowers skills and runtime bootstrap for coding agents",
   "type": "module",
   "main": ".opencode/plugins/dmi-superpowers.js",
