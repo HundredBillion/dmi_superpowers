@@ -1,0 +1,29 @@
+{
+  "name": "dmi-superpowers",
+  "version": "0.1.0",
+  "description": "Superpowers skills and runtime bootstrap for coding agents",
+  "type": "module",
+  "main": ".opencode/plugins/dmi-superpowers.js",
+  "keywords": [
+    "pi-package",
+    "skills",
+    "tdd",
+    "debugging",
+    "collaboration",
+    "workflow"
+  ],
+  "pi": {
+    "extensions": [
+      "./.pi/extensions/dmi-superpowers.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
+  "author": {
+    "name": "David Lee",
+    "email": "dalee@dminc.com"
+  },
+  "homepage": "https://github.com/HundredBillion/dmi_superpowers",
+  "repository": "https://github.com/HundredBillion/dmi_superpowers"
+}

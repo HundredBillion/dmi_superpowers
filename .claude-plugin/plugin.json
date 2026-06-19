@@ -1,0 +1,20 @@
+{
+  "name": "dmi-superpowers",
+  "description": "DMI core skills library: brainstorm→PRD→TSP→TDD workflow, merged debugging, collaboration patterns",
+  "version": "0.1.0",
+  "author": {
+    "name": "David Lee",
+    "email": "dalee@dminc.com"
+  },
+  "homepage": "https://github.com/HundredBillion/dmi_superpowers",
+  "repository": "https://github.com/HundredBillion/dmi_superpowers",
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "tdd",
+    "debugging",
+    "collaboration",
+    "best-practices",
+    "workflows"
+  ]
+}

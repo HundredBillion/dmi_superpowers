@@ -56,13 +56,13 @@ Two layers of change across the 8 superpowers SKILL.md files that mention these 
 - **Prose/vocabulary:** "spec" → "PRD", "plan" → "TSP" in bodies, checklists, and the
   embedded flow diagrams (graphviz node labels).
 
-## 5. Final skill inventory (21 skills)
+## 5. Final skill inventory (22 skills)
 
-### From superpowers — kept (11)
+### From superpowers — kept (12)
 `using-superpowers` (bootstrap), `brainstorming`, `writing-plans`, `executing-plans`,
-`subagent-driven-development`, `requesting-code-review`, `receiving-code-review`,
-`finishing-a-development-branch`, `using-git-worktrees`, `verification-before-completion`,
-`writing-skills`.
+`subagent-driven-development`, `dispatching-parallel-agents`, `requesting-code-review`,
+`receiving-code-review`, `finishing-a-development-branch`, `using-git-worktrees`,
+`verification-before-completion`, `writing-skills`.
 
 ### Merged (1)
 `systematic-debugging` — superpowers' skill with Matt's `diagnosing-bugs` folded in
@@ -167,7 +167,7 @@ Keep all of superpowers' multi-harness machinery: `.claude-plugin/`, `.codex-plu
 
 - `dmi_superpowers` installs as a plugin and the session-start bootstrap loads
   `using-superpowers` (rebranded).
-- All 21 skills present; every internal cross-reference resolves within the repo.
+- All 22 skills present; every internal cross-reference resolves within the repo.
 - No occurrence of the old `superpowers:` namespace or `spec`/`plan` doc-path vocabulary
   remains except where intentionally quoted.
 - The brainstorming → grill → writing-plans → grill → implementation chain invokes
