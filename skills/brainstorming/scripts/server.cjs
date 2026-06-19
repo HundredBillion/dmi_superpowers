@@ -244,7 +244,7 @@ function brandMarkup() {
   const text = 'dmi-superpowers v' + version;
   const logo = '';
 
-  return '<div class="brand"><a href="https://github.com/dminc/dmi_superpowers">' + logo + '<span class="brand-copy">' + text + '</span></a></div>';
+  return '<div class="brand"><a href="https://github.com/HundredBillion/dmi_superpowers">' + logo + '<span class="brand-copy">' + text + '</span></a></div>';
 }
 
 function renderBranding(html) {

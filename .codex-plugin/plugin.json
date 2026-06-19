@@ -6,8 +6,8 @@
     "name": "David Lee",
     "email": "dalee@dminc.com"
   },
-  "homepage": "https://github.com/dminc/dmi_superpowers",
-  "repository": "https://github.com/dminc/dmi_superpowers",
+  "homepage": "https://github.com/HundredBillion/dmi_superpowers",
+  "repository": "https://github.com/HundredBillion/dmi_superpowers",
   "license": "MIT",
   "keywords": [
     "brainstorming",
@@ -36,7 +36,7 @@
       "I've got an idea for something I'd like to build.",
       "Let's add a feature to this project."
     ],
-    "websiteURL": "https://github.com/dminc/dmi_superpowers",
+    "websiteURL": "https://github.com/HundredBillion/dmi_superpowers",
     "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
     "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
     "brandColor": "#F59E0B",

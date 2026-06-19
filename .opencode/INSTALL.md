@@ -10,7 +10,7 @@ Add superpowers to the `plugin` array in your `opencode.json` (global or project
 
 ```json
 {
-  "plugin": ["dmi-superpowers@git+https://github.com/dminc/dmi_superpowers.git"]
+  "plugin": ["dmi-superpowers@git+https://github.com/HundredBillion/dmi_superpowers.git"]
 }
 ```
 
@@ -59,7 +59,7 @@ To pin a specific version:
 
 ```json
 {
-  "plugin": ["dmi-superpowers@git+https://github.com/dminc/dmi_superpowers.git#v0.1.0"]
+  "plugin": ["dmi-superpowers@git+https://github.com/HundredBillion/dmi_superpowers.git#v0.1.0"]
 }
 ```
 
@@ -80,7 +80,7 @@ the plugin, try installing with system npm and pointing OpenCode at the local
 package:
 
 ```powershell
-npm install dmi-superpowers@git+https://github.com/dminc/dmi_superpowers.git --prefix "$HOME\.config\opencode"
+npm install dmi-superpowers@git+https://github.com/HundredBillion/dmi_superpowers.git --prefix "$HOME\.config\opencode"
 ```
 
 Then use the installed package path in `opencode.json`:
@@ -111,5 +111,5 @@ Skills speak in actions ("create a todo", "dispatch a subagent", "read a file").
 
 ## Getting Help
 
-- Report issues: https://github.com/dminc/dmi_superpowers/issues
-- Full documentation: https://github.com/dminc/dmi_superpowers/blob/main/docs/README.opencode.md
+- Report issues: https://github.com/HundredBillion/dmi_superpowers/issues
+- Full documentation: https://github.com/HundredBillion/dmi_superpowers/blob/main/docs/README.opencode.md

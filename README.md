@@ -70,14 +70,14 @@ Install dmi-superpowers separately for each harness you use.
 Or from this repository directly:
 
 ```bash
-/plugin marketplace add dminc/dmi_superpowers
+/plugin marketplace add HundredBillion/dmi_superpowers
 /plugin install dmi-superpowers@dmi-superpowers-marketplace
 ```
 
 ### Antigravity
 
 ```bash
-agy plugin install https://github.com/dminc/dmi_superpowers
+agy plugin install https://github.com/HundredBillion/dmi_superpowers
 ```
 
 ### Codex CLI
@@ -93,7 +93,7 @@ agy plugin install https://github.com/dminc/dmi_superpowers
 ### Gemini CLI
 
 ```bash
-gemini extensions install https://github.com/dminc/dmi_superpowers
+gemini extensions install https://github.com/HundredBillion/dmi_superpowers
 ```
 
 Update later:
@@ -105,7 +105,7 @@ gemini extensions update dmi-superpowers
 ### Kimi Code
 
 ```text
-/plugins install https://github.com/dminc/dmi_superpowers
+/plugins install https://github.com/HundredBillion/dmi_superpowers
 ```
 
 Detailed docs: [docs/README.kimi.md](docs/README.kimi.md)
@@ -113,7 +113,7 @@ Detailed docs: [docs/README.kimi.md](docs/README.kimi.md)
 ### OpenCode
 
 ```
-Fetch and follow instructions from https://raw.githubusercontent.com/dminc/dmi_superpowers/refs/heads/main/.opencode/INSTALL.md
+Fetch and follow instructions from https://raw.githubusercontent.com/HundredBillion/dmi_superpowers/refs/heads/main/.opencode/INSTALL.md
 ```
 
 Detailed docs: [docs/README.opencode.md](docs/README.opencode.md)
@@ -121,7 +121,7 @@ Detailed docs: [docs/README.opencode.md](docs/README.opencode.md)
 ### Pi
 
 ```bash
-pi install git:github.com/dminc/dmi_superpowers
+pi install git:github.com/HundredBillion/dmi_superpowers
 ```
 
 For local development:

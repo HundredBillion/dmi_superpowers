@@ -19,7 +19,7 @@ superpowers plugin (v6.0.3) and Matt Pocock's skills, tailored for David Lee / D
 
 **What was changed:**
 
-- Package name, author, and repository metadata updated to `dmi-superpowers` / `dminc/dmi_superpowers`
+- Package name, author, and repository metadata updated to `dmi-superpowers` / `HundredBillion/dmi_superpowers`
 - Skill namespace prefixed as `superpowers:` for harness compatibility
 - All top-level docs and metadata rebranded to dmi_superpowers
 - Upstream contributor governance removed (this is a private personal repo)

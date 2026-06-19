@@ -6,7 +6,7 @@
     "name": "David Lee",
     "email": "dalee@dminc.com"
   },
-  "homepage": "https://github.com/dminc/dmi_superpowers",
+  "homepage": "https://github.com/HundredBillion/dmi_superpowers",
   "license": "MIT",
   "keywords": [
     "brainstorming",
@@ -33,6 +33,6 @@
       "Read",
       "Write"
     ],
-    "websiteURL": "https://github.com/dminc/dmi_superpowers"
+    "websiteURL": "https://github.com/HundredBillion/dmi_superpowers"
   }
 }
