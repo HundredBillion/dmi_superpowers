@@ -98,6 +98,13 @@ Subagent (general-purpose):
     - DRY without premature abstraction?
     - Edge cases handled?
 
+    **Comments:**
+    - Do comments explain WHY (concise, plain prose) rather than restate WHAT?
+    - Is the intent readable by a non-developer, with technical detail kept
+      alongside rather than dropped?
+    - Are comments self-contained — no references to Jira tickets, ADRs, plan, or
+      spec files?
+
     **Tests:**
     - Do the new and changed tests verify real behavior, not mocks?
     - Are the task's edge cases covered?

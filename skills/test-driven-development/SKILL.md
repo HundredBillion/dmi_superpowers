@@ -93,6 +93,7 @@ After all tests pass, look for [refactor candidates](refactoring.md):
 - [ ] Deepen modules (move complexity behind simple interfaces)
 - [ ] Apply SOLID principles where natural
 - [ ] Consider what new code reveals about existing code
+- [ ] Comments explain WHY in concise, plain prose — intent a non-developer follows, with technical detail (constants, failure modes) kept alongside; none point to Jira/ADR/plan/spec files
 - [ ] Run tests after each refactor step
 
 **Never refactor while RED.** Get to GREEN first.

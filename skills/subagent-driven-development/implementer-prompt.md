@@ -91,6 +91,14 @@ Subagent (general-purpose):
     - Are names clear and accurate (match what things do, not how they work)?
     - Is the code clean and maintainable?
 
+    **Comments:**
+    - Do comments explain WHY (the reasoning the code can't show), not restate WHAT?
+    - Is each comment concise and led by intent a non-developer could follow, while
+      keeping the technical detail (the constant, the failure mode, the constraint)
+      that makes it precise? Pair the two — don't drop the anchor or bury the intent.
+    - Are comments self-contained — no pointers to Jira tickets, ADRs, plan, or spec
+      files, which may not be accessible to a future reader?
+
     **Discipline:**
     - Did I avoid overbuilding (YAGNI)?
     - Did I only build what was requested?
