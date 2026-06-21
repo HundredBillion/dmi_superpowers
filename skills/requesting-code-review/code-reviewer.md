@@ -70,6 +70,14 @@ Subagent (general-purpose):
     - Unnecessary sequential orchestration or non-atomic updates where a
       simpler, more atomic structure is obvious?
 
+    Report these in the dedicated "Over-engineering / simplification"
+    output section below, one line per finding, using the tag taxonomy
+    (`delete:` / `stdlib:` / `native:` / `yagni:` / `shrink:`). Apply the
+    deletion test before proposing any deletion: delete the thing and ask
+    what happens to the complexity — if it vanishes or merely moves, the
+    thing was shallow, cut it; if it concentrates because the thing was
+    hiding real work, it is a deep module, keep it.
+
     **Architecture:**
     - Sound design decisions?
     - Reasonable scalability and performance?
@@ -110,6 +118,18 @@ Subagent (general-purpose):
 
     ### Strengths
     [What's well done? Be specific.]
+
+    ### Over-engineering / simplification
+    One line per finding: `L<line>: <tag> <what>. <replacement>.`
+    (or `<file>:L<line>: ...` for multi-file diffs). Tags:
+    `delete:` dead/speculative code (replaces with nothing) ·
+    `stdlib:` hand-rolled thing the stdlib ships (name it) ·
+    `native:` dep/code the platform already does (name the feature) ·
+    `yagni:` one-implementation abstraction, config nobody sets, single-caller layer ·
+    `shrink:` same logic, fewer lines (show the shorter form).
+    End with `net: -<N> lines possible.`
+    If there is nothing to cut, write `Lean already. Ship.` and nothing else here.
+    This section never reclassifies a correctness bug — those stay in the severities below.
 
     ### Issues
 
