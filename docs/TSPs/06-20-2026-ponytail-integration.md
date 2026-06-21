@@ -6,7 +6,7 @@
 
 **Architecture:** One new skill (`skills/ponytail/SKILL.md`, lightly adapted from upstream ponytail) plus four small Node hook modules ported from upstream and wired into Claude Code's `UserPromptSubmit`. The hook persists the active intensity to a flag file and **re-injects the level-filtered ruleset on every turn** while active (off by default). The review lens is added to `requesting-code-review`'s reviewer template and to `improve-codebase-architecture`, both governed by the deletion test (ADR-0003).
 
-**Tech Stack:** Node.js (hooks, no dependencies — Node stdlib only), Markdown skills, JSON hook configs. Bash polyglot wrapper (`run-hook.cmd`) is **not** used for these hooks: it execs bash scripts, whereas Node hooks invoke `node` directly with a presence guard (graceful no-op if Node is absent).
+**Tech Stack:** Node.js (hooks, no dependencies — Node stdlib only), Markdown skills, JSON hook configs. Bash polyglot wrapper (`run-hook.cmd`) is **not** used for these hooks: it execs bash scripts, whereas Node hooks invoke `node` directly with a presence guard (graceful no-op if Node is absent). The repo root `package.json` sets `"type": "module"`, which would make bare `.js` hook files ES modules and break their CommonJS `require`/`module.exports`; a single `hooks/package.json` containing `{"type":"commonjs"}` scopes the `hooks/` directory back to CommonJS so every hook file stays a plain `.js` with bare `require('./sibling')` resolution (added in Task 2).
 
 ## Global Constraints
 
@@ -188,6 +188,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 ### Task 2: Port the hook config module
 
 **Files:**
+- Create: `hooks/package.json` (CommonJS scope marker — see Step 0)
 - Create: `hooks/ponytail-config.js`
 
 **Interfaces:**
@@ -199,6 +200,14 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
   - `isDeactivationCommand(text)` → `true` iff the whole trimmed message (minus trailing punctuation) is `stop ponytail` or `normal mode`
   - `getClaudeDir()` → `CLAUDE_CONFIG_DIR` or `~/.claude`
   - `getDefaultMode()` → `PONYTAIL_DEFAULT_MODE` (if a valid runtime mode) else `'full'`
+
+- [ ] **Step 0: Scope `hooks/` back to CommonJS**
+
+The repo root `package.json` declares `"type": "module"`. Without an override, every `.js` file in `hooks/` is treated as an ES module and the CommonJS `require`/`module.exports` these hook files use throws. Create `hooks/package.json` with exactly:
+```json
+{ "type": "commonjs" }
+```
+This makes `.js` files under `hooks/` CommonJS, so the hook files keep their `.js` names and bare `require('./ponytail-config')` (no extension) resolves — verified: `node -e "require(...)"` and `node hooks/<file>.js` both load as CJS with this file present, and fail without it.
 
 - [ ] **Step 1: Create the module**
 
@@ -261,8 +270,8 @@ Expected: prints `PASS` with no assertion errors.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add hooks/ponytail-config.js
-git commit -m "feat: add ponytail hook config resolver
+git add hooks/package.json hooks/ponytail-config.js
+git commit -m "feat: add ponytail hook config resolver (CommonJS-scoped hooks dir)
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 ```
