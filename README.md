@@ -6,13 +6,13 @@ This repo is **not** intended for external contribution. It is a private skills 
 
 ## What It Is
 
-`dmi_superpowers` packages 22 skills that guide coding agents through a disciplined workflow:
+`dmi_superpowers` packages 23 skills that guide coding agents through a disciplined workflow:
 
 **brainstorm → PRD → grill-with-docs → TSP → grill → TDD → review → finish**
 
 The agent never just starts coding. It steps back, refines requirements, validates against domain language, plans carefully, writes tests first, reviews its own work, and closes out cleanly.
 
-## The 22 Skills
+## The 23 Skills
 
 ### Kept from superpowers (core workflow)
 
@@ -26,6 +26,7 @@ The agent never just starts coding. It steps back, refines requirements, validat
 | `receiving-code-review` | Responding to feedback with rigor |
 | `using-git-worktrees` | Parallel development branches |
 | `finishing-a-development-branch` | Merge/PR decision workflow |
+| `creating-a-pull-request` | PR title/body for non-developer + developer audiences |
 | `subagent-driven-development` | Fast iteration with two-stage review |
 | `using-superpowers` | Introduction to the skills system |
 | `writing-skills` | Create new skills following best practices |
