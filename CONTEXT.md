@@ -51,3 +51,21 @@ The full shape of a code finding: **Headline** → **What this code does** →
 complete form used by `systematic-debugging`; `grilling` uses only the explanatory beats to
 set up a question.
 _Avoid_: Template, structure, sections.
+
+### Minimalism (the `ponytail` skill)
+
+**Ponytail mode**:
+The persistent minimalism behavior the `ponytail` skill switches on — defaults every solution
+to the simplest thing that works (YAGNI, stdlib/native before custom code, shortest working
+diff). Switched on by a plain-text trigger the per-turn hook catches (`ponytail [level]`,
+`be lazy`) — not a slash command — and stays active across responses **and** sessions, via a
+single global flag, until turned off (`stop ponytail` / `normal mode`). Has intensity levels
+(`lite` / `full` / `ultra`).
+_Avoid_: Lazy mode, minimal mode (when you mean the skill's standing behavior).
+
+**The deletion test**:
+The single boundary test that decides minimalism-vs-abstraction (from `codebase-design`): delete
+the thing — if complexity vanishes or just moves, it was shallow → cut it; if complexity
+concentrates because it was hiding real work, it is a **deep module** → keep it. The canonical
+arbiter between `ponytail` and `codebase-design`.
+_Avoid_: The complexity rule, the genuinely-complex test.

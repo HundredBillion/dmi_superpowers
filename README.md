@@ -6,13 +6,13 @@ Contributions are welcome. See [AGENTS.md](AGENTS.md) for what belongs here and 
 
 ## What It Is
 
-`dmi_superpowers` packages 23 skills that guide coding agents through a disciplined workflow:
+`dmi_superpowers` packages 25 skills that guide coding agents through a disciplined workflow:
 
 **brainstorm → PRD → grill-with-docs → TSP → grill → TDD → review → finish**
 
 The agent never just starts coding. It steps back, refines requirements, validates against domain language, plans carefully, writes tests first, reviews its own work, and closes out cleanly.
 
-## The 23 Skills
+## The 25 Skills
 
 ### Kept from superpowers (core workflow)
 
@@ -24,6 +24,7 @@ The agent never just starts coding. It steps back, refines requirements, validat
 | `dispatching-parallel-agents` | Concurrent subagent workflows |
 | `requesting-code-review` | Pre-review checklist and dispatch |
 | `receiving-code-review` | Responding to feedback with rigor |
+| `resolving-merge-conflicts` | Resolve an in-progress git merge/rebase conflict |
 | `using-git-worktrees` | Parallel development branches |
 | `finishing-a-development-branch` | Merge/PR decision workflow |
 | `creating-a-pull-request` | PR title/body for non-developer + developer audiences |
@@ -43,20 +44,25 @@ The agent never just starts coding. It steps back, refines requirements, validat
 
 | Skill | Purpose |
 |---|---|
+| `codebase-design` | Shared vocabulary for designing deep modules — interfaces, seams, depth |
+| `domain-modeling` | Build and sharpen the domain model; record architectural decisions (ADRs) |
 | `grill-with-docs` | Challenge plans against CONTEXT.md and ADRs |
+| `grilling` | Relentlessly interview to stress-test a plan or design before building |
 | `improve-codebase-architecture` | Find deepening/refactor opportunities |
-| `to-prd` | Convert rough ideas to structured PRDs |
-| `to-issues` | Convert specs/PRDs to issue lists |
-| `triage` | Investigate and prioritize issues |
 | `say` | Communicate code findings in plain + technical pairs, and rewrite prose for human readers |
-| `deep-research` | Multi-source fact-checked research |
-| `jav-story` | Generate story artifacts |
+| `to-prd` | Convert rough ideas to structured PRDs |
 
 ### Merged / unified (debugging consolidated)
 
 | Skill | Purpose |
 |---|---|
 | `prototype` | Rapid prototyping skill |
+
+### Utility / mode skills
+
+| Skill | Purpose |
+|---|---|
+| `ponytail` | persistent minimalism mode: defaults every solution to the simplest thing that works (YAGNI, stdlib/native first, shortest diff), at intensity lite/full/ultra. Off by default; type `ponytail [level]` or `be lazy` to activate (plain text, not a slash command — ADR-0005). |
 
 ## Installation
 
@@ -164,3 +170,7 @@ pi -e /path/to/dmi_superpowers
 ## License
 
 MIT — see LICENSE file for details.
+
+## Acknowledgements
+
+The `ponytail` skill and its persistence hook are adapted from [ponytail](https://github.com/DietrichGebert/ponytail) by DietrichGebert, used under the MIT License.
