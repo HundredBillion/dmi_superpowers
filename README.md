@@ -6,13 +6,13 @@ Contributions are welcome. See [AGENTS.md](AGENTS.md) for what belongs here and 
 
 ## What It Is
 
-`dmi_superpowers` packages 23 skills that guide coding agents through a disciplined workflow:
+`dmi_superpowers` packages 25 skills that guide coding agents through a disciplined workflow:
 
 **brainstorm → PRD → grill-with-docs → TSP → grill → TDD → review → finish**
 
 The agent never just starts coding. It steps back, refines requirements, validates against domain language, plans carefully, writes tests first, reviews its own work, and closes out cleanly.
 
-## The 23 Skills
+## The 25 Skills
 
 ### Kept from superpowers (core workflow)
 
@@ -57,6 +57,12 @@ The agent never just starts coding. It steps back, refines requirements, validat
 | Skill | Purpose |
 |---|---|
 | `prototype` | Rapid prototyping skill |
+
+### Utility / mode skills
+
+| Skill | Purpose |
+|---|---|
+| `ponytail` | persistent minimalism mode: defaults every solution to the simplest thing that works (YAGNI, stdlib/native first, shortest diff), at intensity lite/full/ultra. Off by default; type `ponytail [level]` or `be lazy` to activate (plain text, not a slash command — ADR-0005). |
 
 ## Installation
 
@@ -164,3 +170,7 @@ pi -e /path/to/dmi_superpowers
 ## License
 
 MIT — see LICENSE file for details.
+
+## Acknowledgements
+
+The `ponytail` skill and its persistence hook are adapted from [ponytail](https://github.com/DietrichGebert/ponytail) by DietrichGebert, used under the MIT License.
