@@ -16,7 +16,7 @@ Every task's requirements implicitly include this section. Values copied verbati
 - **Attribution line**, used verbatim in the skill body and as a comment header in every ported hook file:
   `Adapted from ponytail by DietrichGebert — MIT (https://github.com/DietrichGebert/ponytail).`
   Upstream is MIT and the copyright/permission notice is retained per MIT terms.
-- **Off by default.** Absence of the flag file means ponytail is inactive. It activates only via `/ponytail [lite|full|ultra]` (or the bare `/ponytail`, defaulting to `full`) and deactivates via `/ponytail off`, `stop ponytail`, or `normal mode`. This differs from upstream ponytail (on-by-default) — do not port the on-by-default behavior.
+- **Off by default; activated by plain-text triggers (ADR-0005), not a slash command.** Absence of the flag file means ponytail is inactive. The hook matches **whole-message** plain-text triggers — `ponytail [lite|full|ultra]` (bare `ponytail` defaults to `full`), `be lazy`, `lazy mode` to activate; `ponytail off`, `stop ponytail`, `normal mode` to deactivate. The `/`, `@`, `$` prefixed forms are matched only as a best-effort bonus (Claude Code may intercept an unregistered `/ponytail` before the hook fires — undocumented). Keep the trigger set small and explicit to avoid false activation. Do **not** register a `/ponytail` command file (PRD §3 excludes slash-command infra). This differs from upstream ponytail (on-by-default) — do not port the on-by-default behavior.
 - **Persistence is per-turn re-injection.** While a level is active the hook re-injects the ruleset on *every* `UserPromptSubmit`, not just on command turns. This is the mechanism that fulfills "persists across responses" (PRD §8.1) and survives context compaction.
 - **The deletion test (the §4 rule), embedded verbatim** in the skill, the reviewer template, and `improve-codebase-architecture`:
   > **Delete the thing and ask what happens to the complexity.** If complexity vanishes or merely moves, the thing was a **shallow** or speculative module — cut it (ponytail / YAGNI: no interface with one implementation, no flexibility nobody asked for). If complexity *concentrates* because the thing was hiding real work, it is a **deep module** — keep it (Ousterhout: a simple interface over substantial implementation earns its keep).
@@ -72,8 +72,10 @@ code is the code never written.
 ## Persistence
 
 ACTIVE EVERY RESPONSE. No drift back to over-building. Still active if
-unsure. Off only: "stop ponytail" / "normal mode". Default: **full**.
-Switch: `/ponytail lite|full|ultra`.
+unsure. Default: **full**. Turn on by typing **ponytail lite|full|ultra**
+(or **be lazy**); off with **stop ponytail** / **normal mode**. Stays on
+across responses and sessions until turned off. (Invoking the skill by name
+loads this guidance but does not start persistence — type a trigger to persist.)
 
 ## The ladder
 
@@ -493,24 +495,32 @@ function run(prompt) {
   return execFileSync('node', [SCRIPT], { input: JSON.stringify({ prompt }), env, encoding: 'utf8' });
 }
 
-// 1. /ponytail ultra sets the flag and injects the ULTRA ruleset.
-let out = run('/ponytail ultra');
-assert.strictEqual(fs.readFileSync(flag, 'utf8'), 'ultra', 'flag set to ultra');
-assert.match(out, /level: ultra/i, 'injects ultra ruleset on command');
+// 1. Plain-text "ponytail ultra" sets the flag and injects the ULTRA ruleset.
+let out = run('ponytail ultra');
+assert.strictEqual(fs.readFileSync(flag, 'utf8'), 'ultra', 'plain trigger sets ultra');
+assert.match(out, /level: ultra/i, 'injects ultra ruleset on activation');
 
-// 2. The namespaced command form is also recognized.
+// 2. "be lazy" activates at the default level (full).
+out = run('be lazy');
+assert.strictEqual(fs.readFileSync(flag, 'utf8'), 'full', 'be lazy activates default');
+
+// 3. The /-prefixed, namespaced form is matched as a best-effort bonus.
 out = run('/dmi-superpowers:ponytail lite');
-assert.strictEqual(fs.readFileSync(flag, 'utf8'), 'lite', 'namespaced command sets level');
+assert.strictEqual(fs.readFileSync(flag, 'utf8'), 'lite', 'slash+namespace bonus form sets level');
 
-// 3. A normal turn re-injects the ruleset while a level is active.
+// 4. A normal turn re-injects the ruleset while a level is active.
 out = run('add a date picker to the signup form');
 assert.match(out, /PONYTAIL MODE ACTIVE/i, 're-injects every turn while active');
 
-// 4. "normal mode" as a standalone message clears the flag.
+// 5. A sentence merely containing a trigger word does NOT toggle the mode.
+out = run('a normal mode toggle would be nice');
+assert.strictEqual(fs.readFileSync(flag, 'utf8'), 'lite', 'partial phrase leaves mode unchanged');
+
+// 6. "normal mode" as a standalone message clears the flag.
 out = run('normal mode');
 assert.ok(!fs.existsSync(flag), 'deactivation phrase clears the flag');
 
-// 5. A normal turn with no active mode injects nothing.
+// 7. A normal turn with no active mode injects nothing.
 out = run('add a date picker to the signup form');
 assert.strictEqual(out, '', 'no injection when inactive (off by default)');
 
@@ -533,7 +543,8 @@ Create `hooks/ponytail-mode-tracker.js`:
 ```js
 #!/usr/bin/env node
 // dmi-superpowers ponytail — UserPromptSubmit hook.
-// Detects /ponytail commands, persists the active level to a flag file, and
+// Detects plain-text activation triggers (e.g. "ponytail ultra", "be lazy"),
+// persists the active level to a flag file, and
 // re-injects the level-filtered ruleset on EVERY turn while a level is active
 // (off by default). This per-turn re-injection -- not present upstream -- is
 // what makes the minimalism mode persist across responses and survive compaction.
@@ -543,14 +554,21 @@ const { getDefaultMode, isDeactivationCommand } = require('./ponytail-config');
 const { readMode, setMode, clearMode, writeHookOutput } = require('./ponytail-runtime');
 const { getPonytailInstructions } = require('./ponytail-instructions');
 
-function handle(prompt) {
-  const lower = (prompt || '').trim().toLowerCase();
+// Whole-message activation: optional /@$ prefix, optional dmi-superpowers: namespace,
+// the word "ponytail", optional level. Anchored at both ends so a sentence that merely
+// contains "ponytail" does not toggle the mode. The slash forms are a best-effort bonus
+// (Claude Code may intercept an unregistered /ponytail before the hook fires).
+const PONYTAIL_RE = /^[/@$]?(?:dmi-superpowers:)?ponytail(?:\s+(lite|full|ultra|off))?$/;
+// Slash-free aliases that activate at the default level.
+const ACTIVATE_ALIASES = new Set(['be lazy', 'lazy mode']);
 
-  // Mode-change command: /ponytail [lite|full|ultra|off], plain or namespaced,
-  // and the @ / $ prefixes some harnesses use for slash commands.
-  const cmd = lower.match(/^[/@$](?:dmi-superpowers:)?ponytail(?:\s+(\S+))?/);
-  if (cmd) {
-    const arg = cmd[1] || '';
+function handle(prompt) {
+  // Trim, lowercase, and drop trailing punctuation so "ponytail." / "be lazy!" still match.
+  const lower = (prompt || '').trim().toLowerCase().replace(/[.!?]+$/, '');
+
+  const m = lower.match(PONYTAIL_RE);
+  if (m) {
+    const arg = m[1] || '';
     if (arg === 'off') {
       clearMode();
       return writeHookOutput('off', 'PONYTAIL MODE OFF');
@@ -560,7 +578,13 @@ function handle(prompt) {
     return writeHookOutput(mode, getPonytailInstructions(mode));
   }
 
-  // Deactivation phrase as a standalone message.
+  if (ACTIVATE_ALIASES.has(lower)) {
+    const mode = getDefaultMode();
+    setMode(mode);
+    return writeHookOutput(mode, getPonytailInstructions(mode));
+  }
+
+  // Deactivation phrase as a standalone message ("stop ponytail" / "normal mode").
   if (isDeactivationCommand(lower)) {
     clearMode();
     return writeHookOutput('off', 'PONYTAIL MODE OFF');
@@ -923,7 +947,7 @@ Write the PR with the `dmi-superpowers:creating-a-pull-request` skill format (Ti
 | §7 provenance / attribution / README count | Tasks 1 (credit), 9 |
 | §8 success criteria | verified in Task 10 |
 | §9 three-part eval gate | Task 10 |
-| §10 namespace parsing risk (`/dmi-superpowers:ponytail`) | Task 5 (regex + test assertion 2) |
+| §10 namespace/trigger parsing | Task 5 (anchored regex + aliases; test assertions 1–3, 5) + ADR-0005 |
 
 No gaps. CONTEXT.md glossary and ADR-0003/0004 were written during grill-with-docs and need no task here.
 

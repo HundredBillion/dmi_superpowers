@@ -57,8 +57,10 @@ _Avoid_: Template, structure, sections.
 **Ponytail mode**:
 The persistent minimalism behavior the `ponytail` skill switches on — defaults every solution
 to the simplest thing that works (YAGNI, stdlib/native before custom code, shortest working
-diff), and stays active across responses until turned off. Has intensity levels (`lite` /
-`full` / `ultra`).
+diff). Switched on by a plain-text trigger the per-turn hook catches (`ponytail [level]`,
+`be lazy`) — not a slash command — and stays active across responses **and** sessions, via a
+single global flag, until turned off (`stop ponytail` / `normal mode`). Has intensity levels
+(`lite` / `full` / `ultra`).
 _Avoid_: Lazy mode, minimal mode (when you mean the skill's standing behavior).
 
 **The deletion test**:

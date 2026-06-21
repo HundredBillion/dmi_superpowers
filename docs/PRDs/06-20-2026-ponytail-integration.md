@@ -94,8 +94,10 @@ retained as inline intent documentation only (no ledger).
 ponytail's "active every response" is produced by a `UserPromptSubmit` hook, not by `SKILL.md`
 (which the runtime loads once per session — ADR-0002). We port a minimal, rebranded version:
 
-- A `UserPromptSubmit` mode-tracker that detects `/ponytail [lite|full|ultra|off]`, persists the
-  active level to a flag file, and re-injects the minimalism instructions each turn.
+- A `UserPromptSubmit` mode-tracker that detects plain-text activation triggers
+  (`ponytail [lite|full|ultra]`, `be lazy`; `stop ponytail` / `normal mode` to deactivate — not
+  a slash command, per [ADR-0005](../adr/0005-ponytail-activates-by-plain-text-trigger-not-slash-command.md)),
+  persists the active level to a flag file, and re-injects the minimalism instructions each turn.
 - The instruction-injector that builds the per-level instruction text from the skill body.
 - Hung on dmi's existing `run-hook.cmd` / per-harness hook configs (`hooks.json`,
   `hooks-codex.json`, `hooks-cursor.json`).
@@ -170,9 +172,11 @@ Before/after evidence goes in the PR (per `AGENTS.md`).
 
 - **Review-skill bloat.** The standing over-engineering section in `code-reviewer.md` must not
   dilute correctness review; if it does in eval, revisit the rejected opt-in alternative.
-- **Hook trigger parsing across namespaces.** The mode-tracker must match dmi's namespaced
-  invocation (e.g. `/dmi-superpowers:ponytail` as well as `/ponytail`) — a TSP-level detail to
-  pin during implementation.
+- **Unknown-slash-command behavior is undocumented.** If a future Claude Code version *does*
+  reliably pass `/ponytail …` through to the hook, the slash form becomes a first-class trigger
+  for free (the regex already matches it); no change needed, but worth revisiting if users ask
+  for the slash form.
 
 *(Resolved by grilling: persistence achievability → ADR-0004; rule-wording ambiguity →
-ADR-0003 deletion test.)*
+ADR-0003 deletion test; activation mechanism + flag scope → ADR-0005 plain-text triggers,
+global flag.)*
