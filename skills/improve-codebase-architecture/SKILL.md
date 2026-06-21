@@ -6,7 +6,7 @@ disable-model-invocation: true
 
 # Improve Codebase Architecture
 
-Surface architectural friction and propose **deepening opportunities** — refactors that turn shallow modules into deep ones. The aim is testability and AI-navigability.
+Surface architectural friction and propose two kinds of candidate, both decided by the **deletion test**: **deepening opportunities** — refactors that turn shallow modules into deep ones — and **simplify / delete opportunities** — shallow or speculative structure to cut. The aim is testability and AI-navigability. A codebase improves as much by deleting shallow cruft as by deepening.
 
 This command is _informed_ by the project's domain model and built on a shared design vocabulary:
 
@@ -26,8 +26,12 @@ Then use the Agent tool with `subagent_type=Explore` to walk the codebase. Don't
 - Where have pure functions been extracted just for testability, but the real bugs hide in how they're called (no **locality**)?
 - Where do tightly-coupled modules leak across their seams?
 - Which parts of the codebase are untested, or hard to test through their current interface?
+- Where is there **over-engineering to cut** — a reinvented standard-library
+  function, a dependency doing what the platform already does, an interface
+  with one implementation, config nobody sets, dead flexibility? These are
+  **Simplify / delete** candidates.
 
-Apply the **deletion test** to anything you suspect is shallow: would deleting it concentrate complexity, or just move it? A "yes, concentrates" is the signal you want.
+Apply the **deletion test** to every candidate: delete the thing and ask what happens to the complexity. If it *concentrates* because the thing was hiding real work, it is a **deep module** — a Deepen candidate, keep and extend it. If it vanishes or merely moves, the thing was **shallow** or speculative — a Simplify / delete candidate, cut it.
 
 ### 2. Present candidates as an HTML report
 
@@ -43,6 +47,12 @@ For each candidate, render a card with:
 - **Benefits** — explained in terms of locality and leverage, and how tests would improve
 - **Before / After diagram** — side-by-side, custom-drawn, illustrating the shallowness and the deepening
 - **Recommendation strength** — one of `Strong`, `Worth exploring`, `Speculative`, rendered as a badge
+
+**Candidate type:** tag each card as **Deepen** or **Simplify / delete**. For
+Simplify / delete cards, label the specific move with the tag taxonomy —
+`delete:` / `stdlib:` / `native:` / `yagni:` / `shrink:` — and state the line
+count the deletion saves. The before/after diagram shows the structure
+shrinking rather than deepening.
 
 End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
 
