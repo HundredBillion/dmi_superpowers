@@ -24,6 +24,7 @@ The agent never just starts coding. It steps back, refines requirements, validat
 | `dispatching-parallel-agents` | Concurrent subagent workflows |
 | `requesting-code-review` | Pre-review checklist and dispatch |
 | `receiving-code-review` | Responding to feedback with rigor |
+| `resolving-merge-conflicts` | Resolve an in-progress git merge/rebase conflict |
 | `using-git-worktrees` | Parallel development branches |
 | `finishing-a-development-branch` | Merge/PR decision workflow |
 | `creating-a-pull-request` | PR title/body for non-developer + developer audiences |
@@ -43,14 +44,13 @@ The agent never just starts coding. It steps back, refines requirements, validat
 
 | Skill | Purpose |
 |---|---|
+| `codebase-design` | Shared vocabulary for designing deep modules — interfaces, seams, depth |
+| `domain-modeling` | Build and sharpen the domain model; record architectural decisions (ADRs) |
 | `grill-with-docs` | Challenge plans against CONTEXT.md and ADRs |
+| `grilling` | Relentlessly interview to stress-test a plan or design before building |
 | `improve-codebase-architecture` | Find deepening/refactor opportunities |
-| `to-prd` | Convert rough ideas to structured PRDs |
-| `to-issues` | Convert specs/PRDs to issue lists |
-| `triage` | Investigate and prioritize issues |
 | `say` | Communicate code findings in plain + technical pairs, and rewrite prose for human readers |
-| `deep-research` | Multi-source fact-checked research |
-| `jav-story` | Generate story artifacts |
+| `to-prd` | Convert rough ideas to structured PRDs |
 
 ### Merged / unified (debugging consolidated)
 
