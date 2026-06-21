@@ -48,6 +48,28 @@ Subagent (general-purpose):
     - DRY without premature abstraction?
     - Edge cases handled?
 
+    **Structural quality & simplification:**
+    This is where reviews are usually too shallow. Don't stop at "this
+    could be a bit cleaner" — actively look for behavior-preserving
+    restructurings that *delete* complexity rather than rearrange it.
+    - Is there a reframing ("code judo") that makes whole branches,
+      helpers, modes, or layers disappear? Propose it concretely, even
+      when the code as written works.
+    - Does the diff push a file past a healthy size (~1000 lines)? If so,
+      ask whether it should be decomposed before this change lands.
+    - New ad-hoc conditionals or special cases bolted onto an unrelated
+      flow? Treat that as a missing abstraction, not a style nit.
+    - Thin wrappers, identity, or pass-through helpers that add
+      indirection without buying clarity?
+    - Casts, `any`/`unknown`, or gratuitous optionality papering over an
+      invariant that should be made explicit at a boundary?
+    - Copy-pasted logic that should be an extracted helper — or a bespoke
+      helper duplicating one that already exists canonically?
+    - Logic living in the wrong layer/package, or feature-specific logic
+      leaking into a shared path?
+    - Unnecessary sequential orchestration or non-atomic updates where a
+      simpler, more atomic structure is obvious?
+
     **Architecture:**
     - Sound design decisions?
     - Reasonable scalability and performance?
@@ -76,6 +98,13 @@ Subagent (general-purpose):
     so the implementer can confirm whether the deviation was intentional.
     If you find issues with the plan itself rather than the implementation,
     say so.
+
+    Don't rubber-stamp "it works" code that leaves the codebase messier.
+    A clearly visible simplification the change missed is a legitimate
+    finding — usually Important, occasionally Minor — not something to
+    stay silent on because the behavior is correct. Match severity to
+    real impact: a structural finding is only Critical if it actively
+    risks bugs, data loss, or security.
 
     ## Output Format
 
@@ -123,6 +152,31 @@ Subagent (general-purpose):
     - Give feedback on code you didn't actually read
     - Be vague ("improve error handling")
     - Avoid giving a clear verdict
+
+    ## Preferred Remedies
+
+    When a structural issue is real, name the concrete move rather than
+    "make this cleaner":
+    - Delete a layer of indirection instead of polishing it
+    - Reframe the state model so conditionals disappear
+    - Collapse duplicate branches into one clearer flow
+    - Replace a condition chain with a typed model or explicit dispatcher
+    - Extract a helper / pure function; split a large file into focused modules
+    - Separate orchestration from business logic
+    - Reuse the existing canonical helper instead of a near-duplicate
+    - Move logic to the package/layer that already owns the concept
+    - Make a type boundary explicit so the control flow simplifies
+
+    ## Example Phrasings
+
+    Direct and specific, not harsh:
+    - `this pushes the file past ~1k lines — can we decompose before this lands?`
+    - `this adds another special-case branch to an already busy flow; can it move behind its own abstraction?`
+    - `works, but it makes the surrounding code more tangled — same behavior, cleaner structure?`
+    - `this reads like feature logic leaking into a shared path; can we isolate it?`
+    - `this wrapper adds indirection without clarifying the API — keep the direct flow?`
+    - `why the cast/optional here? can we make the boundary explicit instead?`
+    - `i think there's a reframing that makes these branches disappear — worth a look before merge.`
 ```
 
 **Placeholders:**
