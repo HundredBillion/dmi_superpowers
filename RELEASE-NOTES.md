@@ -4,8 +4,8 @@
 
 ### Initial dmi_superpowers consolidation
 
-This is the first release of `dmi_superpowers` — a personal consolidation of the
-superpowers plugin (v6.0.3) and Matt Pocock's skills, tailored for David Lee / DMI workflows.
+This is the first release of `dmi_superpowers` — an open-source consolidation of the
+superpowers plugin (v6.0.3) and Matt Pocock's skills into a single coherent methodology engine.
 
 **What was consolidated:**
 
@@ -19,8 +19,8 @@ superpowers plugin (v6.0.3) and Matt Pocock's skills, tailored for David Lee / D
 
 **What was changed:**
 
-- Package name, author, and repository metadata updated to `dmi-superpowers` / `HundredBillion/dmi_superpowers`
-- Skill namespace prefixed as `superpowers:` for harness compatibility
+- Package name and repository metadata updated to `dmi-superpowers` / `HundredBillion/dmi_superpowers`
+- Skill namespace prefixed as `dmi-superpowers:` for harness compatibility
 - All top-level docs and metadata rebranded to dmi_superpowers
-- Upstream contributor governance removed (this is a private personal repo)
+- Upstream contributor governance removed in favor of this repo's own contribution guide (`AGENTS.md`)
 - Design documents (PRDs, TSPs) preserved in `docs/PRDs/` and `docs/TSPs/` for reference
