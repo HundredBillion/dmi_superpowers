@@ -4,8 +4,7 @@
   "description": "Core skills library: TDD, debugging, collaboration patterns, and proven techniques",
   "version": "0.2.1",
   "author": {
-    "name": "David Lee",
-    "email": "dalee@dminc.com"
+    "name": "dmi_superpowers contributors"
   },
   "homepage": "https://github.com/HundredBillion/dmi_superpowers",
   "repository": "https://github.com/HundredBillion/dmi_superpowers",

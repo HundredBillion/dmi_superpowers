@@ -1,8 +1,8 @@
 # dmi_superpowers
 
-A personal consolidation of the superpowers plugin and Matt Pocock's skills, tailored for David Lee / DMI workflows.
+An open-source, continuously distilled collection of the best skills and concepts for giving coding agents the discipline to write high-quality code — consolidated from the superpowers plugin and Matt Pocock's skills into a single coherent methodology engine.
 
-This repo is **not** intended for external contribution. It is a private skills plugin, maintained and evolved for internal use.
+Contributions are welcome. See [AGENTS.md](AGENTS.md) for what belongs here and how to write a pull request.
 
 ## What It Is
 

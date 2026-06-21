@@ -3,8 +3,7 @@
   "version": "0.2.1",
   "description": "An agentic skills framework & software development methodology that works: planning, TDD, debugging, and collaboration workflows.",
   "author": {
-    "name": "David Lee",
-    "email": "dalee@dminc.com"
+    "name": "dmi_superpowers contributors"
   },
   "homepage": "https://github.com/HundredBillion/dmi_superpowers",
   "repository": "https://github.com/HundredBillion/dmi_superpowers",
