@@ -125,6 +125,8 @@ git branch -d <feature-branch>
 git push -u origin <feature-branch>
 ```
 
+**REQUIRED SUB-SKILL:** Use `dmi-superpowers:creating-a-pull-request` to write the title and body and open the PR — do not hand-write the PR description here.
+
 **Do NOT clean up worktree** — user needs it alive to iterate on PR feedback.
 
 #### Option 3: Keep As-Is
