@@ -130,6 +130,7 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 **Implementation:**
 
+- If `ponytail` is still on from the scoping step, type `stop ponytail` now — it must not persist past design approval.
 - Invoke `dmi-superpowers:grill-with-docs` to harden the PRD against the domain model
 - Then invoke `dmi-superpowers:writing-plans` to create a detailed TSP
 - Do NOT invoke any other skill. grill-with-docs then writing-plans are the next steps.
@@ -138,7 +139,7 @@ Wait for the user's response. If they request changes, make them and re-run the 
 
 - **One question at a time** - Don't overwhelm with multiple questions
 - **Multiple choice preferred** - Easier to answer than open-ended when possible
-- **YAGNI ruthlessly** - Remove unnecessary features from all designs
+- **YAGNI ruthlessly** - Remove unnecessary features from all designs. Turn on `dmi-superpowers:ponytail` by typing `ponytail ultra` when you start proposing approaches and scoping the design — challenge whether each piece needs to exist *before* it reaches the PRD, where scope is still open and nothing is committed. Type `stop ponytail` once the user approves the design (before writing the PRD), so the lazy-scoping lens does NOT persist into the PRD, grilling, or implementation.
 - **Explore alternatives** - Always propose 2-3 approaches before settling
 - **Incremental validation** - Present design, get approval before moving on
 - **Be flexible** - Go back and clarify when something doesn't make sense

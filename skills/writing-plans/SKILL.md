@@ -140,6 +140,7 @@ Every step must contain the actual content an engineer needs. These are **plan f
 - Complete code in every step — if a step changes code, show the code
 - Exact commands with expected output
 - DRY, YAGNI, TDD, frequent commits
+- Turn on `dmi-superpowers:ponytail` by typing `ponytail full` while making File Structure and Task Right-Sizing decisions — pick the laziest approach that works (stdlib before custom code, native features before dependencies, shortest working diff) and bake that choice into each task, so the executor just follows it. Don't re-litigate whether the feature should exist — that was settled in brainstorming. Type `stop ponytail` once the TSP is written (before the Execution Handoff), so the lens does NOT persist into implementation, where the executor must follow the TSP exactly.
 
 ## Self-Review
 
@@ -158,6 +159,8 @@ If you find issues, fix them inline. No need to re-review — just fix and move 
 After saving the TSP and completing the self-review, invoke `dmi-superpowers:grill-with-docs` to stress-test the TSP against the domain model before handing off to execution.
 
 ## Execution Handoff
+
+If `ponytail` is still on from the decomposition step, type `stop ponytail` now — execution follows the TSP exactly, so the lazy lens must not persist into implementation.
 
 After the grill-with-docs session completes, offer execution choice:
 

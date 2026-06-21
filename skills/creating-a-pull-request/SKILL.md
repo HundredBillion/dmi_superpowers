@@ -41,7 +41,7 @@ Plain-language and concise. Name the **outcome** a non-developer cares about, ne
 The body is a contract with these parts, in this order:
 
 **1. Summary** (always) — for a non-developer.
-Explain what this PR does in plain language, no jargon. Use an analogy to make the concept clear. Two to four sentences.
+Explain what this PR does from a high level using non-technical language so that people who are not software engineers can understand the PR. Use analogies to keep things fun and easy to understand.
 
 **2. TLDR for developers** (always) — for a developer.
 What code changed (files, functions, key mechanisms) and *why it was written this way* — the reasoning behind the approach, not just a restatement of the diff.
