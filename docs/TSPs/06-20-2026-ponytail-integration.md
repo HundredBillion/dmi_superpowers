@@ -462,7 +462,7 @@ Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
 
 ### Task 5: The UserPromptSubmit mode-tracker + its runnable check
 
-This is the core deliverable: the hook that detects `/ponytail` commands, persists the level, and re-injects the ruleset every turn while active. It is built test-first against the three modules from Tasks 2–4.
+This is the core deliverable: the hook that detects the plain-text activation triggers (`ponytail [level]`, `be lazy`), persists the level, and re-injects the ruleset every turn while active. It is built test-first against the three modules from Tasks 2–4.
 
 **Files:**
 - Create: `hooks/ponytail-mode-tracker.js`
@@ -619,7 +619,7 @@ Run:
 cd /Users/davidlee/Projects/dmi_superpowers
 node hooks/ponytail-mode-tracker.test.js
 ```
-Expected: prints `PASS — ponytail-mode-tracker` (all five assertions hold).
+Expected: prints `PASS — ponytail-mode-tracker` (all seven assertions hold).
 
 - [ ] **Step 5: Commit**
 
@@ -852,7 +852,7 @@ Expected: `25` (24 existing skill directories + the new `ponytail`). Use this nu
 
 Read `README.md`, find the skill inventory list, and add an entry in the same format the other skills use. The description line to use:
 ```
-ponytail — persistent minimalism mode: defaults every solution to the simplest thing that works (YAGNI, stdlib/native first, shortest diff), at intensity lite/full/ultra. Off by default; `/ponytail [level]` to activate.
+ponytail — persistent minimalism mode: defaults every solution to the simplest thing that works (YAGNI, stdlib/native first, shortest diff), at intensity lite/full/ultra. Off by default; type `ponytail [level]` or `be lazy` to activate (plain text, not a slash command — ADR-0005).
 ```
 Update any skill-count figure in `README.md` (e.g. "23 skills") to the count from Step 1.
 
@@ -920,7 +920,7 @@ Separately paste the amended `### Over-engineering / simplification` section fro
 - [ ] **Step 3: Post-reinstall live test**
 
 Reinstall the plugin from the branch, open a fresh session, then:
-1. Type `/ponytail ultra`; confirm the hook injects the ULTRA ruleset.
+1. Type `ponytail ultra` (plain text, per ADR-0005); confirm the hook injects the ULTRA ruleset. (Optionally also try `/ponytail ultra` to observe whether this Claude Code version passes the slash form through — bonus, not required.)
 2. Submit an unrelated coding request on the next turn; confirm minimalism instructions are still in context (per-turn re-injection working).
 3. Type `normal mode`; confirm the flag clears and the next turn injects nothing.
 
