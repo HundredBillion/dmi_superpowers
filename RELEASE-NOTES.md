@@ -1,5 +1,25 @@
 # dmi_superpowers Release Notes
 
+## v0.4.1 (2026-06-22)
+
+### `creating-a-pull-request`: analogies that teach, not decorate
+
+- **Rewrote the Summary guidance** from "use analogies to keep things fun" (which produced
+  one-line garnish similes the agent dropped after a sentence) into a positive recipe: keep
+  learning fun by carrying the whole Summary on ONE sustained analogy — pick a single concrete
+  world, map every technical noun to it 1:1, make the metaphor do the reasoning (the *why* and
+  the gotchas), and give the actors agency.
+- **Upgraded the skill's own worked example** to practice the recipe (a sustained
+  messenger/neighbor/door world that carries the retry + circuit-breaker behavior), and
+  reframed the "No analogy" mistake into "Throwaway analogy" (simile abandoned / world switched
+  / reverted to literal).
+- **Why this form:** the baseline failure is wrong-shaped output, not a skipped rule, so per
+  `writing-skills` ("Match the Form to the Failure") the fix is a positive recipe, not a
+  prohibition. Verified with a control-vs-treatment subagent micro-test (5 reps each, fresh
+  task): the recipe took single-sustained-world adherence from 3/5 to 5/5, gave 5/5 strong
+  actor agency, and collapsed cross-rep variance — while the control switched worlds mid-summary
+  and reverted to literal prose.
+
 ## v0.4.0 (2026-06-22)
 
 ### Deterministic reminder to use `creating-a-pull-request`

@@ -41,7 +41,11 @@ Plain-language and concise. Name the **outcome** a non-developer cares about, ne
 The body is a contract with these parts, in this order:
 
 **1. Summary** (always) — for a non-developer.
-Explain what this PR does from a high level using non-technical language so that people who are not software engineers can understand the PR. Use analogies to keep things fun and easy to understand.
+Explain what this PR does in plain, non-technical language, and **keep learning fun** by carrying the whole explanation on ONE sustained analogy. The analogy is load-bearing, not garnish — it should teach the change by itself. Recipe:
+- **Pick one concrete, everyday world** (a mailroom, a kitchen, a hotel front desk) and stay inside it from the first sentence to the last. Don't open with a simile and then revert to literal prose, and don't switch to a second world halfway.
+- **Map every technical noun to one thing in that world**, one-to-one: the system, the data, the bug, the fix, and the actors each get a counterpart.
+- **Make the metaphor do the reasoning** — explain the *why* and any gotchas (deploy order, edge cases) *through* the world, not in a literal aside.
+- **Give the actors agency** — a clerk who reads tags, a courier who drops the same parcel twice — a small story teaches better than static labels.
 
 **2. TLDR for developers** (always) — for a developer.
 What code changed (files, functions, key mechanisms) and *why it was written this way* — the reasoning behind the approach, not just a restatement of the diff.
@@ -59,7 +63,7 @@ gh pr create --title "<plain-language title>" --body "<body from Step 3>"
 ## Example (no-template body)
 
 > ## Summary
-> When the server we sync with restarts, it briefly says "I'm busy, try later." Until now our app heard that once and gave up — like mailing a letter, having it bounce, and throwing it in the bin instead of trying again. This change makes the app wait a moment and try a few more times, and if the server stays down it stops knocking for half a minute so it doesn't make the problem worse.
+> Picture our app as a messenger who needs a signature from a neighbor across the street. When that neighbor is briefly busy, they call "not now!" back through the door. Until this change, our messenger took one "not now!", shrugged, and dropped the errand in the bin — so the signature was simply lost. Now the messenger waits a beat and knocks a few more times. And if the neighbor stays silent through every knock, the messenger stops pestering the door for half a minute, so a genuinely overwhelmed neighbor isn't buried under even more knocking — then tries again fresh once the half-minute is up.
 >
 > ## TLDR for developers
 > - `sync_worker.py`: wrapped the upstream call in retry-with-exponential-backoff (3 attempts, jittered). Jitter avoids a thundering-herd retry spike when many workers recover at once.
@@ -75,7 +79,7 @@ gh pr create --title "<plain-language title>" --body "<body from Step 3>"
 | Part | Audience | Required? | Must contain |
 |------|----------|-----------|--------------|
 | Title | Non-developer | Always | Plain-language outcome, concise |
-| Summary | Non-developer | Always | Plain language + an analogy |
+| Summary | Non-developer | Always | Plain language + ONE sustained analogy (one world, every noun mapped) |
 | TLDR for developers | Developer | Always | What changed + *why this way* |
 | Evidence | Both | When meaningful | Before/after screenshots or logs |
 
@@ -83,7 +87,7 @@ gh pr create --title "<plain-language title>" --body "<body from Step 3>"
 
 - **Jargon title** ("Add circuit breaker to sync_worker") — name the outcome a non-developer cares about instead.
 - **Opening with the technical summary** — the first thing readers see must be the plain-language Summary.
-- **No analogy** — the Summary explains a concept; an analogy is what makes it land for a non-developer.
+- **Throwaway analogy** — a one-line simile you abandon, a switch to a second world halfway through, or a revert to literal prose after the first sentence. The Summary should ride ONE world start to finish with every technical noun mapped to it (see the Summary recipe).
 - **Merging lay and dev explanations into one block** — keep Summary and TLDR as separate sections.
 - **Skipping evidence when it exists** — if there's a reproducible before/after, show it.
 - **Template overrides the house style** — a repo template tells you which sections to fill, not how to write them. Plain-language Summary + developer TLDR still apply.
