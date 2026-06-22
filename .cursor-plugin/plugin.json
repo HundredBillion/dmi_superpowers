@@ -2,7 +2,7 @@
   "name": "dmi-superpowers",
   "displayName": "Superpowers",
   "description": "Core skills library: TDD, debugging, collaboration patterns, and proven techniques",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "author": {
     "name": "dmi_superpowers contributors"
   },

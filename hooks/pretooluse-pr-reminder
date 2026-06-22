@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# PreToolUse hook for dmi-superpowers.
+#
+# Fires before a Bash tool call. When the command is about to author a pull
+# request body -- `gh pr create`, or `gh pr edit` with `--body`/`--body-file`
+# -- it injects a reminder to run the `creating-a-pull-request` skill first.
+#
+# Why this exists: the only enforcement for skills is the agent self-policing
+# the `using-superpowers` rule, and the easiest skill to skip under momentum
+# ("just open the PR") is `creating-a-pull-request`. A skipped invocation
+# yields a PR body that opens with the technical summary and drops the
+# plain-language, analogy-led Summary a non-developer needs. This hook puts a
+# deterministic nudge at the exact moment the PR command runs, so the reminder
+# no longer depends on the agent remembering.
+#
+# Non-blocking by design: it injects context, it does not deny the command.
+# A hard block would deadlock the legitimate `gh pr create` that *follows*
+# invoking the skill (the hook can't see whether the skill already ran), so a
+# nudge is the right trade-off for a command this rare.
+
+set -euo pipefail
+
+payload="$(cat)"
+
+# React only to PR-authoring commands. We substring-match the raw payload
+# rather than parse JSON (no jq dependency); the hooks.json matcher already
+# restricts this hook to Bash, and these substrings don't collide with other
+# fields in practice.
+should_remind=0
+case "$payload" in
+  *"gh pr create"*) should_remind=1 ;;
+esac
+if [ "$should_remind" -eq 0 ]; then
+  case "$payload" in
+    *"gh pr edit"*)
+      case "$payload" in
+        *"--body"*) should_remind=1 ;;  # also matches --body-file
+      esac
+      ;;
+  esac
+fi
+
+if [ "$should_remind" -eq 0 ]; then
+  exit 0
+fi
+
+reminder="REMINDER (dmi-superpowers): this command writes a PR body. Invoke the 'creating-a-pull-request' skill BEFORE running it (skip only if you already did this session). The body MUST lead with a plain-language, analogy-led **Summary** for a non-developer, then a **TLDR for developers** (what changed + why this way), then **Evidence**. Do not open with the technical summary; do not skip the analogy."
+
+# Platform-aware output, mirroring hooks/session-start:
+#  - Cursor expects additional_context (snake_case, top-level)
+#  - Claude Code expects hookSpecificOutput.additionalContext (nested)
+#  - Copilot CLI / others expect additionalContext (top-level, SDK standard)
+# The reminder string contains no double quotes, backslashes, or newlines, so
+# it is safe to embed directly in the JSON "%s" slot.
+if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
+  printf '{\n  "additional_context": "%s"\n}\n' "$reminder"
+elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
+  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "PreToolUse",\n    "additionalContext": "%s"\n  }\n}\n' "$reminder"
+else
+  printf '{\n  "additionalContext": "%s"\n}\n' "$reminder"
+fi
+
+exit 0
