@@ -1,5 +1,22 @@
 # dmi_superpowers Release Notes
 
+## v0.4.0 (2026-06-22)
+
+### Deterministic reminder to use `creating-a-pull-request`
+
+- **New Claude Code `PreToolUse` hook** (`hooks/pretooluse-pr-reminder`): fires before a Bash
+  call and, when the command is about to author a PR body (`gh pr create`, or `gh pr edit` with
+  `--body`/`--body-file`), injects a reminder to invoke the `creating-a-pull-request` skill —
+  so the body leads with a plain-language, analogy-led Summary instead of the technical summary.
+- **Why:** until now the only thing keeping a skill from being skipped was the agent
+  self-policing the `using-superpowers` rule; under momentum ("just open the PR") that fails.
+  The hook moves the reminder from judgment to a deterministic trigger at the exact moment the
+  PR command runs. Non-blocking by design (it nudges, it does not deny) so it can't deadlock the
+  legitimate `gh pr create` that follows invoking the skill.
+- **Scope:** Claude Code only. Cursor/Codex `PreToolUse` wiring is intentionally left out
+  (those manifests currently wire SessionStart only); the hook script itself already emits the
+  cursor/SDK output shapes if those platforms wire it later.
+
 ## v0.3.0 (2026-06-21)
 
 ### Persistent minimalism mode + over-engineering review lens
