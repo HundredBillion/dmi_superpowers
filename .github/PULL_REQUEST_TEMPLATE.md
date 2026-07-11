@@ -4,8 +4,8 @@ Keep the section order below. Plain-language meaning first, technical detail sec
 -->
 
 ## Summary
-<!-- For a non-developer. What this PR does in plain language, with an analogy that makes the
-     concept land. Two to four sentences. No jargon. -->
+<!-- For a non-developer, in plain language: the problem this PR solves, then the solution
+     it delivers. Two to four sentences. No jargon, no analogies. -->
 
 ## TLDR for developers
 <!-- What changed (files, skills, mechanisms) and WHY it was written this way — the reasoning
