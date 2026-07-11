@@ -41,7 +41,7 @@ Plain-language and concise. Name the **outcome** a non-developer cares about, ne
 The body is a contract with these parts, in this order:
 
 **1. Summary** (always) — for a non-developer.
-Explain what this PR does from a high level using non-technical language so that people who are not software engineers can understand the PR. Use analogies to keep things fun and easy to understand.
+Written in non-technical language that a non-developer can understand. It should contain two parts, in order: **the problem** — what wasn't working, was missing, or was slow, stated so a non-engineer feels why it mattered — then **the solution** — what the solution is and how the PR implements the solution.
 
 **2. TLDR for developers** (always) — for a developer.
 What code changed (files, functions, key mechanisms) and *why it was written this way* — the reasoning behind the approach, not just a restatement of the diff.
@@ -59,7 +59,7 @@ gh pr create --title "<plain-language title>" --body "<body from Step 3>"
 ## Example (no-template body)
 
 > ## Summary
-> When the server we sync with restarts, it briefly says "I'm busy, try later." Until now our app heard that once and gave up — like mailing a letter, having it bounce, and throwing it in the bin instead of trying again. This change makes the app wait a moment and try a few more times, and if the server stays down it stops knocking for half a minute so it doesn't make the problem worse.
+> **Problem:** When the server we sync with restarts, it briefly turns requests away. Our app took that first "not now" as final and gave up, so updates were silently lost during every restart. **Solution:** The app now waits a moment and tries again a few times, and if the server stays down it backs off for half a minute instead of piling on. Updates survive a restart; nothing is dropped.
 >
 > ## TLDR for developers
 > - `sync_worker.py`: wrapped the upstream call in retry-with-exponential-backoff (3 attempts, jittered). Jitter avoids a thundering-herd retry spike when many workers recover at once.
@@ -75,7 +75,7 @@ gh pr create --title "<plain-language title>" --body "<body from Step 3>"
 | Part | Audience | Required? | Must contain |
 |------|----------|-----------|--------------|
 | Title | Non-developer | Always | Plain-language outcome, concise |
-| Summary | Non-developer | Always | Plain language + an analogy |
+| Summary | Non-developer | Always | Plain language: the problem, then the solution |
 | TLDR for developers | Developer | Always | What changed + *why this way* |
 | Evidence | Both | When meaningful | Before/after screenshots or logs |
 
@@ -83,7 +83,8 @@ gh pr create --title "<plain-language title>" --body "<body from Step 3>"
 
 - **Jargon title** ("Add circuit breaker to sync_worker") — name the outcome a non-developer cares about instead.
 - **Opening with the technical summary** — the first thing readers see must be the plain-language Summary.
-- **No analogy** — the Summary explains a concept; an analogy is what makes it land for a non-developer.
+- **Solution without a problem** — a Summary that only says what changed leaves a non-engineer with no idea why it mattered. State the problem first, then the solution.
+- **Reaching for an analogy** — a plain statement of the problem and the solution is the goal, not a metaphor. Skip analogies.
 - **Merging lay and dev explanations into one block** — keep Summary and TLDR as separate sections.
 - **Skipping evidence when it exists** — if there's a reproducible before/after, show it.
 - **Template overrides the house style** — a repo template tells you which sections to fill, not how to write them. Plain-language Summary + developer TLDR still apply.

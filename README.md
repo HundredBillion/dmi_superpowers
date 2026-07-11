@@ -12,7 +12,7 @@ Contributions are welcome. See [AGENTS.md](AGENTS.md) for what belongs here and 
 
 The agent never just starts coding. It steps back, refines requirements, validates against domain language, plans carefully, writes tests first, reviews its own work, and closes out cleanly.
 
-## The 25 Skills
+## The 26 Skills
 
 ### Kept from superpowers (core workflow)
 
@@ -62,6 +62,7 @@ The agent never just starts coding. It steps back, refines requirements, validat
 
 | Skill | Purpose |
 |---|---|
+| `writing-code-comments` | Keep developer notes short — one plain sentence about intent or reason, not a walkthrough of the code |
 | `ponytail` | persistent minimalism mode: defaults every solution to the simplest thing that works (YAGNI, stdlib/native first, shortest diff), at intensity lite/full/ultra. Off by default; type `ponytail [level]` or `be lazy` to activate (plain text, not a slash command — ADR-0005). |
 
 ## Installation
