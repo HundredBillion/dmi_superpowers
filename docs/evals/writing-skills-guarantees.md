@@ -16,7 +16,11 @@ ranges refer to that file as read on 2026-07-13.
   180.)
 - **G3 STOP after writing ANY skill**: you MUST STOP and complete the
   deployment/verification process before moving to the next skill.
-  (`## STOP: Before Moving to Next Skill`, lines 614-626.)
+  (`## STOP: Before Moving to Next Skill`, lines 614-626, which declares the
+  deployment checklist "MANDATORY for EACH skill" at line 623 — the concrete
+  actions of that checklist are the "Deployment:" bullets at lines 664-666,
+  "Commit skill to git and push to your fork" / "Consider contributing back
+  via PR".)
 - **G4 Required YAML frontmatter**: `name` and `description` are the two
   required fields; description ≤1024 chars total; `name` uses only letters,
   numbers, hyphens. (`## SKILL.md Structure` → "Frontmatter (YAML)", lines
@@ -34,6 +38,16 @@ and the "Red Flags - STOP" block at lines 528-542, which is illustrative
 example content showing *how to write* a red-flags list for a skill under
 test — not a red-flag list writing-skills itself imposes). No additional
 guarantee was found beyond the seed list of 5.
+
+**Sweep-keyword gap (correction):** the original grep pattern omitted
+`MANDATORY` and `CRITICAL`. That's what let the line-623/664-666 dependency
+hide: line 623 ("The deployment checklist below is MANDATORY for EACH
+skill") and line 150 ("CRITICAL: Description = When to Use...") never
+surfaced in the sweep, so the checklist section downstream of line 623 got
+classified wholesale instead of split at the guarantee boundary. Re-running
+the sweep with `MUST|NEVER|Iron Law|STOP|REQUIRED|MANDATORY|CRITICAL` is the
+fix; future passes over this or any other SKILL.md should use the wider
+pattern.
 
 ## Classification
 
@@ -74,22 +88,32 @@ CONTEXT.md's load-bearing-rule definition).
 | 575-591 | Micro-Test Wording Before Full Scenarios | DEFERRABLE | — |
 | 593-612 | Anti-Patterns (narrative example, multi-language, code-in-flowcharts, generic labels) | DEFERRABLE | — |
 | 614-626 | STOP: Before Moving to Next Skill | RESIDENT | G3 |
-| 627-666 | Skill Creation Checklist (TDD Adapted) | DEFERRABLE | — (redundant reinforcement/mnemonic; every rule it restates is already resident in its own section) |
+| 627-663 | Skill Creation Checklist (TDD Adapted): RED/GREEN/REFACTOR/Quality-Checks phase restatements | DEFERRABLE | — (redundant reinforcement/mnemonic; every rule it restates is already resident in its own section) |
+| 664-666 | Skill Creation Checklist: "**Deployment:**" bullets ("Commit skill to git and push to your fork", "Consider contributing back via PR") | RESIDENT | G3 |
 | 668-679 | Discovery Workflow | DEFERRABLE | — |
 | 681-689 | The Bottom Line | DEFERRABLE | — (restates G1, but the Iron Law section already carries it) |
+
+**Near-miss note (line 629):** "**IMPORTANT: Create a todo for EACH checklist
+item below.**" is not promoted to a guarantee and not pinned resident on its
+own — it's a todo-hygiene instruction about *how to track* the checklist,
+not an Iron Law, hard gate, or red-flag stop per CONTEXT.md's guarantee
+criteria, and "IMPORTANT" isn't one of the sweep keywords. It stays inside
+the deferrable 627-663 span along with the rest of the checklist body.
 
 - RESIDENT total: the actual frontmatter, the Overview's core-principle /
   RED-GREEN-REFACTOR one-liner, the TDD-mapping table, the frontmatter field
   rules (G4), the description-is-triggers-only core rule (G2), the flowchart
-  restriction bullets (G5), the full Iron Law section (G1), and the STOP
-  deployment section (G3).
+  restriction bullets (G5), the full Iron Law section (G1), the STOP
+  deployment section (G3), and the "Deployment:" bullets at 664-666 (G3 —
+  the only place the concrete deployment actions are spelled out).
 - DEFERRABLE → reference file: the extended worked examples, the
   prohibitions-vs-recipes deep discussion + wording-test evidence
   (Bulletproofing, Match the Form to the Failure), the exhaustive
   bulletproofing/rationalization catalogs, per-platform path notes, the full
   SKILL.md template example, Testing All Skill Types, Anti-Patterns,
-  Discovery Workflow, and the Skill Creation Checklist (mnemonic restatement
-  of rules already resident elsewhere).
+  Discovery Workflow, and the RED/GREEN/REFACTOR/Quality-Checks phases of the
+  Skill Creation Checklist (mnemonic restatement of rules already resident
+  elsewhere — but NOT its "Deployment:" bullets, which are pinned resident).
 
 ## Size projection and floor gate
 
@@ -108,17 +132,18 @@ per block, summed):
 | Flowchart restrictions (305-315) | 338 |
 | The Iron Law (374-393) | 594 |
 | STOP deployment (614-626) | 449 |
-| **Resident total** | **4,483** |
+| Deployment bullets (664-666) | 140 |
+| **Resident total** | **4,623** |
 
-Deferrable set = file total − resident total ≈ 26,868 − 4,483 = **22,385
+Deferrable set = file total − resident total ≈ 26,868 − 4,623 = **22,245
 chars**.
 
-`projected_resident_savings ≈ 22,385 / 4 ≈ 5,596 est. tokens`
+`projected_resident_savings ≈ 22,245 / 4 ≈ 5,561 est. tokens`
 
-Trimmed body would be ≈ 4,483 chars ≈ 1,121 tokens (before any glue text
+Trimmed body would be ≈ 4,623 chars ≈ 1,156 tokens (before any glue text
 pointing to the new reference file).
 
 ## Decision
 
-**GO** — projected savings (~5,596 tokens) is well above the ~1,000-token
+**GO** — projected savings (~5,561 tokens) is well above the ~1,000-token
 floor.
