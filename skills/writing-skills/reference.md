@@ -21,7 +21,7 @@ Law, description rules, flowchart restrictions, deployment STOP, frontmatter).
 
 ## Setup notes
 
-**Personal skills live in your runtime's skills directory** — see [claude-code-tools.md](../using-superpowers/references/claude-code-tools.md), [codex-tools.md](../using-superpowers/references/codex-tools.md), [copilot-tools.md](../using-superpowers/references/copilot-tools.md), or [gemini-tools.md](../using-superpowers/references/gemini-tools.md) for the path on your runtime. Codex, Copilot CLI, and Gemini CLI all also recognize `~/.agents/skills/` as a cross-runtime alias.
+**Personal skills live in your runtime's skills directory** — see SKILL.md for links to the per-runtime tool docs (claude-code-tools.md, codex-tools.md, copilot-tools.md, gemini-tools.md) giving the exact path on your runtime. Codex, Copilot CLI, and Gemini CLI all also recognize `~/.agents/skills/` as a cross-runtime alias.
 
 **Official guidance:** For Anthropic's official skill authoring best practices, see anthropic-best-practices.md. This document provides additional patterns and guidelines that complement the TDD-focused approach in this skill.
 

@@ -9,7 +9,7 @@ description: Use when creating new skills, editing existing skills, or verifying
 
 **Writing skills IS Test-Driven Development applied to process documentation.**
 
-Setup notes (personal skills directory paths per runtime): see [reference.md](reference.md).
+Setup notes (personal skills directory paths per runtime): see [reference.md](reference.md). Per-runtime tool docs with the exact path: [claude-code-tools.md](../using-superpowers/references/claude-code-tools.md), [codex-tools.md](../using-superpowers/references/codex-tools.md), [copilot-tools.md](../using-superpowers/references/copilot-tools.md), [gemini-tools.md](../using-superpowers/references/gemini-tools.md).
 
 You write test cases (pressure scenarios with subagents), watch them fail (baseline behavior), write the skill (documentation), watch tests pass (agents comply), and refactor (close loopholes).
 
@@ -126,7 +126,7 @@ Edit skill without testing? Same violation.
 
 **REQUIRED BACKGROUND:** The dmi-superpowers:test-driven-development skill explains why this matters. Same principles apply to documentation.
 
-Testing approaches by skill type, common rationalizations for skipping testing, the prohibitions-vs-recipes discussion ("Match the Form to the Failure"), the full bulletproofing/rationalization catalog, the RED-GREEN-REFACTOR phase elaboration, and wording-test evidence for micro-testing: see [bulletproofing.md](bulletproofing.md).
+Testing approaches by skill type, common rationalizations for skipping testing, the prohibitions-vs-recipes discussion ("Match the Form to the Failure"), the full bulletproofing/rationalization catalog, the RED-GREEN-REFACTOR phase elaboration, and wording-test evidence for micro-testing: see [bulletproofing.md](bulletproofing.md). For the complete pressure-scenario methodology (writing pressure scenarios, pressure types, plugging holes systematically, meta-testing): see [testing-skills-with-subagents.md](testing-skills-with-subagents.md).
 
 Anti-pattern examples (narrative examples, multi-language dilution, code-in-flowcharts, generic labels): see [examples.md](examples.md).
 
