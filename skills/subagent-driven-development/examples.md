@@ -161,7 +161,7 @@ that implementer. Single-file mechanical fixes also take the cheapest tier.
 
 Everything you paste into a dispatch prompt — and everything a subagent
 prints back — stays resident in your context for the rest of the session
-and is re-read on every later turn. Hand artifacts over as files:
+and is re-read on every later turn.
 
 ### Report file / reviewer-inputs bullets
 
