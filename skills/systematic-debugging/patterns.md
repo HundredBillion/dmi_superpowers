@@ -15,7 +15,7 @@ Use these to *generate* and *sharpen* candidate hypotheses (not to replace the r
 3. **Identify differences.** What's different between working and broken? List every difference, however small. Don't assume "that can't matter".
 4. **Understand dependencies.** What other components, settings, config, environment does this need? What assumptions does it make?
 
-Each difference you find is a candidate hypothesis. Fix at the source, not at the symptom (SKILL.md points to the complete backward-tracing technique for bugs deep in the call stack).
+Each difference you find is a candidate hypothesis. Fix at the source, not at the symptom.
 
 ### Show the ranked list to the user before testing
 
