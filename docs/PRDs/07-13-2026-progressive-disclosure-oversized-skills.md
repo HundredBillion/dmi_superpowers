@@ -53,19 +53,31 @@ keep every load-bearing rule resident, verify parity with subagent evals.
 
 ## 4. The governing rule — the classification rubric
 
-Every block in a SKILL.md is tagged:
+Terms are defined in `CONTEXT.md` (**guarantee**, **load-bearing rule**). Before
+trimming a skill, enumerate its **guarantees** — Iron Laws, hard gates, red-flag
+stops — verbatim from the current SKILL.md into a checklist. That checklist is
+both the trimming classifier and the eval grader's rubric (§6): there is one
+artifact, not two.
 
-- **Resident (never moves):** the decision path / flowchart; Iron Laws, hard
-  gates, red-flag "STOP" rules; the core numbered process; "when to use / when
-  NOT" boundaries — anything whose absence *at invocation time* changes
-  behavior.
-- **Deferrable (moves to a reference file):** worked examples and sample
-  transcripts; deep sub-procedures already gated behind "see X.md"; exhaustive
-  edge-case catalogs; long illustrative tables; background/rationale prose;
-  per-platform variants.
+Every block in a SKILL.md is then tagged:
+
+- **Resident (never moves):** any **load-bearing rule** — a block whose removal
+  would let an agent fail a checklist item. Includes the decision path /
+  flowchart, the Iron Laws / hard gates / red-flag stops themselves, the core
+  numbered process, and "when to use / when NOT" boundaries.
+- **Deferrable (moves to a reference file):** blocks that *illustrate* a
+  guarantee without being one — worked examples and sample transcripts, deep
+  sub-procedures already gated behind "see X.md", exhaustive edge-case catalogs,
+  long illustrative tables, background/rationale prose, per-platform variants.
 
 **The test:** _If the agent never opens the reference file, does the skill still
-enforce its core guarantee?_ If moving a block breaks that, it stays resident.
+enforce its guarantees?_ A block maps to a checklist item or it does not —
+classification is not a matter of taste.
+
+**Pre-eval savings floor.** Classification runs first (cheap). If a skill's
+projected resident savings is under ~1,000 tokens, it is **skipped** — no trim,
+no eval — and the projection is recorded. `systematic-debugging` (dense,
+mostly-load-bearing) may legitimately be skipped on this basis.
 
 ## 5. Trim mechanics and reference structure
 
@@ -81,25 +93,34 @@ enforce its core guarantee?_ If moving a block breaks that, it stays resident.
 
 ## 6. Eval gate (required before each skill's merge)
 
-Full subagent pressure-testing per `dmi-superpowers:writing-skills`, on all
-three skills:
+Full subagent pressure-testing per `dmi-superpowers:writing-skills`, on every
+skill that clears the §4 floor. Methodology and rationale are fixed in
+[ADR-0006](../adr/0006-progressive-disclosure-eval-parity-methodology.md):
 
-1. For each skill, define 2–4 **pressure scenarios** — a subagent task
-   engineered to tempt the exact failure the skill prevents. Scenarios are
-   derived directly from the skill's stated Iron Laws / hard gates, so they
-   test real guarantees.
+1. **Scenarios by coverage, not count.** Define pressure scenarios — subagent
+   tasks engineered to tempt the exact failure a guarantee prevents — such that
+   **every enumerated guarantee is exercised by at least one scenario** (one
+   scenario may cover several). "2–4" is the usual consequence, not a cap.
    - _systematic-debugging_: e.g. "here's a failing behavior, fix it" — tempts
      jumping to a fix without a feedback loop or root cause.
    - _subagent-driven-development_: a task that tempts skipping the
      subagent/verification discipline.
    - _writing-skills_: a skill-authoring task that tempts skipping the TDD /
      conciseness rubric.
-2. **Baseline:** run each scenario against the current (full) skill; record
-   whether the agent complied with the core guarantee.
-3. **After trim:** run the same scenarios against the trimmed skill; assert
-   compliance is **equal-or-better**.
-4. **Parity bar:** any regression means the deferred content was load-bearing —
-   pull it back into the body and re-run.
+2. **N=5, graded by a separate subagent.** Run each scenario **5 times** against
+   the current (full) skill and 5 times against the trimmed skill. A separate
+   grader subagent scores each run pass/fail against the guarantee checklist
+   (§4). The full-skill baseline is captured once and **frozen**.
+3. **Parity bar:** trimmed pass-rate ≥ full pass-rate on every scenario, **and**
+   the trimmed skill never fails a scenario the full skill passed 5/5 (a
+   must-hold guarantee cannot regress at all).
+4. **Frozen baseline; sub-5/5 guarantees pinned.** Pre-existing flakiness is not
+   fixed here (relocation, not rewriting — §3). Any guarantee the full skill
+   scores <5/5 on is reported as high-risk: its bar tightens to strict
+   run-for-run non-regression, and every block mapping to it stays resident
+   regardless of size.
+5. **On regression:** the deferred content was load-bearing — pull it back into
+   the body and re-run.
 
 ## 7. Execution plan (Approach A — sequential vertical slices)
 
@@ -119,14 +140,17 @@ is written down once and reused across all three.
 
 ## 8. Success criteria
 
-- Each SKILL.md body materially smaller (target ~2,000–2,500 tokens where the
-  content allows; the rubric decides what moves, not the number).
-- Subagent evals show trimmed ≥ full on every pressure scenario for all three
-  skills.
-- No load-bearing rule (Iron Law, hard gate, red-flag stop) left any body.
+- Each *trimmed* skill's body materially smaller (target ~2,000–2,500 tokens
+  where content allows; the rubric decides what moves, not the number). A skill
+  skipped by the §4 floor is a valid outcome, with its projection recorded.
+- Subagent evals meet the ADR-0006 parity bar on every guarantee-covering
+  scenario, for each trimmed skill.
+- No load-bearing rule (Iron Law, hard gate, red-flag stop) left any body; every
+  guarantee is covered by ≥1 scenario.
 - No reference file chains to another reference file; long reference files have
   a TOC.
-- Final report: summed per-invocation token savings across the three skills.
+- Final report: summed per-invocation token savings across the trimmed skills,
+  plus any sub-5/5 guarantees flagged.
 
 ## 9. Open risks
 

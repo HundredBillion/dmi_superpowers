@@ -69,3 +69,21 @@ the thing — if complexity vanishes or just moves, it was shallow → cut it; i
 concentrates because it was hiding real work, it is a **deep module** → keep it. The canonical
 arbiter between `ponytail` and `codebase-design`.
 _Avoid_: The complexity rule, the genuinely-complex test.
+
+### Skill authoring (the `writing-skills` domain)
+
+**Guarantee**:
+An Iron Law, hard gate, or red-flag stop that a skill exists to enforce — the behavior the
+skill promises to produce (e.g. systematic-debugging's "no fix without root cause"). A skill's
+guarantees are enumerated verbatim from its SKILL.md; together they are what any change to the
+skill must preserve.
+_Avoid_: Rule, principle, requirement (when you mean specifically the enforced promise).
+
+**Load-bearing rule**:
+A block of a SKILL.md body whose removal would let an agent fail one of the skill's
+**guarantees**. Load-bearing content must stay resident in the body (it is loaded and in
+context the moment the skill is invoked); everything else — examples, rationale, edge-case
+catalogs — is *deferrable* to a reference file that loads on demand. Whether a block is
+load-bearing is decided by the guarantee it maps to, not by taste: the enumerated guarantee
+checklist is both the trimming classifier and the eval grader's pass/fail rubric.
+_Avoid_: Important content, core content, essential (as vague synonyms).
