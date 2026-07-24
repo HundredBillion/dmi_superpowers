@@ -1,6 +1,6 @@
 ---
 name: writing-code-comments
-description: Use when writing or editing code and adding a comment, note, TODO, or docstring - keeps developer notes short and about intent or reason, not a walkthrough of the mechanics.
+description: Use when writing or editing code and adding a comment, note, TODO, or docstring — including when the change comes from a ticket, PR, or review thread whose ID could leak into the note.
 ---
 
 # Writing Code Comments
@@ -12,13 +12,14 @@ A code comment is a **developer note** — a line for whoever reads this code ne
 - **What** is this code trying to accomplish? (the intent)
 - **Why** is it written this way? (the reason — a constraint, a tradeoff, a non-obvious choice)
 
-**Core principle:** As few sentences as possible — usually one, often none. Plain, high-level language about the goal or the reason, never a restatement of the lines below it.
+**Core principle:** One sentence if possible, never more than three — and the note is **self-contained**: it carries the whole reason itself, readable by someone with only this file. Traceability to tickets lives in commit messages and PR bodies, not in the code.
 
 ## The Recipe
 
-Each comment is **one plain sentence** answering **what** or **why**. If it can't be said in a sentence, the code needs to be clearer — not the comment longer.
+Each comment is a self-contained note answering **what** or **why** — one plain sentence if possible, at most three.
 
 - Say the intent or the reason at a high level: the goal, the constraint, the surprise.
+- State the reason itself, in full. The note is complete when it reads without a ticket tracker, PR, chat thread, or plan document — a future developer may have the repo and nothing else.
 - Leave out the mechanics. The reader can read the code.
 - Prefer no comment when the code already speaks for itself.
 
@@ -40,17 +41,31 @@ for order in orders:
 pending_orders = [o for o in orders if o.status == "pending"]
 ```
 
+❌ Outsources the reason to a tracker the reader may not have:
+```python
+# Retry limit is 3 per CRM-430; see PR #78 discussion.
+def sync_contact(contact, attempts=3):
+```
+
+✅ Self-contained — the reason travels with the code:
+```python
+# Three attempts stays inside the CRM rate-limiter budget.
+def sync_contact(contact, attempts=3):
+```
+
 ## Quick Reference
 
 | A good comment... | A bad comment... |
 |---|---|
 | Says *what* the code is for, or *why* it's this way | Narrates *how*, line by line |
-| One sentence, plain language | A paragraph of prose |
+| One sentence (three at most), plain language | A paragraph of prose |
+| Carries the full reason itself | Points to a Jira key, PR number, ADR, plan doc, or review thread |
 | Explains a non-obvious choice or constraint | Repeats what the code already says |
 | Is absent when the code is self-evident | Is added out of habit |
 
 ## Common Mistakes
 
 - **Narrating the code** — `# increment the counter` above `count += 1`. Delete it.
-- **Multi-sentence notes** — if it runs to three sentences, keep the one that states the intent or the reason and drop the rest.
+- **Multi-sentence notes** — past three sentences, keep the ones that state the intent or the reason and drop the rest.
 - **Explaining the how instead of the why** — the how is already in the code; the why is what's missing.
+- **Citing the ticket instead of stating the reason** — `# KP-60: dedupe warnings` tells a future developer nothing once the tracker is gone (and it will be). Write the reason the ticket contained: `# Warn once per distinct key per bill, not per line.` Ticket IDs belong in the commit message and PR, where history tooling preserves them.

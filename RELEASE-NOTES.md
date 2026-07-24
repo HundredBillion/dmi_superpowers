@@ -1,5 +1,27 @@
 # dmi_superpowers Release Notes
 
+## v0.4.3 (2026-07-24)
+
+### `writing-code-comments`: developer notes are self-contained — no ticket references
+
+- **Added the self-containment rule to the canonical comment skill.** The rule ("no pointers
+  to Jira/ADR/plan/spec") already lived in the `test-driven-development` checklist and the
+  `subagent-driven-development` implementer self-review, but not in `writing-code-comments`
+  itself — so any flow that wrote comments without loading those two skills never saw it.
+  The recipe now states positively what a note IS: self-contained, carrying the whole reason,
+  readable by someone with only this file; one sentence preferred, never more than three.
+  Ticket IDs belong in commit messages and PR bodies.
+- **New before/after pair and Common Mistakes entry** showing the failure (`# Retry limit is
+  3 per CRM-430; see PR #78`) and the fix (`# Three attempts stays inside the CRM rate-limiter
+  budget.`).
+- **Description now triggers on ticket-context** ("including when the change comes from a
+  ticket, PR, or review thread whose ID could leak into the note") so the skill loads in
+  exactly the situations that produce the leak.
+- **Why this form:** baseline micro-test (3 reps, current skill text verbatim, ticket-heavy
+  task context) leaked tracker references in 2/3 notes; per `writing-skills` ("Match the Form
+  to the Failure") wrong-shaped output gets a positive recipe, not a prohibition. With the
+  amended text: 3/3 self-contained, one-sentence notes, zero references.
+
 ## v0.4.1 (2026-06-22)
 
 ### `creating-a-pull-request`: analogies that teach, not decorate
