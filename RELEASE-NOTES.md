@@ -22,6 +22,13 @@
   to the Failure") wrong-shaped output gets a positive recipe, not a prohibition. With the
   amended text: 3/3 self-contained, one-sentence notes, zero references.
 
+### `pretooluse-pr-reminder` hook: catch up with the plain-language PR style
+
+- The hook still demanded an "analogy-led" Summary and "do not skip the analogy" — wording
+  from v0.4.1 that v0.4.2's `creating-a-pull-request` explicitly reversed ("Skip analogies").
+  The reminder now matches the skill: plain-language problem-then-solution Summary, no
+  analogies.
+
 ## v0.4.1 (2026-06-22)
 
 ### `creating-a-pull-request`: analogies that teach, not decorate
