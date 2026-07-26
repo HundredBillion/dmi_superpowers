@@ -1,12 +1,12 @@
 # dmi_superpowers
 
-An open-source, continuously distilled collection of the best skills and concepts for giving coding agents the discipline to write high-quality code — consolidated from the superpowers plugin and Matt Pocock's skills into a single coherent methodology engine.
+An open-source, continuously distilled collection of the best skills and concepts for giving coding agents the discipline to write high-quality code — consolidating ideas from the superpowers plugin, Matt Pocock's skills, Ponytail, and Cursor's Thermos plugin into a single coherent methodology engine.
 
 Contributions are welcome. See [AGENTS.md](AGENTS.md) for what belongs here and how to write a pull request.
 
 ## What It Is
 
-`dmi_superpowers` packages 25 skills that guide coding agents through a disciplined workflow:
+`dmi_superpowers` packages 26 skills that guide coding agents through a disciplined workflow:
 
 **brainstorm → PRD → grill-with-docs → TSP → grill → TDD → review → finish**
 
@@ -174,4 +174,11 @@ MIT — see LICENSE file for details.
 
 ## Acknowledgements
 
-The `ponytail` skill and its persistence hook are adapted from [ponytail](https://github.com/DietrichGebert/ponytail) by DietrichGebert, used under the MIT License.
+`dmi_superpowers` builds on ideas and workflows from several open-source projects:
+
+- [obra/superpowers](https://github.com/obra/superpowers) provides the core brainstorming, planning, TDD, debugging, review, and branch-completion workflow.
+- [mattpocock/skills](https://github.com/mattpocock/skills) provides the domain-modeling, architecture, PRD, grilling, communication, and prototyping skills consolidated here.
+- [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) is the source of the `ponytail` minimalism skill and persistence hook, adapted here under the MIT License.
+- Cursor's [Thermos plugin](https://github.com/cursor/plugins/tree/main/plugins/thermos), particularly `thermo-nuclear-code-quality-review`, inspired the structural-quality lens in `requesting-code-review`: code-judo reframing, large-file decomposition, abstraction quality, and aggressive simplification without changing behavior. Cursor's plugin repository is available under the MIT License.
+
+These are influences incorporated into `dmi-superpowers`; users install this plugin as one package rather than installing each source plugin separately.
