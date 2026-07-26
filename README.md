@@ -63,7 +63,7 @@ The agent never just starts coding. It steps back, refines requirements, validat
 | Skill | Purpose |
 |---|---|
 | `writing-code-comments` | Keep developer notes short — one plain sentence about intent or reason, not a walkthrough of the code |
-| `ponytail` | persistent minimalism mode: defaults every solution to the simplest thing that works (YAGNI, stdlib/native first, shortest diff), at intensity lite/full/ultra. Off by default; type `ponytail [level]` or `be lazy` to activate (plain text, not a slash command — ADR-0005). |
+| `ponytail` | persistent minimalism mode: defaults every solution to the simplest thing that works (YAGNI, stdlib/native first, shortest diff), at intensity lite/full/ultra. Off by default; type `ponytail [level]` or `be lazy` to activate with plain text. |
 
 ## Installation
 
@@ -178,7 +178,7 @@ MIT — see LICENSE file for details.
 
 - [obra/superpowers](https://github.com/obra/superpowers) provides the core brainstorming, planning, TDD, debugging, review, and branch-completion workflow.
 - [mattpocock/skills](https://github.com/mattpocock/skills) provides the domain-modeling, architecture, PRD, grilling, communication, and prototyping skills consolidated here.
-- [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail) is the source of the `ponytail` minimalism skill and persistence hook, adapted here under the MIT License.
-- Cursor's [Thermos plugin](https://github.com/cursor/plugins/tree/main/plugins/thermos), particularly `thermo-nuclear-code-quality-review`, inspired the structural-quality lens in `requesting-code-review`: code-judo reframing, large-file decomposition, abstraction quality, and aggressive simplification without changing behavior. Cursor's plugin repository is available under the MIT License.
+- [DietrichGebert/ponytail](https://github.com/DietrichGebert/ponytail), created by Dietrich Gebert, is the source of the `ponytail` minimalism skill and persistence hook, adapted here under the MIT License.
+- Cursor's [Thermos plugin](https://github.com/cursor/plugins/tree/main/thermos), particularly `thermo-nuclear-code-quality-review`, inspired the structural-quality lens in `requesting-code-review`: code-judo reframing, large-file decomposition, abstraction quality, and aggressive simplification without changing behavior. The rubric originated in Cursor's built-in code-quality review prompt with additional constraints requested by Sualeh Asif; Eric Zakariasson contributed the public plugin version. Cursor's plugin repository is available under the MIT License.
 
 These are influences incorporated into `dmi-superpowers`; users install this plugin as one package rather than installing each source plugin separately.
