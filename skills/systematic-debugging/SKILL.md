@@ -27,19 +27,7 @@ If you catch yourself reading code to build a theory before a feedback loop exis
 
 ## Phase 0 — Orient
 
-Before anything else, get your bearings. **Orientation only — this does NOT license a fix.**
-
-1. **Read error messages and stack traces completely.**
-   - Don't skip past errors or warnings; they often contain the exact solution.
-   - Note line numbers, file paths, error codes.
-
-2. **Check recent changes.**
-   - What changed that could cause this? `git diff`, recent commits.
-   - New dependencies, config changes, environmental differences.
-
-3. **Read `CONTEXT.md` and relevant ADRs** for the modules you're touching, to ground your mental model before you start probing.
-
-Orientation gives you the shape of the problem. It does **not** entitle you to a fix — proceed to Phase 1 to build a loop.
+Get your bearings before Phase 1 (read errors, check recent changes, read CONTEXT.md) — see [examples.md](examples.md#phase-0--orient) for the mechanics. Orientation does **not** entitle you to a fix.
 
 ## Phase 1 — Build a feedback loop
 
@@ -47,71 +35,9 @@ Orientation gives you the shape of the problem. It does **not** entitle you to a
 
 Spend disproportionate effort here. **Be aggressive. Be creative. Refuse to give up.**
 
-### Ways to construct one — try them in roughly this order
-
-1. **Failing test** at whatever seam reaches the bug — unit, integration, e2e.
-2. **Curl / HTTP script** against a running dev server.
-3. **CLI invocation** with a fixture input, diffing stdout against a known-good snapshot.
-4. **Headless browser script** (Playwright / Puppeteer) — drives the UI, asserts on DOM/console/network.
-5. **Replay a captured trace.** Save a real network request / payload / event log to disk; replay it through the code path in isolation.
-6. **Throwaway harness.** Spin up a minimal subset of the system (one service, mocked deps) that exercises the bug code path with a single function call.
-7. **Property / fuzz loop.** If the bug is "sometimes wrong output", run 1000 random inputs and look for the failure mode.
-8. **Bisection harness.** If the bug appeared between two known states (commit, dataset, version), automate "boot at state X, check, repeat" so you can `git bisect run` it.
-9. **Differential loop.** Run the same input through old-version vs new-version (or two configs) and diff outputs.
-10. **HITL bash script.** Last resort. If a human must click, drive _them_ with `scripts/hitl-loop.template.sh` so the loop is still structured. Captured output feeds back to you.
+The ten ways to construct a loop (failing test, curl, CLI, headless browser, replay, throwaway harness, fuzz loop, bisection harness, differential loop, HITL script), the sub-technique for locating *where* a multi-component bug breaks, and tightening/non-deterministic-bug guidance: see [examples.md](examples.md#ways-to-construct-a-loop).
 
 Build the right feedback loop, and the bug is 90% fixed.
-
-### Locating *where* it breaks in a multi-component system
-
-A sub-technique for building the loop when the bug spans **multiple components** (CI → build → signing, API → service → database). Before you can assert on the symptom, you often need to find which boundary fails. Add diagnostic instrumentation at each component boundary, then run **once** to gather evidence showing *where* it breaks:
-
-```
-For EACH component boundary:
-  - Log what data enters component
-  - Log what data exits component
-  - Verify environment/config propagation
-  - Check state at each layer
-
-Run once to gather evidence showing WHERE it breaks
-THEN analyze evidence to identify failing component
-THEN narrow the feedback loop to that specific component
-```
-
-**Example (multi-layer system):**
-```bash
-# Layer 1: Workflow
-echo "=== Secrets available in workflow: ==="
-echo "IDENTITY: ${IDENTITY:+SET}${IDENTITY:-UNSET}"
-
-# Layer 2: Build script
-echo "=== Env vars in build script: ==="
-env | grep IDENTITY || echo "IDENTITY not in environment"
-
-# Layer 3: Signing script
-echo "=== Keychain state: ==="
-security list-keychains
-security find-identity -v
-
-# Layer 4: Actual signing
-codesign --sign "$IDENTITY" --verbose=4 "$APP"
-```
-
-**This reveals:** which layer fails (secrets → workflow ✓, workflow → build ✗) — letting you point the feedback loop at the right component.
-
-### Tighten the loop
-
-Treat the loop as a product. Once you have _a_ loop, **tighten** it:
-
-- Can I make it faster? (Cache setup, skip unrelated init, narrow the test scope.)
-- Can I make the signal sharper? (Assert on the specific symptom, not "didn't crash".)
-- Can I make it more deterministic? (Pin time, seed RNG, isolate filesystem, freeze network.)
-
-A 30-second flaky loop is barely better than no loop; a 2-second deterministic one is tight — a debugging superpower.
-
-### Non-deterministic bugs
-
-The goal is not a clean repro but a **higher reproduction rate**. Loop the trigger 100×, parallelise, add stress, narrow timing windows, inject sleeps. A 50%-flake bug is debuggable; 1% is not — keep raising the rate until it's debuggable.
 
 ### When you genuinely cannot build a loop
 
@@ -158,40 +84,48 @@ Each hypothesis must be **falsifiable**: state the prediction it makes.
 
 If you cannot state the prediction, the hypothesis is a vibe — discard or sharpen it.
 
-### Pattern Analysis — feed hypothesis generation
-
-Use these to *generate* and *sharpen* candidate hypotheses (not to replace the ranked list):
-
-1. **Find working examples.** Locate similar working code in the same codebase. What works that's similar to what's broken?
-2. **Compare against references.** If implementing a pattern, read the reference implementation **completely** — every line, not a skim — before applying.
-3. **Identify differences.** What's different between working and broken? List every difference, however small. Don't assume "that can't matter".
-4. **Understand dependencies.** What other components, settings, config, environment does this need? What assumptions does it make?
-
-Each difference you find is a candidate hypothesis. For bugs deep in the call stack, trace the bad value backward to its origin — see **`root-cause-tracing.md`** in this directory for the complete backward-tracing technique. Fix at the source, not at the symptom.
-
-### Show the ranked list to the user before testing
-
-They often have domain knowledge that re-ranks instantly ("we just deployed a change to #3"), or know hypotheses they've already ruled out. Cheap checkpoint, big time saver. Don't block on it — proceed with your ranking if the user is AFK.
-
-**When you present the ranked hypotheses to the user, format each with `dmi-superpowers:say` (code-findings mode):** plain headline, what the suspect code does, and the *Plain* / *Technical* split — so the user can re-rank on meaning, not jargon.
+Pattern-analysis techniques for generating and sharpening hypotheses, and presenting the ranked list to the user: see [patterns.md](patterns.md#pattern-analysis). For bugs deep in the call stack, trace the bad value backward to its origin — see **`root-cause-tracing.md`** in this directory for the complete backward-tracing technique. Fix at the source, not at the symptom.
 
 ## Phase 4 — Instrument
 
 Each probe must map to a specific prediction from Phase 3. **Change one variable at a time.**
 
-Tool preference:
-
-1. **Debugger / REPL inspection** if the env supports it. One breakpoint beats ten logs.
-2. **Targeted logs** at the boundaries that distinguish hypotheses.
-3. Never "log everything and grep".
+Instrumentation tool preference (debugger over logs, never "log everything") and the perf-regression measure-first branch: see [examples.md](examples.md#tool-preference).
 
 **Tag every debug log** with a unique prefix, e.g. `[DEBUG-a4f2]`. Cleanup at the end becomes a single grep. Untagged logs survive; tagged logs die.
-
-**Perf branch.** For performance regressions, logs are usually wrong. Instead: establish a baseline measurement (timing harness, `performance.now()`, profiler, query plan), then bisect. Measure first, fix second.
 
 When the bug involves waiting on a condition (timeouts, races, "it works if I add a sleep"), replace arbitrary timeouts with condition polling — see **`condition-based-waiting.md`** in this directory.
 
 ## Phase 5 — Fix + regression test
+
+### Verify the claims that justify the fix shape
+
+A fix's *shape* is usually decided by a claim that some other code depends on the
+current arrangement: "keeping these two values apart is what lets X compare
+them", "removing this would blind the Y check", "Z reads this field". That claim
+is the difference between re-pointing one line and adding a field, a second
+writer, and a paired change in another service.
+
+**Every such claim names a consumer. Go read the consumer, and state the file and
+line where it reads the value.** If you cannot name one, the claim is void — and
+so is the fix it was protecting.
+
+Do this even when the claim arrives as settled. These claims are where inherited
+analysis fails, for three reasons:
+
+- **They are negative claims.** "Nothing else reads this" and "this is what X
+  compares" cannot be settled by looking at the value being written. Reading the
+  writer proves nothing; only the reader decides.
+- **The consumer lives outside what you are changing** — another service, another
+  repo, the schema. Checking a fix's *scope* keeps you in code you already have
+  open; checking its *justification* does not, so it quietly gets skipped.
+- **They come pre-stamped as verified** by a ticket, a prior PR, a commit
+  message, a passing test's name, or your own earlier summary. A test proving a
+  value is *written* or *sent* proves nothing *reads* it.
+
+Cheapest sufficient check: grep the whole system for the field name, read every
+hit, and confirm the schema has the column at all. A justification that survives
+that is real; one that does not was holding up the wrong design.
 
 ### Verify the claims that justify the fix shape
 
@@ -228,7 +162,7 @@ A correct seam is one where the test exercises the **real bug pattern** as it oc
 
 **If no correct seam exists, that itself is the finding.** Note it. The codebase architecture is preventing the bug from being locked down. Flag this for Phase 6.
 
-**When you report the confirmed root cause to the user, format it with `dmi-superpowers:say` (the full four-beat):** Headline → What this code does → What's wrong (*Plain* / *Technical*, naming the exact file/function/lines) → Your call. This is a finding the user must understand and decide on — not status narration.
+Reporting the confirmed root cause to the user with `dmi-superpowers:say` (the full four-beat — this is a finding the user must understand and decide on, not status narration): see [patterns.md](patterns.md#reporting-practices).
 
 If a correct seam exists:
 
@@ -302,7 +236,7 @@ If you catch yourself thinking:
 
 **When you see these:** STOP. Return to Phase 1.
 
-### Common Rationalizations
+### The Common Rationalizations catalog and the "no root cause" edge case (95% of those are incomplete investigation): see [patterns.md](patterns.md#common-rationalizations).
 
 | Excuse | Reality |
 |--------|---------|
@@ -333,6 +267,8 @@ If systematic investigation reveals the issue is truly environmental, timing-dep
 ## Supporting files
 
 In this directory:
+- **`examples.md`** — orientation mechanics, ways to construct a feedback loop, locating where a multi-component bug breaks, tightening the loop, and instrumentation tool preference.
+- **`patterns.md`** — pattern-analysis hypothesis generation, reporting practices, the common-rationalizations catalog, and the "no root cause" edge case.
 - **`root-cause-tracing.md`** — trace bugs backward through the call stack to the original trigger (Phase 3).
 - **`condition-based-waiting.md`** (+ `condition-based-waiting-example.ts`) — replace arbitrary timeouts with condition polling (Phase 4).
 - **`defense-in-depth.md`** — add validation at multiple layers after finding the root cause (Phase 5).

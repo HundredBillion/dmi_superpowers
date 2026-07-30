@@ -9,5 +9,6 @@ triage/
 
 # Eval harness lives in its own repository, cloned into evals/ for local
 # development (see CLAUDE.md / README.md). It is not part of the published
-# plugin, so the whole directory is ignored here.
-evals/
+# plugin, so the whole directory is ignored here. Root-anchored so it does
+# not also sweep tracked docs (e.g. docs/evals/).
+/evals/
