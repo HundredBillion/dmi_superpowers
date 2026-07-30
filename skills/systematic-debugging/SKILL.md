@@ -193,6 +193,35 @@ When the bug involves waiting on a condition (timeouts, races, "it works if I ad
 
 ## Phase 5 — Fix + regression test
 
+### Verify the claims that justify the fix shape
+
+A fix's *shape* is usually decided by a claim that some other code depends on the
+current arrangement: "keeping these two values apart is what lets X compare
+them", "removing this would blind the Y check", "Z reads this field". That claim
+is the difference between re-pointing one line and adding a field, a second
+writer, and a paired change in another service.
+
+**Every such claim names a consumer. Go read the consumer, and state the file and
+line where it reads the value.** If you cannot name one, the claim is void — and
+so is the fix it was protecting.
+
+Do this even when the claim arrives as settled. These claims are where inherited
+analysis fails, for three reasons:
+
+- **They are negative claims.** "Nothing else reads this" and "this is what X
+  compares" cannot be settled by looking at the value being written. Reading the
+  writer proves nothing; only the reader decides.
+- **The consumer lives outside what you are changing** — another service, another
+  repo, the schema. Checking a fix's *scope* keeps you in code you already have
+  open; checking its *justification* does not, so it quietly gets skipped.
+- **They come pre-stamped as verified** by a ticket, a prior PR, a commit
+  message, a passing test's name, or your own earlier summary. A test proving a
+  value is *written* or *sent* proves nothing *reads* it.
+
+Cheapest sufficient check: grep the whole system for the field name, read every
+hit, and confirm the schema has the column at all. A justification that survives
+that is real; one that does not was holding up the wrong design.
+
 Write the regression test **before the fix** — but only if there is a **correct seam** for it.
 
 A correct seam is one where the test exercises the **real bug pattern** as it occurs at the call site. If the only available seam is too shallow (single-caller test when the bug needs multiple callers, unit test that can't replicate the chain that triggered the bug), a regression test there gives false confidence.
@@ -250,6 +279,8 @@ If you catch yourself thinking:
 - "It's probably X, let me fix that"
 - "I don't fully understand but this might work"
 - "Pattern says X but I'll adapt it differently"
+- **"This separation is what lets X compare Y" (naming a consumer you have not opened)**
+- **"Removing this would blind Z" (never read Z)**
 - "Here are the main problems: [lists fixes without investigation]"
 - Proposing solutions before building a feedback loop or tracing data flow
 - **"One more fix attempt" (when already tried 2+)**
@@ -263,6 +294,7 @@ If you catch yourself thinking:
 
 **Watch for these redirections:**
 - "Is that not happening?" — you assumed without verifying
+- "Are we sure it reads that?" — you took a consumer claim on trust
 - "Will it show us...?" — you should have added evidence gathering
 - "Stop guessing" — you're proposing fixes without understanding
 - "Ultra-think this" — question fundamentals, not just symptoms
@@ -282,6 +314,9 @@ If you catch yourself thinking:
 | "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
 | "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
+| "The ticket/prior PR already confirmed the mechanism" | It named a consumer. Open the consumer. Someone else's confirmation is a claim, not evidence. |
+| "A passing test covers that behaviour" | A test that a value is written or sent proves nothing reads it. Read the reader. |
+| "That check would be blinded if I changed this" | Name the file and line that performs the check. If you cannot, there is no check to blind. |
 | "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question the pattern, don't fix again. |
 
 ### When the process reveals "no root cause"
