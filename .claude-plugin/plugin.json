@@ -1,7 +1,7 @@
 {
   "name": "dmi-superpowers",
   "description": "DMI core skills library: brainstorm→PRD→TSP→TDD workflow, merged debugging, collaboration patterns",
-  "version": "0.4.2",
+  "version": "0.4.4",
   "author": {
     "name": "dmi_superpowers contributors"
   },

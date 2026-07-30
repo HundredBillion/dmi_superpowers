@@ -9,7 +9,7 @@
 # the `using-superpowers` rule, and the easiest skill to skip under momentum
 # ("just open the PR") is `creating-a-pull-request`. A skipped invocation
 # yields a PR body that opens with the technical summary and drops the
-# plain-language, analogy-led Summary a non-developer needs. This hook puts a
+# plain-language Summary a non-developer needs. This hook puts a
 # deterministic nudge at the exact moment the PR command runs, so the reminder
 # no longer depends on the agent remembering.
 #
@@ -44,7 +44,7 @@ if [ "$should_remind" -eq 0 ]; then
   exit 0
 fi
 
-reminder="REMINDER (dmi-superpowers): this command writes a PR body. Invoke the 'creating-a-pull-request' skill BEFORE running it (skip only if you already did this session). The body MUST lead with a plain-language, analogy-led **Summary** for a non-developer, then a **TLDR for developers** (what changed + why this way), then **Evidence**. Do not open with the technical summary; do not skip the analogy."
+reminder="REMINDER (dmi-superpowers): this command writes a PR body. Invoke the 'creating-a-pull-request' skill BEFORE running it (skip only if you already did this session). The body MUST lead with a plain-language **Summary** for a non-developer (the problem, then the solution — no analogies), then a **TLDR for developers** (what changed + why this way), then **Evidence**. Do not open with the technical summary."
 
 # Platform-aware output, mirroring hooks/session-start:
 #  - Cursor expects additional_context (snake_case, top-level)
