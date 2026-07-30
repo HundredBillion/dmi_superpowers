@@ -3,6 +3,12 @@ name: using-superpowers
 description: Use when starting any conversation - establishes how to find and use skills, requiring skill invocation before ANY response including clarifying questions
 ---
 
+<!-- DRIFT GUARD: the SessionStart hook (hooks/session-start) injects a hand-trimmed
+     summary of the core rules below, not this whole file. If you change a core rule
+     (the ~1% invoke-before-acting threshold, process-before-implementation ordering,
+     or the user > skills > default priority), update the boot message in
+     hooks/session-start and its checks in hooks/session-start.test.js too. -->
+
 <SUBAGENT-STOP>
 If you were dispatched as a subagent to execute a specific task, skip this skill.
 </SUBAGENT-STOP>
