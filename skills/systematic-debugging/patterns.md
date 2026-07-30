@@ -39,6 +39,9 @@ They often have domain knowledge that re-ranks instantly ("we just deployed a ch
 | "Multiple fixes at once saves time" | Can't isolate what worked. Causes new bugs. |
 | "Reference too long, I'll adapt the pattern" | Partial understanding guarantees bugs. Read it completely. |
 | "I see the problem, let me fix it" | Seeing symptoms ≠ understanding root cause. |
+| "The ticket/prior PR already confirmed the mechanism" | It named a consumer. Open the consumer. Someone else's confirmation is a claim, not evidence. |
+| "A passing test covers that behaviour" | A test that a value is written or sent proves nothing reads it. Read the reader. |
+| "That check would be blinded if I changed this" | Name the file and line that performs the check. If you cannot, there is no check to blind. |
 | "One more fix attempt" (after 2+ failures) | 3+ failures = architectural problem. Question the pattern, don't fix again. |
 
 ## When the process reveals "no root cause"
