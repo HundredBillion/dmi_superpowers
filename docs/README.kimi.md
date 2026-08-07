@@ -10,10 +10,10 @@ Install dmi-superpowers from this repository:
 /plugins install https://github.com/HundredBillion/dmi_superpowers
 ```
 
-For unreleased changes on the active `consolidation` branch, pin the branch explicitly:
+For unreleased changes on the `main` branch, pin the branch explicitly:
 
 ```text
-/plugins install https://github.com/HundredBillion/dmi_superpowers/tree/consolidation
+/plugins install https://github.com/HundredBillion/dmi_superpowers/tree/main
 ```
 
 Kimi Code applies plugin changes to new sessions. After installing, updating, enabling, disabling, or reloading a plugin, start a fresh session with `/new`.
@@ -68,7 +68,7 @@ Select dmi-superpowers and update it from there. Start a fresh session with `/ne
 Kimi Code installs the latest GitHub release for a bare repository URL when one exists. To test unreleased changes before the next dmi-superpowers release, install the branch explicitly:
 
 ```text
-/plugins install https://github.com/HundredBillion/dmi_superpowers/tree/consolidation
+/plugins install https://github.com/HundredBillion/dmi_superpowers/tree/main
 ```
 
 ### Skills not triggering

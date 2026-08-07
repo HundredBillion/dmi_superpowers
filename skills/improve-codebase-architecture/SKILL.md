@@ -1,7 +1,6 @@
 ---
 name: improve-codebase-architecture
-description: Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through whichever one you pick.
-disable-model-invocation: true
+description: Use when a debugging post-mortem concludes the root cause was architectural (no test seam, tangled callers, hidden coupling), or when the user asks for an architecture review, a deepening pass, or wants to find over-engineering to cut. Writes an HTML report to a temp directory and opens it.
 ---
 
 # Improve Codebase Architecture

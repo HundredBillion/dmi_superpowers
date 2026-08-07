@@ -72,14 +72,14 @@ Install dmi-superpowers separately for each harness you use.
 ### Claude Code
 
 ```bash
-/plugin install dmi-superpowers@dmi-superpowers-marketplace
+/plugin install dmi-superpowers@dmi-marketplace
 ```
 
 Or from this repository directly:
 
 ```bash
 /plugin marketplace add HundredBillion/dmi_superpowers
-/plugin install dmi-superpowers@dmi-superpowers-marketplace
+/plugin install dmi-superpowers@dmi-marketplace
 ```
 
 ### Antigravity
