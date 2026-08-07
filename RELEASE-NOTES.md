@@ -1,5 +1,107 @@
 # dmi_superpowers Release Notes
 
+## v0.5.0 (2026-08-07)
+
+Sweep from an architecture review of this repo (`/dmi-superpowers:improve-codebase-architecture`
+run against itself). Minor rather than patch: the shipped payload loses 4,296 lines and four
+skill descriptions changed, which affects when those skills load.
+
+### Broken for users — fixed
+
+- **The documented install command did not work.** `README.md` said
+  `dmi-superpowers@dmi-superpowers-marketplace`; `a20afa9` renamed the marketplace to
+  `dmi-marketplace` on 2026-06-19 and the README never followed, so the `@<marketplace>`
+  suffix could not resolve. The OpenCode guide pinned `#v0.2.0` (this repo has zero git tags)
+  and the Kimi guide pinned a `consolidation` branch that does not exist; both now point at
+  `main`.
+- **`systematic-debugging`'s Phase 6 handoff could never fire.** It hands off to
+  `improve-codebase-architecture`, which carried `disable-model-invocation: true` — so the
+  model could not invoke it and the instruction silently no-opped. Not a decision this repo
+  made: the flag arrived with the upstream import (`d404478`) and the handoff arrived from a
+  merge (`ab4dd5e`) **the same day**, and nobody reconciled them. The flag is gone and the
+  description is now a `Use when…` trigger naming the two situations that should reach it,
+  with its file-writing side effect stated.
+- **The PR reminder and ponytail never ran outside Claude.** `hooks-codex.json` and
+  `hooks-cursor.json` registered only `SessionStart` while `hooks.json` registered three
+  events, leaving the Cursor and Copilot branches inside those scripts as unreachable code.
+  Both configs now register all three.
+
+### One place decides the harness output shape
+
+Four harnesses want three JSON envelopes, and that three-way branch was written out in every
+hook that injects context — plus a fourth copy in `ponytail-runtime.js` that detected Codex
+from `PLUGIN_DATA`, a variable **no bash hook ever read**, so one Codex session could be
+`codex` to node and `unknown` to bash at the same moment. Detection and shape now live in
+`hooks/harness-shapes.json`, applied by the new `hooks/emit-context` and required by the node
+runtime. Adding a harness is a table row.
+
+The table is parsed with `sed`, not `jq`: `jq` is not a safe dependency inside a session-start
+hook, since a user without it would lose the bootstrap entirely. The file is kept one harness
+per line for that reason, and CI asserts the two runtimes still agree.
+
+### Deleted — 4,296 lines
+
+`docs/TSPs/` (2,344) were execution scripts for shipped work with every checkbox still
+unchecked and absolute paths to another machine. `docs/PRDs/` (732) are covered by
+ADR-0003/0004/0005/0006, which carry `## Considered Options`.
+`writing-plans/plan-document-reviewer-prompt.md` (49) had **zero inbound references** and was
+superseded by `SKILL.md:145-155`. `writing-skills/anthropic-best-practices.md` (1,150) was a
+third of that skill's shipped payload behind one bare-filename mention two hops deep.
+`.pre-commit-config.yaml` guarded an `evals/` tree that does not exist, so all three of its
+hooks were inert. Git history keeps every one of them; what was being paid for was
+working-tree and shipped-payload cost.
+
+### `AGENTS.md` points instead of restating
+
+It restated the PR format and drifted: it asked for **an analogy** in the Summary long after
+`creating-a-pull-request`, `.github/PULL_REQUEST_TEMPLATE.md` and the `pretooluse-pr-reminder`
+hook had all settled on the opposite rule. Because `CLAUDE.md` is an 11-byte delegation to it,
+Claude loaded the wrong rule every session while the hook fired the right one at PR time. The
+restatement is gone — the skill is now the only statement of the format.
+
+Also corrected: *"No automated test suite"* (two test files exist), *"~25 skills"* (26), and
+*"verify skill changes by running them in a real session"*, which **ADR-0002** says is
+impossible for working-tree skill edits; it now describes content-simulation plus
+post-reinstall confirmation and cites the ADR.
+
+### CI — nothing ran on a PR before
+
+`.github/workflows/validate.yml` runs the two hook tests, `scripts/lint-shell.sh`, JSON parsing
+of every manifest, the version audit, a check that the README install command matches the
+declared marketplace name, hook parity across the three configs, and a check that
+`emit-context` agrees with the shape table. The middle two would each have caught a bug that
+shipped. It calls `lint-shell.sh` rather than `shellcheck` directly so CI enforces the repo's
+existing `--severity=warning` policy rather than a stricter invented one.
+
+### Trigger collisions
+
+`grilling` claimed *"any 'grill' trigger phrases"* while `grill-with-docs` had no `Use when…`
+clause at all (against `writing-skills:50`); `dispatching-parallel-agents` and
+`subagent-driven-development` both said "independent tasks" with nothing to choose between
+them and shared a byte-identical paragraph. All four descriptions now discriminate, and the
+duplicated paragraph is a pointer.
+
+`grill-with-docs` was **kept**, against the review's own recommendation to cut it: it is
+referenced 11 times across 3 skills, including inside `brainstorming`'s graphviz flowchart and
+its *"the ONLY skills you invoke after brainstorming"* constraint — the name is a protocol
+token, not an alias.
+
+### Eval methodology wired to its callers
+
+`AGENTS.md` and the PR template both gate PRs on evaluation evidence and neither named the
+method; `writing-skills`, the skill the methodology is about, never said "eval". All three now
+point at `docs/evals/README.md` and ADR-0006. Not fixed here: the three `*-guarantees.md` files
+still cite line ranges that no longer resolve.
+
+### Not verified
+
+The Cursor and Codex hook registrations are unverified **on those harnesses** — the configs
+parse and `emit-context` produces the right envelope for each, but no Cursor or Codex instance
+was available to confirm they accept `preToolUse` / `userPromptSubmit` under those schema
+names. Claude is unaffected either way. The four description rewrites also ship without a
+baseline/treatment eval: per ADR-0002 working-tree skill edits are not invokable in-session,
+and each fixes a provable contradiction in the text rather than a measured behaviour delta.
+
 ## v0.4.5 (2026-08-07)
 
 ### `pretooluse-pr-reminder`: walk the acceptance criteria before calling the work done
