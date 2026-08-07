@@ -15,7 +15,9 @@ You write test cases (pressure scenarios with subagents), watch them fail (basel
 
 **Core principle:** If you didn't watch an agent fail without the skill, you don't know if the skill teaches the right thing.
 
-**REQUIRED BACKGROUND:** You MUST understand dmi-superpowers:test-driven-development before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill adapts TDD to documentation.
+**REQUIRED BACKGROUND:** You MUST understand dmi-superpowers:test-driven-development before using this skill.
+
+**The eval procedure lives in `docs/evals/README.md` (ADR-0006):** dispatch subagents against the current skill text to establish a baseline, make the change, re-run, and report both arms. `AGENTS.md` gates PRs on that evidence, so produce it there rather than inventing a method. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill adapts TDD to documentation.
 
 Official guidance pointer and "What is a Skill?": see [reference.md](reference.md).
 

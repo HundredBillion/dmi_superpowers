@@ -1,6 +1,6 @@
 ---
 name: subagent-driven-development
-description: Use when executing implementation plans with independent tasks in the current session
+description: Use when executing a written implementation plan (TSP) whose tasks are independent, in the current session. For ad-hoc fan-out with no plan behind it, use dispatching-parallel-agents instead.
 ---
 
 # Subagent-Driven Development
