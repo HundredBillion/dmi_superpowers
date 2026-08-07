@@ -13,6 +13,14 @@
 # deterministic nudge at the exact moment the PR command runs, so the reminder
 # no longer depends on the agent remembering.
 #
+# The second paragraph of the reminder carries the acceptance-criteria walk for
+# the same reason. `verification-before-completion` already rules that "tests
+# passing" is not sufficient evidence that a requirement is met, but that row
+# is easiest to forget precisely when a long session ends on a green suite --
+# the point at which the criteria are about to be restated as done. Naming the
+# evidence per criterion is what turns an ambiguous criterion ("the rule fires
+# once") into a question the author has to answer before a reviewer does.
+#
 # Non-blocking by design: it injects context, it does not deny the command.
 # A hard block would deadlock the legitimate `gh pr create` that *follows*
 # invoking the skill (the hook can't see whether the skill already ran), so a
@@ -44,7 +52,7 @@ if [ "$should_remind" -eq 0 ]; then
   exit 0
 fi
 
-reminder="REMINDER (dmi-superpowers): this command writes a PR body. Invoke the 'creating-a-pull-request' skill BEFORE running it (skip only if you already did this session). The body MUST lead with a plain-language **Summary** for a non-developer (the problem, then the solution — no analogies), then a **TLDR for developers** (what changed + why this way), then **Evidence**. Do not open with the technical summary."
+reminder="REMINDER (dmi-superpowers): this command writes a PR body. Invoke the 'creating-a-pull-request' skill BEFORE running it (skip only if you already did this session). The body MUST lead with a plain-language **Summary** for a non-developer (the problem, then the solution — no analogies), then a **TLDR for developers** (what changed + why this way), then **Evidence**. Do not open with the technical summary. Before you claim this work is complete, walk the ticket's acceptance criteria LINE BY LINE against what you have actually proven. A passing test suite is explicitly NOT sufficient evidence that a requirement is met. For each criterion, name the evidence that establishes it. Where a criterion has no evidence, say so in the PR body rather than letting a green suite imply coverage."
 
 # Platform-aware output, mirroring hooks/session-start:
 #  - Cursor expects additional_context (snake_case, top-level)

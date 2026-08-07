@@ -1,5 +1,48 @@
 # dmi_superpowers Release Notes
 
+## v0.4.5 (2026-08-07)
+
+### `pretooluse-pr-reminder`: walk the acceptance criteria before calling the work done
+
+- **The hook now also asks for an acceptance-criteria audit** at the moment a PR body is
+  written: walk the ticket's criteria line by line against what has actually been proven,
+  name the evidence for each, and say so in the body where a criterion has none. One
+  paragraph appended to the existing reminder string; no new hook, no new matcher, no skill
+  edits.
+- **Why a hook and not skill text.** `verification-before-completion` already rules that
+  "tests passing" is *not sufficient* for "requirements met" — the row exists and is
+  correct. The failure is recall, not knowledge: that row is easiest to forget at the end of
+  a long session that finishes on a green suite, which is exactly when the criteria are
+  about to be restated as done. A hook fires regardless of how much context precedes it;
+  a document competes with it. Same reasoning that put the PR-format reminder here.
+- **Why this form:** baseline micro-test, 3 valid reps per arm, identical long-context
+  scenario (a real ticket with 5 acceptance criteria, the design already chosen and
+  implemented, 5 green unit tests, both suites passing, lint and migration clean, branches
+  pushed), the arms differing only in the injected reminder. The load-bearing criterion was
+  *"transformer rule fires once and routes to bill.additional_charges"*, whose ambiguity —
+  once per bill, or once per account? — is where the real defect hid.
+
+  | | control | treatment |
+  |---|---|---|
+  | flagged that criterion as not fully proven | 1/3 | 3/3 |
+  | identified *"once"* itself as unproven | **0/3** | **3/3** |
+
+  Control is not a blank miss: agents do walk the criteria unprompted, and one run caught
+  the weaker half (routing asserted at the rule-engine layer, not end-to-end). None
+  questioned once-ness; two ticked the criterion outright on the strength of the green
+  suite. Treatment reached it by three independent routes — that once-ness is a property of
+  how many records upstream emits and nothing tested the two stages together; that the
+  single-account fixture never exercised the multi-account case; and that a hand-built
+  fixture proves the rule handles such a record, not that one is emitted per account.
+- **Provenance:** the scenario is a real post-mortem — that criterion shipped a design which
+  had to be reversed after review. One control rep was discarded as contaminated (it reached
+  the live ticket and PRs through `gh` and Jira despite a filesystem-only seal, which is
+  worth knowing for anyone running these evals on a machine with the real repos on it); the
+  counts above are valid runs only.
+- **No skill files changed.** Six candidate skill edits were pressure-tested first and all
+  six baselines passed against the current text — agents already do those things when asked
+  cold. Only the recall failure reproduced, so only the recall failure is addressed here.
+
 ## v0.4.3 (2026-07-24)
 
 ### `writing-code-comments`: developer notes are self-contained — no ticket references
