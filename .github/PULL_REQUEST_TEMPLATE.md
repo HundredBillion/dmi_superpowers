@@ -18,6 +18,6 @@ Keep the section order below. Plain-language meaning first, technical detail sec
 
 ## Checklist
 - [ ] One concern in this PR (unrelated changes split out)
-- [ ] If a skill's behavior changed, I used `dmi-superpowers:writing-skills` and included eval / subagent evidence above
+- [ ] If a skill's behavior changed, I used `dmi-superpowers:writing-skills` and included eval / subagent evidence above (method: `docs/evals/README.md`, ADR-0006 — baseline both arms)
 - [ ] Change is general-purpose core (project-, tool-, or domain-specific work belongs in a standalone plugin)
 - [ ] Disclosed the model, harness, and harness version used to produce this contribution

@@ -27,22 +27,19 @@ per-harness: `hooks/hooks.json` (Claude), `hooks-codex.json`, `hooks-cursor.json
 ## Contributing — submitting a pull request
 
 **Write every PR with the `dmi-superpowers:creating-a-pull-request` skill.** It is not
-optional house style; it is the format this repo reviews against. In short:
+optional house style; it is the format this repo reviews against.
 
-- **Title** — a plain-language *outcome*, never a mechanism.
-  - ✅ "Stop agents from skipping the test-first step on quick fixes"
-  - ❌ "Add RED-state guard to tdd SKILL.md"
-- **Summary** (always) — for a non-developer. What this PR does in plain language, with an
-  analogy to make the concept land. Two to four sentences.
-- **TLDR for developers** (always) — what changed (files, skills, mechanisms) and *why it was
-  written this way*, not just a restatement of the diff.
-- **Evidence** (when meaningful) — for skill changes, before/after agent behavior from
-  subagent pressure-testing; otherwise before/after logs or screenshots. Say so if you omit it.
+**That skill is the only statement of the PR format.** This file deliberately does not
+restate it. A second copy is a copy that drifts, and this one did: it asked for an analogy
+in the Summary long after the skill, the PR template, and the `pretooluse-pr-reminder` hook
+had all settled on the opposite rule. Read the skill; do not learn the format from here.
 
 Repo-specific expectations on top of the skill:
 
 - **One concern per PR.** Split unrelated changes.
-- **Skill behavior changes need evaluation evidence** (see the cardinal rule above).
+- **Skill behavior changes need evaluation evidence** (see the cardinal rule above). The
+  method is in `docs/evals/README.md` and ADR-0006: dispatch subagents against the current
+  skill text to establish a baseline, make the change, then re-run and report both arms.
 - **Confirm it belongs in core.** Project-, tool-, or domain-specific skills belong in a
   standalone plugin, not here.
 - **Disclose your environment.** Note the model, harness, and harness version used to produce
@@ -50,12 +47,17 @@ Repo-specific expectations on top of the skill:
 
 ## Validating a change
 
-- Shell: `scripts/lint-shell.sh`
+- CI runs everything below on every PR — see `.github/workflows/validate.yml`
+- Hook tests: `node hooks/session-start.test.js` · `node hooks/ponytail-mode-tracker.test.js`
+- Shell: `scripts/lint-shell.sh` (shellcheck)
 - Codex plugin mirror: `scripts/sync-to-codex-plugin.sh` after changes that affect it
-- Version bump: `scripts/bump-version.sh` (version lives in `.claude-plugin/plugin.json`)
-- No automated test suite — verify skill changes by running them in a real session.
+- Version bump: `scripts/bump-version.sh` — syncs all seven manifests; `--audit` finds strays
+- **Skill edits are not testable in the session that makes them.** Per ADR-0002, working-tree
+  changes under `skills/` are not invokable — not even by dispatched subagents, which inherit
+  the parent session's already-loaded skills. Verify by content-simulation in-session (paste
+  the amended text into a subagent's prompt), then confirm live after `/plugin` reinstall.
 
 ## Facts
 
-- Skill namespace: `dmi-superpowers:`  ·  ~25 skills — see README for the inventory
+- Skill namespace: `dmi-superpowers:`  ·  26 skills — see README for the inventory
 - Plugin manifest: `.claude-plugin/plugin.json` / `marketplace.json`

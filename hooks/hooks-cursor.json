@@ -5,6 +5,16 @@
       {
         "command": "./hooks/run-hook.cmd session-start"
       }
+    ],
+    "userPromptSubmit": [
+      {
+        "command": "command -v node >/dev/null 2>&1 && node ./hooks/ponytail-mode-tracker.js || exit 0"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": "./hooks/run-hook.cmd pretooluse-pr-reminder"
+      }
     ]
   }
 }

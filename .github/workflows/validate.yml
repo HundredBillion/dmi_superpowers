@@ -1,0 +1,108 @@
+name: Validate
+
+# Nothing used to run on a PR here: the two hook tests were runnable by hand and
+# run by nobody, .pre-commit-config.yaml guarded an evals/ tree that does not
+# exist, and package.json had no scripts field. Every drift this workflow checks
+# for is one that actually shipped — a marketplace name the README got wrong, a
+# hook registered on one harness and not the others, a dead variable shellcheck
+# would have caught.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Hook tests
+        run: |
+          node hooks/session-start.test.js
+          node hooks/ponytail-mode-tracker.test.js
+
+      # Uses the repo's own entry point rather than calling shellcheck directly,
+      # so CI enforces exactly the severity policy lint-shell.sh already sets
+      # (--severity=warning) instead of inventing a stricter one.
+      - name: Shellcheck
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq shellcheck
+          bash scripts/lint-shell.sh
+
+      - name: Manifests and hook configs parse
+        run: |
+          for f in hooks/*.json .claude-plugin/*.json .cursor-plugin/*.json \
+                   .codex-plugin/*.json .kimi-plugin/*.json gemini-extension.json package.json; do
+            python3 -c "import json,sys; json.load(open('$f'))" || { echo "invalid JSON: $f"; exit 1; }
+          done
+
+      - name: Version surfaces in sync
+        run: bash scripts/bump-version.sh --audit
+
+      # The README's install command embeds the marketplace name. They drifted
+      # apart for seven weeks and the documented install silently failed.
+      - name: Install command matches marketplace name
+        run: |
+          declared=$(python3 -c "import json; print(json.load(open('.claude-plugin/marketplace.json'))['name'])")
+          if ! grep -q "dmi-superpowers@${declared}" README.md; then
+            echo "README install command does not reference the declared marketplace name: ${declared}"
+            grep -n 'plugin install' README.md || true
+            exit 1
+          fi
+
+      # hooks.json is the Claude registration; the other harnesses had silently
+      # stopped tracking it, leaving two hooks Claude-only and their non-Claude
+      # code paths unreachable.
+      - name: Hook parity across harnesses
+        run: |
+          python3 - <<'PY'
+          import json, sys
+          claude = json.load(open('hooks/hooks.json'))['hooks']
+          codex  = json.load(open('hooks/hooks-codex.json'))['hooks']
+          cursor = json.load(open('hooks/hooks-cursor.json'))['hooks']
+          norm = lambda d: {k.lower() for k in d}
+          missing = []
+          for name, cfg in (('codex', codex), ('cursor', cursor)):
+              gap = norm(claude) - norm(cfg)
+              if gap:
+                  missing.append(f"{name} is missing: {sorted(gap)}")
+          if missing:
+              print("Hook registrations have drifted from hooks/hooks.json:")
+              [print(" ", m) for m in missing]
+              sys.exit(1)
+          print("hook parity OK:", sorted(norm(claude)))
+          PY
+
+      # Every harness in the shape table must resolve to a real envelope, and
+      # emit-context must agree with the table node reads.
+      - name: Harness shape table is consistent
+        run: |
+          python3 - <<'PY'
+          import json, subprocess, sys
+          t = json.load(open('hooks/harness-shapes.json'))
+          shapes = set(t['shapes'])
+          entries = t['harnesses'] + [t['fallback']]
+          bad = [h['name'] for h in entries if h['shape'] not in shapes]
+          if bad:
+              print("harnesses reference an undefined shape:", bad); sys.exit(1)
+          expected = {'cursor': 'additional_context', 'codex': 'hookSpecificOutput',
+                      'claude': 'hookSpecificOutput'}
+          for h in t['harnesses']:
+              env = {'PATH': '/usr/bin:/bin', h['detect'][0]: '/x'}
+              out = subprocess.run(['bash', 'hooks/emit-context', 'E'], input='X',
+                                   capture_output=True, text=True, env=env).stdout
+              got = list(json.loads(out))[0]
+              want = expected[h['name']]
+              want_key = 'additional_context' if want == 'additional_context' else (
+                  'hookSpecificOutput' if want == 'hookSpecificOutput' else 'additionalContext')
+              if got != want_key:
+                  print(f"emit-context disagrees with the table for {h['name']}: {got} != {want_key}")
+                  sys.exit(1)
+          print("shape table OK for", [h['name'] for h in t['harnesses']])
+          PY

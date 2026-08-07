@@ -54,18 +54,9 @@ fi
 
 reminder="REMINDER (dmi-superpowers): this command writes a PR body. Invoke the 'creating-a-pull-request' skill BEFORE running it (skip only if you already did this session). The body MUST lead with a plain-language **Summary** for a non-developer (the problem, then the solution — no analogies), then a **TLDR for developers** (what changed + why this way), then **Evidence**. Do not open with the technical summary. Before you claim this work is complete, walk the ticket's acceptance criteria LINE BY LINE against what you have actually proven. A passing test suite is explicitly NOT sufficient evidence that a requirement is met. For each criterion, name the evidence that establishes it. Where a criterion has no evidence, say so in the PR body rather than letting a green suite imply coverage."
 
-# Platform-aware output, mirroring hooks/session-start:
-#  - Cursor expects additional_context (snake_case, top-level)
-#  - Claude Code expects hookSpecificOutput.additionalContext (nested)
-#  - Copilot CLI / others expect additionalContext (top-level, SDK standard)
-# The reminder string contains no double quotes, backslashes, or newlines, so
-# it is safe to embed directly in the JSON "%s" slot.
-if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
-  printf '{\n  "additional_context": "%s"\n}\n' "$reminder"
-elif [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && [ -z "${COPILOT_CLI:-}" ]; then
-  printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "PreToolUse",\n    "additionalContext": "%s"\n  }\n}\n' "$reminder"
-else
-  printf '{\n  "additionalContext": "%s"\n}\n' "$reminder"
-fi
+# Harness detection and envelope shape live in hooks/harness-shapes.json and are
+# applied by hooks/emit-context. The reminder string contains no double quotes,
+# backslashes, or newlines, so it is safe to embed directly in the JSON "%s" slot.
+printf '%s' "$reminder" | "$(dirname "$0")/emit-context" PreToolUse
 
 exit 0

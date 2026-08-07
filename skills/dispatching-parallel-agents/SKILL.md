@@ -1,13 +1,13 @@
 ---
 name: dispatching-parallel-agents
-description: Use when facing 2+ independent tasks that can be worked on without shared state or sequential dependencies
+description: Use when facing 2+ independent tasks with no shared state or ordering between them and no written plan to work from — ad-hoc fan-out. When the tasks come from a TSP, use subagent-driven-development instead.
 ---
 
 # Dispatching Parallel Agents
 
 ## Overview
 
-You delegate tasks to specialized agents with isolated context. By precisely crafting their instructions and context, you ensure they stay focused and succeed at their task. They should never inherit your session's context or history — you construct exactly what they need. This also preserves your own context for coordination work.
+Subagent isolation, prompt construction and context handoff are covered by `dmi-superpowers:subagent-driven-development` — read it there rather than here. This skill covers only what differs for ad-hoc fan-out: choosing what is genuinely independent, and reviewing several returns at once.
 
 When you have multiple unrelated failures (different test files, different subsystems, different bugs), investigating them sequentially wastes time. Each investigation is independent and can happen in parallel.
 
