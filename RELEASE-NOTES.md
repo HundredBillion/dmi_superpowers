@@ -1,5 +1,67 @@
 # dmi_superpowers Release Notes
 
+## v0.5.1 (2026-08-22)
+
+Eight verification gates (#27), each derived from a specific way one real session went wrong
+while fixing a device-model bug in a Rails app. Patch rather than minor: no skill description
+changed, so nothing changes about when a skill loads — only what it demands once loaded.
+
+The through-line is that none of the eight was a reasoning failure. In every case the
+conclusion was reasonable given what had been looked at, and wrong because of what had not
+been. So each is written as a gate at the step where the mistake happens, not as advice to
+remember later.
+
+### `systematic-debugging`
+
+- **Census discipline (Phase 3).** A search for every writer of a value, piped through
+  `head -40`, hid three writers — one of them a real instance of the bug being fixed — and the
+  commit message then claimed the bug closed. A command whose output feeds a completeness claim
+  may not be truncated: print the count first, and if you truncate you forfeit *every / all /
+  only / the N writers* until you re-run unbounded.
+- **A claim someone else makes gets the same check (Phase 5).** The section already required
+  going to read the consumer for claims you generate yourself. Review comments, tickets and
+  inherited summaries arrive pre-stamped as authoritative and skipped it entirely. In the
+  session a finding whose facts were all correct rested on a false premise, and the test
+  written to lock the behaviour down is what disproved it.
+- **Measure what a guard gates (Phase 5).** The obvious repair to a freshness condition would
+  have silently stopped model updates for roughly 20,000 devices. A guard's behaviour is a
+  property of the data flowing through it, not of the expression, so count the population that
+  passes it now and after.
+
+### `verification-before-completion`
+
+- **The check must be able to fail.** `docker exec` without `-i` does not forward stdin, so a
+  `--stdin` linter read an empty buffer and reported "no offenses detected" — a green it was
+  structurally incapable of not producing. Know the last time a command failed before citing
+  it; if it never has, break an input on purpose. Includes a table of the usual ways a check
+  silently cannot fail.
+- **Verify by artifact kind, not proximity.** Locale files were changed and the specs near
+  them were run; the repo's own i18n check is what caught the breakage, twice. A table maps
+  artifact kinds — locales, migrations, views, routes, dependencies, schemas — to the check
+  that guards each.
+
+### `codebase-design`
+
+- **Find the solved twin.** A new module was proposed for per-provider key handling thirty
+  lines below the same problem already solved in the same file. Search the file, then its
+  directory, then the repo, and name the precedent you are following or state that none
+  exists. A second home for knowledge that already has one is the most common way a
+  well-intentioned module makes a codebase worse.
+
+### `improve-codebase-architecture`
+
+- **Measured, not estimated, line counts.** A Simplify/delete card claimed a ~280-line saving
+  estimated from file sizes; reading all seven files put the real figure at 41. A sevenfold
+  overstatement in a document whose only purpose is prioritisation. The count must come from
+  performing or dry-running the deletion, or be labelled an estimate with its method.
+
+### `writing-code-comments`
+
+- **A repeated comment is a design smell.** The skill correctly produced a one-sentence note
+  explaining why a merge had to follow a filter — and that note was then pasted into seven
+  files. A comment defending an invariant a tidy-up would break is a guard that cannot enforce
+  itself; extract the rule and let the comment live once beside it.
+
 ## v0.5.0 (2026-08-07)
 
 Sweep from an architecture review of this repo (`/dmi-superpowers:improve-codebase-architecture`
