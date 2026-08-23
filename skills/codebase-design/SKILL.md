@@ -94,6 +94,23 @@ Good interfaces make testing natural:
 
 3. **Small surface area.** Fewer methods = fewer tests needed. Fewer params = simpler test setup.
 
+## Before proposing a new module: find the solved twin
+
+The same problem has often already been solved a few lines away, and the existing
+solution names the seam better than a new one will.
+
+Search before designing — the file you are editing first, then its directory,
+then the repo — for:
+
+- the same *shape* of problem (per-provider key spelling, retry with backoff)
+- the same *concept* under a different name
+- an existing constant, adapter, or reader to extend rather than parallel
+
+Then state the precedent you are following, or that you searched and found none.
+Adding a second home for knowledge that already has one is the most common way a
+well-intentioned module makes a codebase worse: the copies drift, and the drift
+stays invisible until they disagree in production.
+
 ## Relationships
 
 - A **Module** has exactly one **Interface** (the surface it presents to callers and tests).
