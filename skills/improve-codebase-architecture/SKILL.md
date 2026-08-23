@@ -50,8 +50,13 @@ For each candidate, render a card with:
 **Candidate type:** tag each card as **Deepen** or **Simplify / delete**. For
 Simplify / delete cards, label the specific move with the tag taxonomy —
 `delete:` / `stdlib:` / `native:` / `yagni:` / `shrink:` — and state the line
-count the deletion saves. The before/after diagram shows the structure
-shrinking rather than deepening.
+count the deletion saves. That count must come from performing or dry-running the
+deletion — read every file you propose to collapse. A number estimated from file
+sizes routinely overstates the saving several-fold, because most of what looks
+duplicated turns out to be genuinely per-case; a report whose purpose is
+prioritisation is the wrong place for that error. If you have not done the read,
+label the figure an estimate and say how you arrived at it. The before/after
+diagram shows the structure shrinking rather than deepening.
 
 End the report with a **Top recommendation** section: which candidate you'd tackle first and why.
 

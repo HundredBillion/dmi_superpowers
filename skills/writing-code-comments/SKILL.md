@@ -68,4 +68,9 @@ def sync_contact(contact, attempts=3):
 - **Narrating the code** — `# increment the counter` above `count += 1`. Delete it.
 - **Multi-sentence notes** — past three sentences, keep the ones that state the intent or the reason and drop the rest.
 - **Explaining the how instead of the why** — the how is already in the code; the why is what's missing.
+- **The same comment in more than one place** — if a note must be repeated to keep
+  several copies of a rule correct, the rule wants to be code. A comment defending
+  an ordering or an invariant that a tidy-up would break is the strongest form of
+  this signal: you are writing a guard that cannot enforce itself. Extract the
+  rule; let the comment live once, beside it.
 - **Citing the ticket instead of stating the reason** — `# KP-60: dedupe warnings` tells a future developer nothing once the tracker is gone (and it will be). Write the reason the ticket contained: `# Warn once per distinct key per bill, not per line.` Ticket IDs belong in the commit message and PR, where history tooling preserves them.

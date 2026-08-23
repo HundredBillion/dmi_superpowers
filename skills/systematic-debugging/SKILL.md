@@ -84,6 +84,22 @@ Each hypothesis must be **falsifiable**: state the prediction it makes.
 
 If you cannot state the prediction, the hypothesis is a vibe — discard or sharpen it.
 
+### Census discipline — never truncate evidence you intend to count
+
+A command whose output feeds a completeness claim must not be truncated. `| head`,
+`| tail`, `-m`, and a query `limit` silently turn *all* into *some*, and the rows
+they drop are invisible in the result you paste.
+
+- Print the count first (`grep -c`, `count(*)`), then the rows, and state the
+  count in the finding.
+- If you truncate for readability, you forfeit the words **every, all, only,
+  none, the N writers** until you re-run unbounded.
+
+This bites hardest when enumerating the *writers* of a value, the *callers* of a
+function, or the *consumers* of a field — exactly the lists a fix's completeness
+rests on. A fix that routed six of nine writers is not a partial fix; it is a bug
+report you wrote about yourself and then closed.
+
 Pattern-analysis techniques for generating and sharpening hypotheses, and presenting the ranked list to the user: see [patterns.md](patterns.md#pattern-analysis). For bugs deep in the call stack, trace the bad value backward to its origin — see **`root-cause-tracing.md`** in this directory for the complete backward-tracing technique. Fix at the source, not at the symptom.
 
 ## Phase 4 — Instrument
@@ -126,6 +142,26 @@ analysis fails, for three reasons:
 Cheapest sufficient check: grep the whole system for the field name, read every
 hit, and confirm the schema has the column at all. A justification that survives
 that is real; one that does not was holding up the wrong design.
+
+**The same rule applies to a claim someone else makes.** A review comment, ticket,
+or inherited summary asserting *"this flow works today"*, *"an admin can do X"*, or
+*"nothing else reads this"* is a claim about behaviour, and it arrives pre-stamped
+as authoritative — which is exactly why it skips the check. Go make the behaviour
+happen before you act on the finding; the test you would write to lock it down
+*is* the check. A finding whose facts are all correct and whose premise is wrong
+will send you to fix something that was never broken, and the fix will look
+reasonable to everyone.
+
+### Changing a guard: measure what it gates
+
+Before altering a conditional that decides whether a write happens, count the
+records that pass it now and the records that would pass after. A guard's
+behaviour is a property of the data flowing through it, not of the expression.
+
+An expression that reads as obviously wrong can be load-bearing for most of the
+fleet, and an obviously-better replacement can silently stop work for a large
+population. Report both numbers; if you cannot obtain them, say the change is
+unmeasured rather than letting the cleaner expression imply it is safer.
 
 Write the regression test **before the fix** — but only if there is a **correct seam** for it.
 
@@ -185,6 +221,8 @@ If you catch yourself thinking:
 - "I don't fully understand but this might work"
 - "Pattern says X but I'll adapt it differently"
 - **"This separation is what lets X compare Y" (naming a consumer you have not opened)**
+- **"Every writer now goes through…" (from a search you piped through `head`)**
+- **"The reviewer says this path works, so I'll protect it" (never ran the path)**
 - **"Removing this would blind Z" (never read Z)**
 - "Here are the main problems: [lists fixes without investigation]"
 - Proposing solutions before building a feedback loop or tracing data flow

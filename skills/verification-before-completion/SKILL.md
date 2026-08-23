@@ -37,6 +37,50 @@ BEFORE claiming any status or expressing satisfaction:
 Skip any step = lying, not verifying
 ```
 
+## The Check Must Be Able To Fail
+
+A green result from a command that *cannot* go red proves nothing, and reads
+exactly like a real pass. Before citing any verification, know the last time you
+watched it fail.
+
+```
+BEFORE citing a command as evidence:
+
+1. Has this command failed, in this session, on this work?
+   - YES: cite it
+   - NO:  break one input on purpose, watch it go red, restore, re-run
+```
+
+Ways a check silently cannot fail:
+
+| Symptom | Cause |
+|---------|-------|
+| "no offenses" on a file you know is messy | The tool got empty input — wrong path, unattached stdin, glob matched nothing |
+| A filtered run reports "0 examples" | The name/`-e` filter matched nothing |
+| A grep-based audit returns nothing | Pattern wrong, or output truncated |
+| A regression test passes before the fix | It is not exercising the bug |
+
+Command wrappers are a frequent cause: `docker exec` without `-i` does not
+forward stdin, so a `--stdin` linter reads an empty buffer and reports success.
+
+## Verify By Artifact Kind, Not By Proximity
+
+Running the tests *near* your change is not the same as running the checks *for*
+it. For each kind of artifact the change touches, name the check that guards that
+kind, and run it.
+
+| Changed | Guarded by (typical) |
+|---------|----------------------|
+| Locale / translation files | The repo's i18n consistency spec, `i18n-tasks` |
+| Migrations / schema | Schema load, pending-migration check, fresh test DB |
+| Views / templates | View or system specs, template compilation |
+| Routes | Routing specs |
+| Dependencies | Clean install from lockfile, audit |
+| Public API / schema | Schema dump or contract test |
+
+If you cannot name the check for something you changed, say so rather than
+letting a nearby green suite imply coverage.
+
 ## Common Failures
 
 | Claim | Requires | Not Sufficient |
@@ -48,6 +92,8 @@ Skip any step = lying, not verifying
 | Regression test works | Red-green cycle verified | Test passes once |
 | Agent completed | VCS diff shows changes | Agent reports "success" |
 | Requirements met | Line-by-line checklist | Tests passing |
+| No new lint errors | Same linter on old and new, both runs producing output | One run, or a run whose input you did not confirm |
+| Every caller/writer found | Unbounded search with a count | A search piped through `head` |
 
 ## Red Flags - STOP
 
