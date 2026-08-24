@@ -56,7 +56,7 @@ Ways a check silently cannot fail:
 | Symptom | Cause |
 |---------|-------|
 | "no offenses" on a file you know is messy | The tool got empty input — wrong path, unattached stdin, glob matched nothing |
-| A filtered run reports "0 examples" | The name/`-e` filter matched nothing |
+| A filtered run reports "0 examples" | The name/`-e` filter matched nothing, or the loader crashed before collection (a missing env var, an unloadable gem) |
 | A grep-based audit returns nothing | Pattern wrong, or output truncated |
 | A regression test passes before the fix | It is not exercising the bug |
 
