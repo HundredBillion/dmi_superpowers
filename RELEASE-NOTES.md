@@ -1,5 +1,60 @@
 # dmi_superpowers Release Notes
 
+## v0.6.0 (2026-08-23)
+
+Rewrites `writing-code-comments` around a length rule that scales, plus six new rules and six
+red flags. Minor rather than patch even though no skill description changed: the core principle
+is *reversed*, not extended, and a changelog reader needs to notice that.
+
+The evidence is one session that rewrote every developer note in a Rails PR after the author
+said, repeatedly, that he could not understand them. Nine commits, roughly nineteen distinct
+defects. Not one comment was too long in the way the skill warned about — every defect was a
+comment that was too *thin*: missing a name, a number, a third case, a destination.
+
+### `writing-code-comments`
+
+- **Length now follows what the note guards.** The old rule was "one sentence if possible,
+  never more than three", applied to every comment alike. The skill also told you to extract a
+  spanning invariant and let one note carry it — and then capped that note at three sentences,
+  which made it unwritable. Two kinds are now named: an **inline note** keeps the three-sentence
+  cap; an **invariant note**, sitting on the owner of a rule that spans callers, runs as long as
+  the rule takes. The test is that every line answers a question you can name.
+- **Name It, Don't Point At It.** Five of the seven defects found in a final audit pass were
+  this one defect: "these three", "two columns", "the chain", "the reader below", a bare "it",
+  and "the non-creating lookup" followed by the name of the creating one. Also: quote literal
+  values when two identifiers are near-homographs, because paraphrasing `'Bulk Import'` and
+  `'Bulk Update'` as "the bulk import" made a note read as contradicting its own code.
+- **Every Number Is A Claim.** Two of the three specific claims written that session were
+  wrong. "every writer of any of its ninety columns" described a 68-column table, checkable
+  with one call. A four-provider mapping was presented as the complete set of seven. When a
+  claim cannot be verified, state what is known plus the failure mode, not a false inventory.
+- **Account For Every Exit.** Four notes summarised two of three early returns. A reader who
+  counts the returns and finds one unexplained assumes it is a bug.
+- **Defer, Don't Paraphrase.** A caller restating one of its callee's three reasons was correct
+  when written and wrong the moment the callee's own note improved. Point at it and stop. And
+  before writing "See X", read X — in one case X already said it, so the pointer was a duplicate.
+- **Name The Destination, Not The Transport.** "leaves through a queue that no rollback reaches"
+  sent readers hunting for a table. The effect was an email a person at another company acts on,
+  irreversible by anything in the codebase — which is what made the surrounding ordering care
+  look proportionate instead of fussy.
+- **State Rules Forwards, And Lead With The Present.** Positively, never inverted in a relative
+  clause (`whose reverts this guard exists to lose to` said the guard loses), rule before
+  history, and warning before justification.
+- **Mechanics.** One sentence per line, never breaking mid-sentence, which makes each sentence's
+  budget `LineLength − comment prefix` and moves with indentation. Measure rather than eyeball:
+  a sentence that will not fit is usually two ideas. Plainness costs lines and that is the trade.
+- **Six new red flags**: explaining an omission without naming what depends on it; under-
+  describing a side effect (`# try to find` above `find_or_create_by`); naming the method in its
+  own doc comment (`# def foo` already means dead code in 18 places in the target repo); saying
+  what was wrong without saying why it was *silent*; adjacent branches making opposite safety
+  choices undocumented; and a comment positioned to annotate the line above the one it explains.
+
+### `verification-before-completion`
+
+- **"0 examples" has a second cause.** The table blamed a filter matching nothing. In the
+  session it was a loader crash before collection — a missing `RAILS_ENV=test` left a test-group
+  gem undefined, and the run printed `0 examples, 0 failures`, which reads like a pass.
+
 ## v0.5.1 (2026-08-22)
 
 Eight verification gates (#27), each derived from a specific way one real session went wrong
