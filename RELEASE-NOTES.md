@@ -1,5 +1,45 @@
 # dmi_superpowers Release Notes
 
+## v0.6.1 (2026-08-23)
+
+Cuts four of the six rules v0.6.0 added to `writing-code-comments`, because the eval that
+should have gated v0.6.0 was run afterwards and showed those four were already being
+followed without them. Patch: this removes guidance, changes no description, and leaves
+v0.6.0's core change standing.
+
+The eval ran two arms — 0.5.1 and 0.6.0 — five blind runs each, one scenario, a separate
+grader per run, graders unaware a second arm existed. Full results and caveats are on #29.
+
+| Guarantee | 0.5.1 | 0.6.0 | outcome |
+|-----------|-------|-------|---------|
+| names the three sources rather than counting them | 1/5 | 4/5 | kept, tightened |
+| quotes `'Bulk Import'` / `'Bulk Update'` literally | 0/5 | 4/5 | kept, tightened |
+| accounts for every early return | 5/5 | 5/5 | **cut** |
+| states no invented number | 5/5 | 5/5 | **cut** |
+| states rules forwards | 5/5 | 4/5 | **cut** |
+| names the omission's dependent | 5/5 | 4/5 | **cut** |
+
+### `writing-code-comments`
+
+- **Cut `Every Number Is A Claim`, `Account For Every Exit`, `State Rules Forwards, And
+  Lead With The Present`, and the Common Mistakes bullet on naming an omission's
+  dependent.** All four scored 5/5 against the *old* text: agents accounted for every
+  exit, declined a planted "68 columns" fact, stated rules forwards, and named the
+  downstream job with no instruction to. Two of the four then scored 4/5 with the new
+  text, which points the wrong way. Guidance that costs tokens on every load and changes
+  no behaviour is guidance to delete.
+- **Tightened the two that earned their place** into checks rather than prose. Naming
+  instead of counting is stated as a step to run before writing a note, and the
+  near-homograph rule is stated as a correctness requirement, since both sit at 4/5 with
+  the new text — reduced, not prevented.
+- **Kept but still untested:** `Defer, Don't Paraphrase`, `Name The Destination, Not The
+  Transport`, and `Mechanics`. The scenario never exercised them, so they are neither
+  supported nor refuted. They need a fixture with an outbound side effect and a
+  delegating caller.
+- The v0.6.0 length rule stands. It resolves a contradiction inside the skill — extract a
+  spanning invariant, then cap the resulting note at three sentences — rather than an
+  empirical finding, and no checklist item measured it.
+
 ## v0.6.0 (2026-08-23)
 
 Rewrites `writing-code-comments` around a length rule that scales, plus six new rules and six

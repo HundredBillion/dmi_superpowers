@@ -61,8 +61,12 @@ def sync_contact(contact, attempts=3):
 
 ## Name It, Don't Point At It
 
-A note that refers to something by count or position costs the reader a lookup
-they will skip. Spell out the thing.
+**Before you write a note, check it for a count or a position word.** "these three",
+"two columns", "the chain", "the reader below", a bare "it", "the non-creating
+lookup" — each is a referent you owe the reader, and each costs a lookup they will
+skip. Replace it with the thing itself. This is the most common comment defect
+measured: five of seven found in one audit, and four of five agents reproduced it
+unprompted against guidance that did not name it.
 
 | ❌ points | ✅ names |
 |---|---|
@@ -73,31 +77,12 @@ they will skip. Spell out the thing.
 | `# so it only runs where…` | `# so #newer? only runs where…` |
 | `# the reader below used to be handed the record` | `# A reader inside device_attributes once said @mdm` |
 
-**Quote literal values when two identifiers are near-homographs.** Prose that
-paraphrases `'Bulk Import'` and `'Bulk Update'` as "the bulk import" destroys the
-only distinction the reader needed, and the note then reads as contradicting its
-own code.
-
-## Every Number Is A Claim
-
-A specific number, date, or list in a note is an assertion a reader will trust and
-never re-check. Verify it with a command before writing it, or don't write it.
-
-- `# every writer of any of its ninety columns` — the table had **68**.
-  `Device.column_names.size` would have said so in one call.
-- `# Intune and Zoho write imei, MaaS360 imei_esn, AirWatch Imei` — four of seven
-  providers, presented as the complete set.
-
-When you cannot verify, say what you know and what happens when the list is wrong:
-`# the others seen so far write imei` plus
-`# A provider using some other key reads as blank until that key is added here.`
-Vague beats confidently wrong; a stated failure mode beats a false inventory.
-
-## Account For Every Exit
-
-If a method has N early returns, the note accounts for N. A summary naming two of
-three sends a reader hunting for the reason the third exists, and they will assume
-it is a bug.
+**Two identifiers that read alike must both appear as literal values.** Not a style
+preference — a correctness one. Prose paraphrasing `'Bulk Import'` and `'Bulk Update'`
+as "the bulk import" destroys the only distinction the reader needed, and the note
+then reads as contradicting its own code. Five of five agents made exactly this
+mistake against guidance that did not forbid it. If your note mentions a thing the
+list excludes, quote the string.
 
 ## Defer, Don't Paraphrase
 
@@ -126,20 +111,6 @@ The first describes plumbing; the second tells you the effect happens in another
 company and is irreversible — which is what makes the surrounding care look
 proportionate rather than fussy.
 
-## State Rules Forwards, And Lead With The Present
-
-- **Positively:** "The person wins if their change came after the report" beats
-  "the MDM does not overwrite a change made after…". A negation makes the reader
-  construct the positive case, and they can get it wrong.
-- **Never invert the point in a relative clause.** `# the overnight job whose
-  reverts this guard exists to lose to` says the guard loses. It was meant to say
-  the reverts do.
-- **Rule first, history second.** A note that spends four of six lines on deleted
-  code answers a question nobody asked before the one they did.
-- **Warning before justification.** `# Do not mix this into another model.` then
-  the reasons — not two clauses of self-justification first, because a skimming
-  reader takes away the opposite.
-
 ## Mechanics
 
 **One sentence per line, never a break mid-sentence.** This makes each sentence's
@@ -162,8 +133,6 @@ distinction plain words can't — but only that.
 | Names the things it refers to | Points at them by count or position |
 | Scales to the rule it guards | Pads an inline note past three sentences |
 | Carries the full reason itself | Points to a Jira key, PR number, ADR, plan doc, or review thread |
-| Verifies every number it states | States a specific figure nobody checked |
-| Accounts for every exit | Explains some of the early returns |
 | Is absent when the code is self-evident | Is added out of habit |
 
 ## Common Mistakes
@@ -177,10 +146,6 @@ distinction plain words can't — but only that.
   rule; let the comment live once, beside it — and then let that one note be as
   long as the rule needs.
 - **Citing the ticket instead of stating the reason** — `# KP-60: dedupe warnings` tells a future developer nothing once the tracker is gone (and it will be). Write the reason the ticket contained: `# Warn once per distinct key per bill, not per line.` Ticket IDs belong in the commit message and PR, where history tooling preserves them.
-- **Explaining an omission without naming what depends on it** — "leaves the alias
-  in place" is unverifiable; `# ResolveDeviceModelsJob finds it by that pointer`
-  gives the reader somewhere to go. Comments about what code *doesn't* do need an
-  anchor more than comments about what it does.
 - **Under-describing a side effect** — `# try to find the mapping` above
   `find_or_create_by` grants false confidence that the line is safe to reorder or
   skip. Worse than no comment.
