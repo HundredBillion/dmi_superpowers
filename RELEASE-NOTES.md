@@ -1,5 +1,47 @@
 # dmi_superpowers Release Notes
 
+## v0.7.0 (2026-08-25)
+
+Adds one check to `writing-code-comments`: grep the note you just wrote for position
+words. Minor, because it changes what agents produce. Three further checks were proposed,
+evaluated, and not merged.
+
+Eval CC1 ran two arms — current `main` and `main` plus the four proposed checks — five
+blind runs each, one scenario, a separate grader per run. Runners could not tell which
+arm they were in; graders saw neither the arm nor the run identity, and judged only the
+comments produced, not the agent's prose about its own decisions.
+
+| Guarantee | baseline | candidate | outcome |
+|-----------|----------|-----------|---------|
+| names its referent instead of pointing by position | 2/5 | 5/5 | **added** |
+| header <= 3 lines, or each extra line justified | 0/5 | 0/5 | **cut** |
+| no ticket prose copied into a comment | 0/5 | 0/5 | **cut** |
+| does not name a file the same change deletes | 5/5 | 5/5 | **cut** |
+
+### `writing-code-comments`
+
+- **Added `Before You Finish, Check The Note You Just Wrote`** — a grep over your own
+  diff for `above|below|here|these|those`. The skill already carried
+  `Name It, Don't Point At It`, and agents that had read it still shipped "neither kill
+  below", "the only honest liveness test here", "still holding the port after that".
+  Guidance alone did not hold; a command to run against the diff did.
+- **Not added: the stale-referent check.** Both arms scored 5/5 — agents already decline
+  to name a file their own change deletes. Same finding as v0.6.1: a rule that changes
+  nothing costs tokens on every load.
+- **Not added: the header-length and ticket-prose checks.** Both scored 0/5 in both arms.
+  The length rule is gameable through the skill's own invariant-note exemption, which
+  every run took, writing one collective justification instead of a per-line one. The
+  ticket-prose rule asks agents to judge their own paraphrasing, which the transcripts
+  show them doing wrongly and confidently — one run stated it had recast the ticket
+  rather than pasting it, in the same file where the grader found near-verbatim
+  reproduction. Both failure modes are recorded in
+  `docs/evals/writing-code-comments-guarantees.md` so the next attempt starts from the
+  analysis rather than the same wording.
+
+Caveat: `OVERALL` (all four guarantees in one run) was 0/5 in both arms. The candidate is
+better on the one guarantee that moved and no worse on any other, but no run passed
+everything.
+
 ## v0.6.1 (2026-08-23)
 
 Cuts four of the six rules v0.6.0 added to `writing-code-comments`, because the eval that
