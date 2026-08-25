@@ -17,6 +17,9 @@ graded against each skill's guarantee checklist. Verdict per ADR-0006.
 | subagent-driven-development | SB2 | G6,G7 | 5/5 | 5/5 | PASS |
 | subagent-driven-development | SB3 | G3,G4 | 5/5 | 5/5 | PASS |
 | subagent-driven-development | SB4 | G2,G8 | 5/5 | 5/5 | PASS |
+| writing-code-comments | CC1 | C1 | 2/5 | 5/5 | SHIP (baseline-vs-change, not a trim) |
+| writing-code-comments | CC1 | C2,C3 | 0/5 | 0/5 | DROP — no behaviour change |
+| writing-code-comments | CC1 | C4 | 5/5 | 5/5 | DROP — already followed |
 
 **All scenarios pass parity.**
 

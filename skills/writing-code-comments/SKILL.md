@@ -125,6 +125,15 @@ means the same thing to more people. Jargon is compression that only works for a
 reader who already decompresses it for free. Keep the jargon that carries a
 distinction plain words can't — but only that.
 
+## Before You Finish, Check The Note You Just Wrote
+
+Comments have no compiler and no test, so the check has to be yours. Run it on the
+lines you just added, not on the file around them:
+
+    git diff -U0 | grep '^+' | grep -inE '\b(above|below|here|these|those)\b'
+
+Every hit is a referent you owe the reader. Name the thing instead.
+
 ## Quick Reference
 
 | A good comment... | A bad comment... |
