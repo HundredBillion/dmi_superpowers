@@ -19,6 +19,11 @@ implementation context and a review gate per task. Use the chosen mode.
 
 ## The Process
 
+Resolve `SDD_SCRIPTS` to the absolute `scripts` directory of the installed
+`subagent-driven-development` skill. Run every helper with the **target
+worktree as the working directory**, never from the plugin's install directory:
+the helpers use the current Git repository to place the plan's records.
+
 ### Step 1: Establish the Plan Record
 
 1. Use `dmi-superpowers:using-git-worktrees` to create an isolated workspace or
@@ -31,8 +36,8 @@ implementation context and a review gate per task. Use the chosen mode.
    the approved scope and record the decision and reason; ask about a change to
    the agreed behavior or a contradiction the source requirements do not settle.
 3. Resolve this plan's workspace with
-   `bash ../subagent-driven-development/scripts/sdd-workspace PLAN_FILE`
-   (paths here are relative to this skill's directory). Read its `plan-path`
+   `bash "$SDD_SCRIPTS/sdd-workspace" PLAN_FILE`.
+   Read its `plan-path`
    identity and only its `progress.md`. Never adopt another plan's ledger or
    the old shared `.superpowers/sdd/progress.md`.
 4. Create `progress.md` with the plan identity, source PRD, `MERGE_BASE`, chosen
@@ -52,13 +57,14 @@ implementation context and a review gate per task. Use the chosen mode.
 For each task whose prerequisites are verified complete:
 
 1. Record its `BASE` commit and mark it in progress. Read its exact brief using
-   `bash ../subagent-driven-development/scripts/task-brief PLAN_FILE N`.
+   `bash "$SDD_SCRIPTS/task-brief" PLAN_FILE N`.
    For a legacy plan without dependency fields, verify the interfaces and follow
    its stated order; do not invent parallel execution.
 2. Implement here. Follow the TDD steps and compare every verification command's
    real output with the expected behavior. Redirect long output to an evidence
    file and inspect failures; a truncated tail alone cannot establish success.
-3. Run the checks covering the changed artifact kinds. Record commands, results,
+3. Run the checks covering the changed artifact kinds. Follow the plan's commit
+   steps without including unrelated changes. Record commands, results,
    evidence paths, and actual commits. Mark the task complete only when its
    verification passed. A failed or unverified prerequisite blocks dependents.
 4. Update the ledger as each task completes, before starting the next. Continue
@@ -73,8 +79,14 @@ Run the project's test command and artifact-specific checks before claiming the
 plan complete. Report failures by name, including failures outside the edited
 files; do not describe a partial test run as a green project suite.
 
-Generate the review package:
-`bash ../subagent-driven-development/scripts/review-package PLAN_FILE MERGE_BASE HEAD`.
+Before packaging, reconcile staged, unstaged, and untracked task changes against
+the ledger. Every implementation change must reach the reviewer. Commit task
+changes as the plan directs; if your human partner requested uncommitted work,
+provide a separate review artifact covering those staged, unstaged, and new
+files. Do not claim completion while task changes are absent from the review.
+
+For committed changes, generate the review package:
+`bash "$SDD_SCRIPTS/review-package" PLAN_FILE MERGE_BASE HEAD`.
 Use the returned path with `dmi-superpowers:requesting-code-review`, supplying
 the TSP, source PRD, Review Focus if present, and ledger decisions.
 
@@ -92,8 +104,9 @@ unsuccessful fix/re-review rounds, stop and present the open findings, attempts,
 and proposed next step. The limit bounds retries; it never makes an unresolved
 Critical/Important finding complete or the branch ready to merge.
 
-If no code diff exists, report that fact and the checks performed; do not invent
-a commit range or a successful code review.
+Only report no code change after checking committed, staged, unstaged, and
+untracked task files. An empty commit range with uncommitted implementation
+needs the separate review artifact above, not an empty-diff completion claim.
 
 ### Step 4: Complete Development
 
