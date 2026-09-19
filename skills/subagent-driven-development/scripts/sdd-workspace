@@ -12,11 +12,57 @@
 # Single source of truth for the workspace location, so task-brief and
 # review-package cannot drift to different directories.
 #
-# Usage: sdd-workspace
+# Usage: bash sdd-workspace PLAN_FILE
 set -euo pipefail
 
+if [ $# -ne 1 ] || [ ! -f "$1" ]; then
+  echo "usage: sdd-workspace PLAN_FILE (an existing file)" >&2
+  exit 2
+fi
+
+# Resolve directory and file symlinks so every spelling of one plan uses the
+# same identity. readlink -f is unavailable on older macOS installations.
+plan=$1
+while :; do
+  plan_dir=$(CDPATH='' cd -- "$(dirname "$plan")" && pwd -P)
+  plan="$plan_dir/$(basename "$plan")"
+  [ -L "$plan" ] || break
+  target=$(readlink "$plan")
+  case "$target" in
+    /*) plan=$target ;;
+    *) plan="$plan_dir/$target" ;;
+  esac
+done
 root=$(git rev-parse --show-toplevel)
-dir="$root/.superpowers/sdd"
-mkdir -p "$dir"
-printf '*\n' > "$dir/.gitignore"
-cd "$dir" && pwd
+root=$(CDPATH='' cd -- "$root" && pwd -P)
+case "$plan" in
+  "$root"/*) identity=${plan#"$root"/} ;;
+  *) identity=$plan ;;
+esac
+# Full path hashes avoid basename collisions; a readable prefix is only a label.
+digest=$(printf '%s' "$identity" | git hash-object --stdin)
+slug=$(basename "$plan" .md)
+slug=${slug:0:80}
+base="$root/.superpowers/sdd"
+mkdir -p "$base"
+if [ ! -e "$base/.gitignore" ]; then
+  printf '*\n' > "$base/.gitignore"
+fi
+candidate="$base/$slug-$digest"
+dir=$candidate
+n=1
+while ! mkdir "$dir" 2>/dev/null; do
+  if [ -f "$dir/plan-path" ] && [ "$(cat "$dir/plan-path")" = "$identity" ]; then
+    printf '%s\n' "$dir"
+    exit 0
+  fi
+  # Never adopt unknown legacy data or overwrite another plan's artifacts.
+  if [ ! -e "$dir" ]; then
+    echo "cannot create workspace: $dir" >&2
+    exit 2
+  fi
+  n=$((n + 1))
+  dir="$candidate-$n"
+done
+printf '%s\n' "$identity" > "$dir/plan-path"
+printf '%s\n' "$dir"

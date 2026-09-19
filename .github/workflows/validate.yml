@@ -27,6 +27,9 @@ jobs:
           node hooks/session-start.test.js
           node hooks/ponytail-mode-tracker.test.js
 
+      - name: Workflow helper tests
+        run: node --test tests/workflow-helpers.test.js
+
       # Uses the repo's own entry point rather than calling shellcheck directly,
       # so CI enforces exactly the severity policy lint-shell.sh already sets
       # (--severity=warning) instead of inventing a stricter one.
