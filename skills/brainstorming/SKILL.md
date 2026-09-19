@@ -7,19 +7,50 @@ description: "You MUST use this before any creative work - creating features, bu
 
 Help turn ideas into fully formed designs and PRDs through natural collaborative dialogue.
 
-Start by understanding the current project context, then ask questions one at a time to refine the idea. Once you understand what you're building, present the design and get user approval.
+Start by understanding the intended outcome and the existing code, then choose
+the amount of planning the task needs. Reflect the outcome and constraints back
+briefly; ask only for information the request and code do not supply.
+
+## Choose the Path
+
+State the path and why it fits:
+
+- **Spike:** a feasibility question whose deliverable is an answer. Define the
+  question and a small probe, investigate, and report evidence and limitations.
+  Label any prototype throwaway; keeping it as production code needs a design.
+- **Bounded:** a change to an existing flow with clear scope and interfaces.
+  Inspect that flow, present a short design in chat with the behavioral checks,
+  and use the existing approval if that exact design was already accepted.
+  After approval, implement with `dmi-superpowers:test-driven-development`,
+  verify with `dmi-superpowers:verification-before-completion`, and review the
+  change. No separate PRD, TSP, or grilling ceremony is required.
+- **Architectural:** a new subsystem, new project, or change to shared
+  interfaces or component boundaries. Follow the architectural checklist below.
+
+Classify by the work, not the deadline or requested line count. If a bounded
+change exposes a new shared contract or unresolved architectural decision,
+reclassify it before implementing the expanded scope. A concrete dependency or
+behavior question needs an answer; a previously approved design does not need
+another approval just because the session resumed.
 
 <HARD-GATE>
-Do NOT invoke any implementation skill, write any code, scaffold any project, or take any implementation action until you have presented a design and the user has approved it. This applies to EVERY project regardless of perceived simplicity.
+For production implementation, present a design and obtain approval for that
+design before writing code or scaffolding. Existing approval of the same design
+counts. A spike authorizes only its agreed investigation, not production work.
+Architectural work also follows the written-PRD review below. Read-only
+exploration can proceed while a necessary decision is unresolved.
 </HARD-GATE>
 
 ## Anti-Pattern: "This Is Too Simple To Need A Design"
 
-Every project goes through this process. A todo list, a single-function utility, a config change — all of them. "Simple" projects are where unexamined assumptions cause the most wasted work. The design can be short (a few sentences for truly simple projects), but you MUST present it and get approval.
+Every production change needs an understood design. For bounded work, a few
+sentences in chat and concrete checks are enough. New projects follow the
+architectural path even when their first implementation looks small.
 
-## Checklist
+## Architectural Checklist
 
-You MUST create a task for each of these items and complete them in order:
+For architectural work, create a task for each item and complete them in order.
+Bounded work and spikes finish through their paths above.
 
 1. **Explore project context** — check files, docs, recent commits
 2. **Offer the visual companion just-in-time** — NOT upfront. The first time a question would genuinely be clearer shown than described, offer it then (its own message); on approval its browser tab opens for you. If no visual question ever arises, never offer it. See the Visual Companion section below.
@@ -32,7 +63,7 @@ You MUST create a task for each of these items and complete them in order:
 9. **Harden PRD** — invoke `dmi-superpowers:grill-with-docs` to stress-test the PRD against the domain model
 10. **Transition to implementation** — invoke `dmi-superpowers:writing-plans` to create TSP
 
-## Process Flow
+## Architectural Process Flow
 
 ```dot
 digraph brainstorming {
@@ -61,7 +92,9 @@ digraph brainstorming {
 }
 ```
 
-**The terminal state is invoking grill-with-docs, then writing-plans.** After the user approves the PRD, invoke `dmi-superpowers:grill-with-docs` to harden the PRD against the domain model, then invoke `dmi-superpowers:writing-plans` to create the TSP. Do NOT invoke frontend-design, mcp-builder, or any other skill. The ONLY skills you invoke after brainstorming are grill-with-docs (first) and then writing-plans.
+**The architectural path ends by invoking grill-with-docs, then writing-plans.**
+After the user approves the PRD, invoke `dmi-superpowers:grill-with-docs` to harden
+it against the domain model, then `dmi-superpowers:writing-plans` to create the TSP.
 
 ## The Process
 
@@ -102,7 +135,7 @@ digraph brainstorming {
 - Where existing code has problems that affect the work (e.g., a file that's grown too large, unclear boundaries, tangled responsibilities), include targeted improvements as part of the design - the way a good developer improves code they're working in.
 - Don't propose unrelated refactoring. Stay focused on what serves the current goal.
 
-## After the Design
+## After the Architectural Design
 
 **Documentation:**
 
