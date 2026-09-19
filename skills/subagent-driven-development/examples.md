@@ -29,25 +29,25 @@ ledger and the tool results carry the record.
 digraph when_to_use {
     "Have TSP?" [shape=diamond];
     "Tasks mostly independent?" [shape=diamond];
-    "Stay in this session?" [shape=diamond];
+    "Partner chose inline, or subagents unavailable?" [shape=diamond];
     "subagent-driven-development" [shape=box];
     "executing-plans" [shape=box];
     "Manual execution or brainstorm first" [shape=box];
 
     "Have TSP?" -> "Tasks mostly independent?" [label="yes"];
     "Have TSP?" -> "Manual execution or brainstorm first" [label="no"];
-    "Tasks mostly independent?" -> "Stay in this session?" [label="yes"];
+    "Tasks mostly independent?" -> "Partner chose inline, or subagents unavailable?" [label="yes"];
     "Tasks mostly independent?" -> "Manual execution or brainstorm first" [label="no - tightly coupled"];
-    "Stay in this session?" -> "subagent-driven-development" [label="yes"];
-    "Stay in this session?" -> "executing-plans" [label="no - parallel session"];
+    "Partner chose inline, or subagents unavailable?" -> "executing-plans" [label="yes"];
+    "Partner chose inline, or subagents unavailable?" -> "subagent-driven-development" [label="no"];
 }
 ```
 
-**vs. Executing Plans (parallel session):**
-- Same session (no context switch)
-- Fresh subagent per task (no context pollution)
-- Review after each task (spec compliance + code quality), broad review at the end
-- Faster iteration (no human-in-loop between tasks)
+**vs. Executing Plans (inline):**
+- Subagent execution uses a fresh implementer and reviewer per task.
+- Inline execution retains the implementing session's context and obtains a
+  final independent review when the harness supports subagents.
+- Both use the same plan-specific workspace and continue through approved work.
 
 ## The Process
 
@@ -63,7 +63,9 @@ digraph process {
         "Implementer subagent implements, tests, commits, self-reviews" [shape=box];
         "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)" [shape=box];
         "Task reviewer reports spec ✅ and quality approved?" [shape=diamond];
-        "Dispatch fix subagent for Critical/Important findings" [shape=box];
+        "Resume implementer for bounded fix round" [shape=box];
+        "Three unsuccessful rounds?" [shape=diamond];
+        "Keep task blocked; escalate with findings and attempts" [shape=box];
         "Mark task complete in todo list and progress ledger" [shape=box];
     }
 
@@ -79,8 +81,10 @@ digraph process {
     "Implementer subagent asks questions?" -> "Implementer subagent implements, tests, commits, self-reviews" [label="no"];
     "Implementer subagent implements, tests, commits, self-reviews" -> "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)";
     "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)" -> "Task reviewer reports spec ✅ and quality approved?";
-    "Task reviewer reports spec ✅ and quality approved?" -> "Dispatch fix subagent for Critical/Important findings" [label="no"];
-    "Dispatch fix subagent for Critical/Important findings" -> "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)" [label="re-review"];
+    "Task reviewer reports spec ✅ and quality approved?" -> "Three unsuccessful rounds?" [label="no"];
+    "Three unsuccessful rounds?" -> "Resume implementer for bounded fix round" [label="no"];
+    "Three unsuccessful rounds?" -> "Keep task blocked; escalate with findings and attempts" [label="yes"];
+    "Resume implementer for bounded fix round" -> "Write diff file, dispatch task reviewer subagent (./task-reviewer-prompt.md)" [label="fix-diff re-review"];
     "Task reviewer reports spec ✅ and quality approved?" -> "Mark task complete in todo list and progress ledger" [label="yes"];
     "Mark task complete in todo list and progress ledger" -> "More tasks remain?";
     "More tasks remain?" -> "Dispatch implementer subagent (./implementer-prompt.md)" [label="yes"];
@@ -221,10 +225,10 @@ Task reviewer: Spec ❌:
   - Extra: Added --json flag (not requested)
   Issues (Important): Magic number (100)
 
-[Dispatch fix subagent with all findings]
+[Resume implementer with all findings; record fix round and prior reviewed HEAD]
 Fixer: Removed --json flag, added progress reporting, extracted PROGRESS_INTERVAL constant
 
-[Task reviewer reviews again]
+[Task reviewer checks each finding and the fix diff; cap unsuccessful rounds at three]
 Task reviewer: Spec ✅. Task quality: Approved.
 
 [Mark Task 2 complete]
@@ -247,9 +251,8 @@ Done!
 - Subagent can ask questions (before AND during work)
 
 **vs. Executing Plans:**
-- Same session (no handoff)
-- Continuous progress (no waiting)
-- Review checkpoints automatic
+- Fresh implementation context per task
+- Independent task-level review, in addition to the final branch review
 
 **Efficiency gains:**
 - Controller curates exactly what context is needed; bulk artifacts move
@@ -282,4 +285,4 @@ Done!
 - **dmi-superpowers:test-driven-development** - Subagents follow TDD for each task
 
 **Alternative workflow:**
-- **dmi-superpowers:executing-plans** - Use for parallel session instead of same-session execution
+- **dmi-superpowers:executing-plans** - Implement inline when selected, or when subagents are unavailable
