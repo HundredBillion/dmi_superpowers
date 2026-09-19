@@ -1,0 +1,60 @@
+{
+  "scenario": "B",
+  "arm": "green",
+  "model": "CLI default; not overridden",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "working-tree",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nReason: Gives a concise implementation plan without mandatory PRD, approval, grilling, or TSP gates.\nPASS\nReason: Preserves scope and explicitly verifies default hidden, toggle show/hide, and empty-state behavior.\nPASS\nReason: Explicitly states that no files were changed and no tests were executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nPASS\nPASS\nReason: The response gives a concise execution plan without extra approval gates, preserves scope and behavioral verification, and explicitly states that no edits or tests were performed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nPASS\nPASS\nReason: The dispatch proceeds directly to scoped implementation, requires concrete behavioral verification, and explicitly states that no edits or tests were performed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nReason: Provides an actionable implementation plan without mandatory PRD, approval, grilling, or TSP gates.\nPASS\nReason: Preserves approved scope and verifies default hidden, toggle show/hide, and empty-state behavior.\nPASS\nReason: Explicitly states that no files were changed and no code or tests were executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nPASS\nPASS\nReason: The dispatch provides an actionable plan without extra approval gates, preserves scope and behavioral verification, and explicitly states that no execution occurred.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

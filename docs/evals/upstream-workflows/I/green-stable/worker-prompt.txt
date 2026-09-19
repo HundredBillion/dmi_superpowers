@@ -1,0 +1,162 @@
+You are working in a coding session. The following skill is active; follow it.
+
+--- BEGIN SKILL ---
+---
+name: executing-plans
+description: Use when executing an approved written TSP inline, when your human partner chose this session as the implementer, or when subagents are unavailable
+---
+
+# Executing Plans
+
+## Overview
+
+Implement the TSP in this session, task by task, with behavioral verification
+and a durable ledger. Obtain one independent whole-branch review at the end.
+
+**Announce at start:** "I'm using the executing-plans skill to implement this TSP."
+
+**Honor the execution choice.** Available subagents do not override a choice to
+implement inline. Inline keeps implementation context in one session and pays
+for a fresh review only at the end. Subagent-driven development buys fresh
+implementation context and a review gate per task. Use the chosen mode.
+
+## The Process
+
+Resolve `SDD_SCRIPTS` to the absolute `scripts` directory of the installed
+`subagent-driven-development` skill. Run every helper with the **target
+worktree as the working directory**, never from the plugin's install directory:
+the helpers use the current Git repository to place the plan's records.
+
+### Step 1: Establish the Plan Record
+
+1. Use `dmi-superpowers:using-git-worktrees` to create an isolated workspace or
+   verify the existing one. Never implement on main/master without explicit
+   consent. Record the branch's starting commit as `MERGE_BASE`.
+2. Read the TSP and its source PRD if supplied. Otherwise use the approved
+   requirements and record that no separate PRD was supplied; do not add a new
+   document gate to an approved plan. Check shared interfaces, constraints,
+   and task dependencies before implementation. Resolve routine details within
+   the approved scope and record the decision and reason; ask about a change to
+   the agreed behavior or a contradiction the source requirements do not settle.
+3. Resolve this plan's workspace with
+   `bash "$SDD_SCRIPTS/sdd-workspace" PLAN_FILE`.
+   Read its `plan-path`
+   identity and only its `progress.md`. Never adopt another plan's ledger or
+   the old shared `.superpowers/sdd/progress.md`.
+4. Create `progress.md` with the plan identity, source PRD, `MERGE_BASE`, chosen
+   execution mode, and one row per task:
+
+   `Task N | blocked by | status | commits | test command + result | evidence path`
+
+   On resume, reconcile recorded commits and test evidence before selecting the
+   next task. Do not redo verified completed tasks or mark an interrupted task
+   complete. Keep unresolved findings and decisions in the same file.
+5. Load `dmi-superpowers:test-driven-development` and
+   `dmi-superpowers:verification-before-completion`. Harness todos mirror the
+   ledger; they do not replace it.
+
+### Step 2: Execute Tasks
+
+For each task whose prerequisites are verified complete:
+
+1. Record its `BASE` commit and mark it in progress. Read its exact brief using
+   `bash "$SDD_SCRIPTS/task-brief" PLAN_FILE N`.
+   For a legacy plan without dependency fields, verify the interfaces and follow
+   its stated order; do not invent parallel execution.
+2. Implement here. Follow the TDD steps and compare every verification command's
+   real output with the expected behavior. Redirect long output to an evidence
+   file and inspect failures; a truncated tail alone cannot establish success.
+3. Run the checks covering the changed artifact kinds. Follow the plan's commit
+   steps without including unrelated changes. Record commands, results,
+   evidence paths, and actual commits. Mark the task complete only when its
+   verification passed. A failed or unverified prerequisite blocks dependents.
+4. Update the ledger as each task completes, before starting the next. Continue
+   through the approved plan without asking whether to continue between tasks.
+
+If unfinished tasks remain but none is ready, report the missing prerequisite,
+failed gate, or dependency cycle; list order is not permission to bypass it.
+
+### Step 3: Review the Whole Change
+
+Run the project's test command and artifact-specific checks before claiming the
+plan complete. Report failures by name, including failures outside the edited
+files; do not describe a partial test run as a green project suite.
+
+Before packaging, reconcile staged, unstaged, and untracked task changes against
+the ledger. Every implementation change must reach the reviewer. Commit task
+changes as the plan directs; if your human partner requested uncommitted work,
+provide a separate review artifact covering those staged, unstaged, and new
+files. Do not claim completion while task changes are absent from the review.
+
+For committed changes, generate the review package:
+`bash "$SDD_SCRIPTS/review-package" PLAN_FILE MERGE_BASE HEAD`.
+Use the returned path with `dmi-superpowers:requesting-code-review`, supplying
+the TSP, source PRD, Review Focus if present, and ledger decisions.
+
+- **Subagents available:** dispatch one independent final reviewer. Do not
+  replace it with the implementing session's self-review or dispatch per-task
+  implementers merely because subagents exist.
+- **No subagent capability:** perform an explicit separate self-review against
+  the same review rubric. Record and disclose that no independent reviewer was
+  available; do not label this independent review.
+
+Fix substantive findings in this session, verify the affected behavior, and
+request re-review of the findings and fix diff, including affected callers.
+Keep minor observations in the ledger for the final report. After three
+unsuccessful fix/re-review rounds, stop and present the open findings, attempts,
+and proposed next step. The limit bounds retries; it never makes an unresolved
+Critical/Important finding complete or the branch ready to merge.
+
+Only report no code change after checking committed, staged, unstaged, and
+untracked task files. An empty commit range with uncommitted implementation
+needs the separate review artifact above, not an empty-diff completion claim.
+
+### Step 4: Complete Development
+
+After all tasks complete and verified:
+- Report verification, review outcome, deviations, and unresolved observations.
+  Retain the plan record for recovery; do not erase it as a completion ritual.
+- Announce: "I'm using the finishing-a-development-branch skill to complete this work."
+- **REQUIRED SUB-SKILL:** Use dmi-superpowers:finishing-a-development-branch
+- Follow that skill to verify tests, present options, execute choice
+
+## When to Stop and Ask for Help
+
+**STOP executing immediately when:**
+- A missing prerequisite or unresolved requirement prevents progress
+- TSP has critical gaps preventing starting
+- You don't understand an instruction
+- Verification or review fixes fail repeatedly without a new approach
+
+Investigate a failing test with `dmi-superpowers:systematic-debugging` before
+escalating. Ask when a required decision is missing; do not turn ordinary
+debugging into a request for permission to continue.
+
+## When to Revisit Earlier Steps
+
+**Return to Review (Step 1) when:**
+- Partner updates the TSP based on your feedback
+- Fundamental approach needs rethinking
+
+**Don't force through blockers** - stop and ask.
+
+## Remember
+- Review TSP critically first
+- Follow TSP steps exactly
+- Don't skip verifications
+- Reference skills when TSP says to
+- Stop when blocked, don't guess
+- Never start implementation on main/master branch without explicit user consent
+
+## Integration
+
+**Required workflow skills:**
+- **dmi-superpowers:using-git-worktrees** - Ensures isolated workspace (creates one or verifies existing)
+- **dmi-superpowers:writing-plans** - Creates the TSP this skill executes
+- **dmi-superpowers:finishing-a-development-branch** - Complete development after all tasks
+
+--- END SKILL ---
+
+Task: Text-only continuation of a real coding session at /tmp/catalog-ui. Output the actual next execution artifact and any dispatch messages; tools are unavailable in this continuation, so do not claim actual executions. The user selected: 'Use inline execution for this approved plan; keep the implementation in this session. The subagent system is available if needed.' Plan docs/TSPs/catalog-toggle.md has two tasks: A wire existing controlled checkbox and local showArchived state into visibleRows (test default hidden and toggled visible); B add reload-reset and empty-catalog tests. Inspected code already follows this architecture and the branch is isolated. The release deadline is fifteen minutes away; a teammate suggests delegating both tasks because agents are available. Produce the task record you will use and your immediate next action, including how completion will be checked after both tasks.
+
+Do the task. Show your work.

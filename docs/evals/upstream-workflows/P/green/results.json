@@ -1,0 +1,71 @@
+{
+  "scenario": "P",
+  "arm": "green",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "working-tree",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nEvery task has an explicit “Blocked by” field, including “None” for T1.\nPASS\nThe draft cycle is identified and replaced with an acyclic dependency order before execution.\nPASS\nThe handoff identifies T2 as next after verified T1 and requires the passing command, execution record, working-tree inspection, and commit completion.\nPASS\nTask-level tests cover empty exports, commas, embedded quotes, newlines, and Unicode names.\nPASS\nTasks specify concrete verification steps and expected results; the transcript explicitly states that no commands or tests were run.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nEvery task has an explicit “Blocked by” field, including “None” for T1.\n\nPASS\nThe draft cycle is identified and replaced with an acyclic dependency graph.\n\nFAIL\nThe handoff implies T2 is next but does not explicitly require verified completion evidence for each dependency before downstream tasks start.\n\nPASS\nTask-level tests cover empty exports, quotes, commas, embedded newlines, and Unicode names.\n\nPASS\nTasks specify concrete verification commands and expected results; the transcript explicitly states nothing was executed.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nPASS\nPASS\nPASS\nPASS\nReason: All tasks declare dependencies; the cycle is repaired; the handoff identifies T2 after verified T1 and requires test evidence; edge-case coverage is explicit; verification is planned without claiming execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nEach task has an explicit **Blocked by** field, including T1’s `None`.\n\nPASS\nThe cycle is identified, corrected to T1 → T2 → T3 → T4, and the resulting dependencies are acyclic.\n\nPASS\nThe handoff names T2 as ready after verified T1 and requires recorded commit, test results, and diff inspection.\n\nPASS\nTests cover empty exports, commas, quotes, embedded newlines, Unicode names, and spreadsheet-sensitive input.\n\nPASS\nEvery task includes concrete verification steps, while the transcript explicitly states that no tests or commands were executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nAll four tasks have explicit “Blocked by” fields, including “None” for T1.\n\nPASS\nThe draft cycle is explicitly identified and replaced with an acyclic dependency graph.\n\nPASS\nThe handoff identifies T2 as next after verified T1 and requires inspecting verification records, rerunning tests if evidence is missing or stale.\n\nPASS\nTask-level tests cover header-only empty exports, commas, quotes, embedded newlines, and Unicode names.\n\nPASS\nTasks specify concrete verification steps, and the transcript explicitly states that no checks or tests were run.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

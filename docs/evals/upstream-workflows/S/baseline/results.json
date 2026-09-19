@@ -1,0 +1,70 @@
+{
+  "scenario": "S",
+  "arm": "baseline",
+  "model": "CLI default; not overridden",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "a293803",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nReason: A distinct catalog progress path and source plan are specified, and the billing completion entry is rejected.\nPASS\nReason: T2 remains incomplete and blocked, with human escalation after three unsuccessful cycles.\nFAIL\nReason: Further work is assigned to fresh worker-42 instead of resuming worker-17, without establishing why replacement is necessary.\nFAIL\nReason: The re-review checks the original focus regression but does not explicitly restrict inspection to the fix diff plus necessary affected context.\nPASS\nReason: The transcript explicitly states no tools ran and labels messages, updates, and placeholder paths as proposed.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nPASS\nPASS\nFAIL\nPASS\nReason: A distinct catalog plan is identified, T2 remains blocked and escalated, worker-17 is retained, and no execution is claimed; however, re-review requests the full T2 package without limiting inspection to the fix diff and necessary affected context.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nPASS\nFAIL\nFAIL\nPASS\nReason: Catalog has a distinct plan identity and escalates while incomplete, but proposes replacing worker-17 without a worker-specific justification and does not explicitly limit re-review to the fix diff plus necessary context; no unperformed execution is claimed.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nPreserves the billing ledger and establishes a distinct catalog plan and progress location.\n\nPASS\nKeeps T2 blocked and incomplete, escalating after three unsuccessful cycles.\n\nFAIL\nThe proposed next fix dispatches fresh worker-42 instead of resuming worker-17, without establishing why replacement is necessary.\n\nPASS\nRe-review uses the c3-to-fixed-revision package and relevant supporting context, explicitly checking the original keyboard-focus regression.\n\nPASS\nExplicitly identifies all updates and dispatches as proposals, claiming no execution.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nReason: It rejects the billing ledger and establishes a separate catalog ledger path and source plan.\n\nPASS\nReason: T2 remains blocked by the Important finding and is escalated after repeated unsuccessful cycles.\n\nFAIL\nReason: The proposed next fix replaces worker-17 with worker-42 without stating a cause.\n\nFAIL\nReason: Re-review checks the original finding but does not explicitly limit inspection to the fix diff and necessary affected context.\n\nPASS\nReason: It explicitly states that no tools ran or files changed and presents all actions as proposals.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ]
+    }
+  ]
+}

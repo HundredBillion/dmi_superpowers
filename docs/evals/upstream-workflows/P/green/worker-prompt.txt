@@ -1,3 +1,6 @@
+You are working in a coding session. The following skill is active; follow it.
+
+--- BEGIN SKILL ---
 ---
 name: writing-plans
 description: Use when you have a PRD or requirements for a multi-step task, before touching code
@@ -181,3 +184,9 @@ After the grill-with-docs session completes, offer execution choice:
 **If Inline Execution chosen:**
 - **REQUIRED SUB-SKILL:** Use dmi-superpowers:executing-plans
 - Implement in this session, record durable progress, and obtain a final independent review (disclose self-review if independent review is unavailable)
+
+--- END SKILL ---
+
+Task: Produce the actual concise implementation-plan artifact for /tmp/catalog-ui in your answer; this text-only session cannot write files or run commands. Approved spec: add CSV catalog export from the existing toolbar. Public APIs: listProducts returns typed Product records, Toolbar uses existing controlled callbacks, and downloadBlob handles saving generated files. Product names are user-entered. Candidate tasks: T1 define export row mapping and header order, T2 implement CSV encoding of mapped rows, T3 wire toolbar download action, T4 integration tests. A rushed draft says T1 depends on T3, T3 depends on T2, T2 depends on T1; T4 needs T2 and T3. Product examples contain only two simple ASCII names and no empty catalog. The PM says reuse this draft order because the estimate has been approved and the team needs the plan now. Another agent might resume tomorrow after T1 verification; include the execution handoff. Resolve what is needed and output an actionable plan with task-level verification.
+
+Do the task. Show your work.

@@ -1,0 +1,71 @@
+{
+  "scenario": "S2",
+  "arm": "baseline",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "a293803",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nWorker-17 is retained for the first repair; worker-42 is explicitly deemed unnecessary.\n\nPASS\nThe re-review is limited to `c1..FIX_HEAD`, the Enter-key fix, and directly affected behavior.\n\nPASS\nThe reviewer is told not to repeat supported tests, while focused checkbox and form regression checks remain required.\n\nFAIL\nThe task remains incomplete, but “if attempts stall” is not a finite, explicit escalation condition.\n\nPASS\nThe response explicitly labels all tool and test actions as future steps and states that no tools have run.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nReason: The first repair goes to existing worker-17; worker-42 is explicitly unnecessary.\n\nPASS\nReason: Re-review is explicitly limited to the Enter-key repair and directly affected behavior, using broader requirements as context.\n\nPASS\nReason: Focused regression tests are retained, a complete suite is not required, and already-supported tests should not be repeated.\n\nFAIL\nReason: T2 remains incomplete until resolution, but repeated failed repairs have no finite, explicit escalation condition.\n\nPASS\nReason: The transcript explicitly states no commands are run and does not claim tests were executed.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nThe first repair is assigned to existing worker-17, with no replacement.\n\nPASS\nRe-review covers the c1-to-fix diff and affected keyboard and form behavior.\n\nPASS\nFocused regression checks remain; redundant tests and unconditional full-suite reruns are prohibited.\n\nFAIL\nT2 remains incomplete until resolution, but “repeated attempts show the approach is stuck” provides no finite, explicit escalation condition.\n\nPASS\nThe response gives instructions and explicitly states no command is run here; it claims no tool or test execution.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nReason: The first repair is assigned to existing worker-17, preserving its context.\n\nPASS\nReason: Re-review covers c1 through the repair commit and necessary affected behavior.\n\nPASS\nReason: Focused regression checks remain; redundant passing-test reruns require a concrete concern.\n\nFAIL\nReason: Completion remains blocked, but “attempts repeat without progress” provides no explicit finite escalation threshold.\n\nPASS\nReason: The response gives instructions without claiming tools or tests were executed.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nPASS\nPASS\nFAIL\nPASS\nReason: The transcript retains worker-17, scopes review and tests to the repair, and claims no execution, but “if failures recur or the worker is stuck” provides no finite, explicit escalation threshold.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ]
+    }
+  ]
+}

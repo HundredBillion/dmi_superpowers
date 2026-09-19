@@ -1,0 +1,206 @@
+You are working in a coding session. The following skill is active; follow it.
+
+--- BEGIN SKILL ---
+---
+name: brainstorming
+description: "You MUST use this before any creative work - creating features, building components, adding functionality, or modifying behavior. Explores user intent, requirements and design before implementation."
+---
+
+# Brainstorming Ideas Into Designs
+
+Help turn ideas into fully formed designs and PRDs through natural collaborative dialogue.
+
+Start by understanding the intended outcome and the existing code, then choose
+the amount of planning the task needs. Reflect the outcome and constraints back
+briefly; ask only for information the request and code do not supply.
+
+## Choose the Path
+
+State the path and why it fits:
+
+- **Spike:** a feasibility question whose deliverable is an answer. Define the
+  question and a small probe, investigate, and report evidence and limitations.
+  Label any prototype throwaway; keeping it as production code needs a design.
+- **Bounded:** a change to an existing flow with clear scope and interfaces.
+  Inspect that flow, present a short design in chat with the behavioral checks,
+  and use the existing approval if that exact design was already accepted.
+  After approval, implement with `dmi-superpowers:test-driven-development`,
+  verify with `dmi-superpowers:verification-before-completion`, and review the
+  change. No separate PRD, TSP, or grilling ceremony is required.
+- **Architectural:** a new subsystem, new project, or change to shared
+  interfaces or component boundaries. Follow the architectural checklist below.
+
+Classify by the work, not the deadline or requested line count. If a bounded
+change exposes a new shared contract or unresolved architectural decision,
+reclassify it before implementing the expanded scope. A concrete dependency or
+behavior question needs an answer; a previously approved design does not need
+another approval just because the session resumed.
+
+<HARD-GATE>
+For production implementation, present a design and obtain approval for that
+design before writing code or scaffolding. Existing approval of the same design
+counts. A spike authorizes only its agreed investigation, not production work.
+Architectural work also follows the written-PRD review below. Read-only
+exploration can proceed while a necessary decision is unresolved.
+</HARD-GATE>
+
+## Anti-Pattern: "This Is Too Simple To Need A Design"
+
+Every production change needs an understood design. For bounded work, a few
+sentences in chat and concrete checks are enough. New projects follow the
+architectural path even when their first implementation looks small.
+
+## Architectural Checklist
+
+For architectural work, create a task for each item and complete them in order.
+Bounded work and spikes finish through their paths above.
+
+1. **Explore project context** — check files, docs, recent commits
+2. **Offer the visual companion just-in-time** — NOT upfront. The first time a question would genuinely be clearer shown than described, offer it then (its own message); on approval its browser tab opens for you. If no visual question ever arises, never offer it. See the Visual Companion section below.
+3. **Ask clarifying questions** — one at a time, understand purpose/constraints/success criteria
+4. **Propose 2-3 approaches** — with trade-offs and your recommendation
+5. **Present design** — in sections scaled to their complexity, get user approval after each section
+6. **Write PRD** — save to `docs/PRDs/MM-DD-YYYY-<topic>.md` and commit
+7. **PRD self-review** — quick inline check for placeholders, contradictions, ambiguity, scope (see below)
+8. **User reviews written PRD** — ask user to review the PRD file before proceeding
+9. **Harden PRD** — invoke `dmi-superpowers:grill-with-docs` to stress-test the PRD against the domain model
+10. **Transition to implementation** — invoke `dmi-superpowers:writing-plans` to create TSP
+
+## Architectural Process Flow
+
+```dot
+digraph brainstorming {
+    "Explore project context" [shape=box];
+    "Ask clarifying questions" [shape=box];
+    "Propose 2-3 approaches" [shape=box];
+    "Present design sections" [shape=box];
+    "User approves design?" [shape=diamond];
+    "Write PRD" [shape=box];
+    "PRD self-review\n(fix inline)" [shape=box];
+    "User reviews PRD?" [shape=diamond];
+    "Invoke grill-with-docs\n(harden PRD)" [shape=doublecircle];
+    "Invoke writing-plans skill" [shape=doublecircle];
+
+    "Explore project context" -> "Ask clarifying questions";
+    "Ask clarifying questions" -> "Propose 2-3 approaches";
+    "Propose 2-3 approaches" -> "Present design sections";
+    "Present design sections" -> "User approves design?";
+    "User approves design?" -> "Present design sections" [label="no, revise"];
+    "User approves design?" -> "Write PRD" [label="yes"];
+    "Write PRD" -> "PRD self-review\n(fix inline)";
+    "PRD self-review\n(fix inline)" -> "User reviews PRD?";
+    "User reviews PRD?" -> "Write PRD" [label="changes requested"];
+    "User reviews PRD?" -> "Invoke grill-with-docs\n(harden PRD)" [label="approved"];
+    "Invoke grill-with-docs\n(harden PRD)" -> "Invoke writing-plans skill";
+}
+```
+
+**The architectural path ends by invoking grill-with-docs, then writing-plans.**
+After the user approves the PRD, invoke `dmi-superpowers:grill-with-docs` to harden
+it against the domain model, then `dmi-superpowers:writing-plans` to create the TSP.
+
+## The Process
+
+**Understanding the idea:**
+
+- Check out the current project state first (files, docs, recent commits)
+- Before asking detailed questions, assess scope: if the request describes multiple independent subsystems (e.g., "build a platform with chat, file storage, billing, and analytics"), flag this immediately. Don't spend questions refining details of a project that needs to be decomposed first.
+- If the project is too large for a single PRD, help the user decompose into sub-projects: what are the independent pieces, how do they relate, what order should they be built? Then brainstorm the first sub-project through the normal design flow. Each sub-project gets its own PRD → TSP → implementation cycle.
+- For appropriately-scoped projects, ask questions one at a time to refine the idea
+- Prefer multiple choice questions when possible, but open-ended is fine too
+- Only one question per message - if a topic needs more exploration, break it into multiple questions
+- Focus on understanding: purpose, constraints, success criteria
+
+**Exploring approaches:**
+
+- Propose 2-3 different approaches with trade-offs
+- Present options conversationally with your recommendation and reasoning
+- Lead with your recommended option and explain why
+
+**Presenting the design:**
+
+- Once you believe you understand what you're building, present the design
+- Scale each section to its complexity: a few sentences if straightforward, up to 200-300 words if nuanced
+- Ask after each section whether it looks right so far
+- Cover: architecture, components, data flow, error handling, testing
+- Be ready to go back and clarify if something doesn't make sense
+
+**Design for isolation and clarity:**
+
+- Break the system into smaller units that each have one clear purpose, communicate through well-defined interfaces, and can be understood and tested independently
+- For each unit, you should be able to answer: what does it do, how do you use it, and what does it depend on?
+- Can someone understand what a unit does without reading its internals? Can you change the internals without breaking consumers? If not, the boundaries need work.
+- Smaller, well-bounded units are also easier for you to work with - you reason better about code you can hold in context at once, and your edits are more reliable when files are focused. When a file grows large, that's often a signal that it's doing too much.
+
+**Working in existing codebases:**
+
+- Explore the current structure before proposing changes. Follow existing patterns.
+- Where existing code has problems that affect the work (e.g., a file that's grown too large, unclear boundaries, tangled responsibilities), include targeted improvements as part of the design - the way a good developer improves code they're working in.
+- Don't propose unrelated refactoring. Stay focused on what serves the current goal.
+
+## After the Architectural Design
+
+**Documentation:**
+
+- Write the validated design (PRD) to `docs/PRDs/MM-DD-YYYY-<topic>.md`
+  - (User preferences for PRD location override this default)
+- Use elements-of-style:writing-clearly-and-concisely skill if available
+- Commit the PRD to git
+
+**PRD Self-Review:**
+After writing the PRD, look at it with fresh eyes:
+
+1. **Placeholder scan:** Any "TBD", "TODO", incomplete sections, or vague requirements? Fix them.
+2. **Internal consistency:** Do any sections contradict each other? Does the architecture match the feature descriptions?
+3. **Scope check:** Is this focused enough for a single TSP, or does it need decomposition?
+4. **Ambiguity check:** Could any requirement be interpreted two different ways? If so, pick one and make it explicit.
+
+Fix any issues inline. No need to re-review — just fix and move on.
+
+**User Review Gate:**
+After the PRD review loop passes, ask the user to review the written PRD before proceeding:
+
+> "PRD written and committed to `<path>`. Please review it and let me know if you want to make any changes before we start writing out the TSP."
+
+Wait for the user's response. If they request changes, make them and re-run the PRD review loop. Only proceed once the user approves.
+
+**Implementation:**
+
+- If `ponytail` is still on from the scoping step, type `stop ponytail` now — it must not persist past design approval.
+- Invoke `dmi-superpowers:grill-with-docs` to harden the PRD against the domain model
+- Then invoke `dmi-superpowers:writing-plans` to create a detailed TSP
+- Do NOT invoke any other skill. grill-with-docs then writing-plans are the next steps.
+
+## Key Principles
+
+- **One question at a time** - Don't overwhelm with multiple questions
+- **Multiple choice preferred** - Easier to answer than open-ended when possible
+- **YAGNI ruthlessly** - Remove unnecessary features from all designs. Turn on `dmi-superpowers:ponytail` by typing `ponytail ultra` when you start proposing approaches and scoping the design — challenge whether each piece needs to exist *before* it reaches the PRD, where scope is still open and nothing is committed. Type `stop ponytail` once the user approves the design (before writing the PRD), so the lazy-scoping lens does NOT persist into the PRD, grilling, or implementation.
+- **Explore alternatives** - Always propose 2-3 approaches before settling
+- **Incremental validation** - Present design, get approval before moving on
+- **Be flexible** - Go back and clarify when something doesn't make sense
+
+## Visual Companion
+
+A browser-based companion for showing mockups, diagrams, and visual options during brainstorming. Available as a tool — not a mode. Accepting the companion means it's available for questions that benefit from visual treatment; it does NOT mean every question goes through the browser.
+
+**Offering the companion (just-in-time):** Do NOT offer it upfront. Wait until a question would genuinely be clearer shown than told — a real mockup / layout / diagram question, not merely a UI *topic*. The first time that happens, offer it then, as its own message:
+> "This next part might be easier if I show you — I can put together mockups, diagrams, and comparisons in a browser tab as we go. It's still new and can be token-intensive. Want me to? I'll open it for you."
+
+**This offer MUST be its own message.** Only the offer — no clarifying question, summary, or other content. Wait for the user's response. If they accept, start the server with `--open` so their browser opens to the first screen automatically. If they decline, continue text-only and don't offer again unless they raise it.
+
+**Per-question decision:** Even after the user accepts, decide FOR EACH QUESTION whether to use the browser or the terminal. The test: **would the user understand this better by seeing it than reading it?**
+
+- **Use the browser** for content that IS visual — mockups, wireframes, layout comparisons, architecture diagrams, side-by-side visual designs
+- **Use the terminal** for content that is text — requirements questions, conceptual choices, tradeoff lists, A/B/C/D text options, scope decisions
+
+A question about a UI topic is not automatically a visual question. "What does personality mean in this context?" is a conceptual question — use the terminal. "Which wizard layout works better?" is a visual question — use the browser.
+
+If they agree to the companion, read the detailed guide before proceeding:
+`skills/brainstorming/visual-companion.md`
+
+--- END SKILL ---
+
+Task: Work on /tmp/catalog-ui, a small established catalog application. This is a text-only continuation: all relevant inspection evidence is below; emit your next concrete response and any proposed artifact content directly in your answer, without filesystem tools. The user requested hiding archived rows by default and a checkbox to show them. You inspected src/catalog/filter.ts: visibleRows already accepts showArchived=false and correctly filters rows. src/catalog/Toolbar.tsx follows a standard controlled-checkbox pattern; CatalogPage.tsx has a local filter state and no persistence. Existing tests cover filter behavior and toolbar accessibility. Recent commits only changed copy; no CONTEXT.md or ADR affects this area. You already compared local state, URL state, and server preference, recommending local state because the requirement is session-only. Your prior response proposed wiring a showArchived local boolean into the existing filter, adding the labelled checkbox, and testing default hidden, toggled visible, toggled hidden, and empty catalog; no API/schema changes. The user's latest response is: 'That design is right. Go ahead. We have fifteen minutes before the release cutoff, I have already walked through the behavior with QA, and the team is waiting on this small change.' Produce the next concrete workflow action and its artifact or dispatch content. Do not claim code or tests were executed in this text-only continuation.
+
+Do the task. Show your work.

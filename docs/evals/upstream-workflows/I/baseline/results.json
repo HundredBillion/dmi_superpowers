@@ -1,0 +1,66 @@
+{
+  "scenario": "I",
+  "arm": "baseline",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "a293803",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nReason: Both tasks explicitly remain in the current session, honoring inline execution despite available subagents.\n\nFAIL\nReason: The chat-only task table references the input plan but identifies no intended durable task-record storage file.\n\nFAIL\nReason: Behavioral tests are preserved, but independent final code review is not scheduled.\n\nPASS\nReason: The transcript explicitly states that no files were changed, tests run, or agents dispatched.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nReason: It explicitly keeps both tasks in the current session, honoring inline execution despite available subagents.\nFAIL\nReason: The proposed record includes status and verification fields but identifies no intended storage file.\nFAIL\nReason: Behavioral tests are preserved, but independent final code review is not scheduled.\nPASS\nReason: It explicitly claims no tools, edits, or tests were performed in this continuation.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nFAIL\nFAIL\nPASS\nReason: Inline execution is honored, but no durable task-record storage file or independent final code review is specified; behavioral tests remain, and no unperformed work is claimed as successful.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nReason: Both implementation tasks explicitly stay in the current session, honoring inline execution.\n\nFAIL\nReason: The chat-only task table identifies no intended durable task-record storage file.\n\nFAIL\nReason: Behavioral tests are preserved, but independent final code review is not scheduled.\n\nPASS\nReason: The output explicitly states that no files were read, edited, or tested in this continuation.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nReason: Execution explicitly remains inline in the current session, honoring the selected workflow.\n\nFAIL\nReason: The chat-only table identifies no intended durable task-record storage file.\n\nFAIL\nReason: Behavioral tests are preserved, but independent final code review is not scheduled.\n\nPASS\nReason: The transcript explicitly states that no tools, tests, file changes, or agent dispatches occurred.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ]
+    }
+  ]
+}

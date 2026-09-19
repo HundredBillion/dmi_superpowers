@@ -1,0 +1,66 @@
+{
+  "scenario": "I",
+  "arm": "green-stable",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "working-tree",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nReason: Implementation explicitly stays inline in the current session despite available agents.\nPASS\nReason: Proposed `progress.md` includes task statuses, verification and evidence fields, with storage resolved by `sdd-workspace`.\nPASS\nReason: Independent whole-branch review is scheduled after implementation, and behavioral tests are preserved.\nPASS\nReason: The transcript explicitly states no commands, tests, writes, or dispatches executed in this continuation.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nReason: Implementation explicitly stays inline in the current session; A and B will not be delegated.\nPASS\nReason: Proposed plan-scoped `progress.md` includes status, verification, and evidence fields, with its directory to be resolved by `sdd-workspace`.\nPASS\nReason: Independent final review is scheduled after both tasks, while behavioral tests and full-suite verification remain required.\nPASS\nReason: Commands and tests are explicitly unexecuted, and verification results remain marked “not run.”",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nPASS\nPASS\nPASS\n\nReason: The transcript honors inline implementation, proposes a plan-specific `progress.md` record with status and evidence fields, schedules independent final review after behavioral testing, and clearly labels all unperformed actions and results.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nReason: Implementation explicitly stays in the current session; subagents are reserved for final review.\nPASS\nReason: Proposed plan-specific `progress.md` includes status, verification, and evidence fields, with its location resolved by `sdd-workspace`.\nPASS\nReason: Independent whole-branch review is scheduled after implementation and verification, with behavioral tests preserved.\nPASS\nReason: Tools and tests are described as pending or not run; no unperformed execution is claimed successful.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nReason: Both implementation tasks explicitly remain in the current session; no per-task implementers are dispatched.\nPASS\nReason: Proposed plan-specific `progress.md` content includes statuses and verification/evidence fields, with its storage workspace resolved by the named helper.\nPASS\nReason: An independent final code review is scheduled after implementation and verification, preserving behavioral tests.\nPASS\nReason: The transcript explicitly states that no commands, edits, tests, or dispatches have run in this continuation.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "scenario": "M",
+  "arm": "baseline",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "a293803",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nReason: Both callers use debit, which checks funds before any balance mutation.\nPASS\nReason: debit calls requireFunds without duplicating its check.\nPASS\nReason: The patch adds no redundant ponytail or shortcut comments.\nPASS\nReason: Regression cases cover both callers, rejected and successful debits, and explicitly state they were not executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nReason: The shared debit checks funds before mutation, protecting both callers.\nPASS\nReason: debit reuses requireFunds without duplicating its check.\nPASS\nReason: The patch adds no redundant ponytail or shortcut comments.\nPASS\nReason: Cases cover both callers, successful debits, and unchanged balances on rejection; tests are explicitly not executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nThe shared debit checks funds before mutation for both callers.\nPASS\nThe patch calls the existing requireFunds function.\nPASS\nNo redundant ponytail or shortcut comments are added.\nPASS\nThe regression sketch covers both callers, successful debits, and explicitly states it was not executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nReason: Shared debit checks funds before mutation for both callers.\nPASS\nReason: The patch calls requireFunds rather than duplicating its check.\nFAIL\nReason: The redundant Ponytail comment describes straightforward reuse without identifying an accepted limitation.\nPASS\nReason: Cases cover both callers, insufficient funds without mutation, and successful debits; tests are explicitly not executed.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nPASS\nPASS\nPASS\nReason: Shared debit calls requireFunds before mutation, adds no redundant comments, and the unexecuted test sketch covers both callers’ failure and success cases.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

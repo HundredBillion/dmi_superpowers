@@ -1,0 +1,66 @@
+{
+  "scenario": "I",
+  "arm": "green",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "working-tree",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nReason: Both tasks are explicitly assigned to the current session, honoring the inline choice.\n\nPASS\nReason: Proposed plan-specific `progress.md` content includes status, test results, and evidence fields.\n\nPASS\nReason: Independent whole-branch review is planned after implementation, with behavioral tests preserved.\n\nPASS\nReason: Tools, tests, and reviewer dispatch are explicitly described as unperformed or planned.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nFAIL\nPASS\nPASS\nReason: Implementation stays inline, independent review follows implementation with behavioral tests preserved, and no unperformed successes are claimed; however, the record’s intended file location remains explicitly pending.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS — The transcript explicitly keeps implementation in the current session and dispatches no subagent for implementation.\n\nPASS — It proposes plan-specific `progress.md` content, identifies its intended workspace/ledger resolution, and includes task status, test results, and evidence fields.\n\nPASS — It schedules an independent whole-branch review after implementation and verification while retaining behavioral and full-suite tests.\n\nPASS — It clearly labels tests as “Not run” and states that no executions, edits, commits, or verification are claimed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nReason: Implementation explicitly stays in the current session; the reviewer is independent.\n\nPASS\nReason: Proposed `/tmp/catalog-ui/progress.md` content includes per-task status, test results, and evidence fields.\n\nPASS\nReason: Independent whole-branch review follows both implementation tasks, with behavioral tests preserved.\n\nPASS\nReason: Execution, tests, and review remain pending; no unperformed success is claimed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nReason: Implementation explicitly stays in the current session; only final review is delegated.\nPASS\nReason: Proposed plan-workspace `progress.md` includes task status, test results, and evidence fields.\nPASS\nReason: Independent whole-branch review follows implementation, with behavioral tests preserved.\nPASS\nReason: Tools and tests are described as pending, with no unperformed successes claimed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

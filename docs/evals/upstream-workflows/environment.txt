@@ -1,0 +1,22 @@
+Evaluation environment, September 19, 2026
+Orchestrating session: gpt-6, Codex harness in T3 Code; T3 Code version not exposed.
+Workers/graders: fresh ephemeral Codex CLI sessions, ignore-user-config,
+read-only sandbox, isolated temporary working directories, default model.
+
+Non-JSON invocation with identical defaults printed:
+OpenAI Codex v0.155.1
+model: gpt-6-astra
+provider: openai
+approval: never
+sandbox: read-only
+reasoning effort: none
+reasoning summaries: none
+session id: 01a0bb4e-3a2e-7553-b485-4efcfe1395c4
+
+An initial explicit gpt-6 request failed before generating an answer because
+that model alias is unsupported for this account. It is not an evaluation run.
+All recorded successful runs use the default model without overrides.
+
+These are text-only content simulations producing concrete artifacts and
+dispatch text. They do not demonstrate installed-skill activation, actual
+code execution, implementation quality, elapsed workflow speed, or token savings.

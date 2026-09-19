@@ -1,0 +1,141 @@
+{
+  "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2",
+  "arms": [
+    {
+      "scenario": "B",
+      "arm": "baseline",
+      "runs": 5,
+      "passed": 0,
+      "prompt_sha256": "b5edfa6b8184954aff0b711ed09b11e5e6d04ae7ebd1f6dda808e1c056249622",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/B/baseline"
+    },
+    {
+      "scenario": "B",
+      "arm": "green",
+      "runs": 5,
+      "passed": 5,
+      "prompt_sha256": "031d2d083a653bd045bc6b4841bdb02a7fc1af37ea7112e2acece5db9e024f74",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/B/green"
+    },
+    {
+      "scenario": "B2",
+      "arm": "baseline",
+      "runs": 5,
+      "passed": 5,
+      "prompt_sha256": "5d38edca393168c0665bc0b2f246a34d9d332f6f17e2c7cabc7a77882f2bebf7",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/B2/baseline"
+    },
+    {
+      "scenario": "B2",
+      "arm": "green",
+      "runs": 5,
+      "passed": 4,
+      "prompt_sha256": "4608782867f6c67c6d0d8916b081f1c38a39239ca3a8abf705201914a5f2ac3e",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/B2/green"
+    },
+    {
+      "scenario": "I",
+      "arm": "baseline",
+      "runs": 5,
+      "passed": 0,
+      "prompt_sha256": "3b52ac4a7239deb64feb185452cfd9a5c4234bdd64b46263bb8fd7eb92dd3f4f",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/I/baseline"
+    },
+    {
+      "scenario": "I",
+      "arm": "green",
+      "runs": 5,
+      "passed": 4,
+      "prompt_sha256": "738119ebbce28690c6c9436d5a2db2cf826741f07be71c61c6ed98e0024632ff",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/I/green"
+    },
+    {
+      "scenario": "I",
+      "arm": "green-final",
+      "runs": 5,
+      "passed": 5,
+      "prompt_sha256": "f958f069de1aad804ffb740c2d67c12b956446493215197d5720126da6120d07",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/I/green-final"
+    },
+    {
+      "scenario": "I",
+      "arm": "green-stable",
+      "runs": 5,
+      "passed": 5,
+      "prompt_sha256": "82f62d3bd0899aba5836c7e8aa98c0ae7b2b3f607f67d5f3a17598a3f068fbb1",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/I/green-stable"
+    },
+    {
+      "scenario": "M",
+      "arm": "baseline",
+      "runs": 5,
+      "passed": 4,
+      "prompt_sha256": "7670dd082962d4501eaf6829ecde271a275d4a08ef8239acb9dd5c5601cfa422",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/M/baseline"
+    },
+    {
+      "scenario": "P",
+      "arm": "baseline",
+      "runs": 5,
+      "passed": 4,
+      "prompt_sha256": "c5051930ef534c1424af184ffc6b07cf4383744d98c22dff4efedf3d34c6fab2",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/P/baseline"
+    },
+    {
+      "scenario": "P",
+      "arm": "green",
+      "runs": 5,
+      "passed": 4,
+      "prompt_sha256": "c7982b6ecb70bba12e8e25b0b2a4e33c7a0c5a3461f2cd0f02ba177f9d650dfa",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/P/green"
+    },
+    {
+      "scenario": "R",
+      "arm": "baseline",
+      "runs": 5,
+      "passed": 2,
+      "prompt_sha256": "08cc66f77d6c0e9d23f1874d2c48be049c39c56aa030bb98678ea5194abf1962",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/R/baseline"
+    },
+    {
+      "scenario": "S",
+      "arm": "baseline",
+      "runs": 5,
+      "passed": 0,
+      "prompt_sha256": "1f93b312e93ea654b484ea12d2e6a3407a49e49ee0bfd2ca4e64a7388d55d436",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/S/baseline"
+    },
+    {
+      "scenario": "S",
+      "arm": "green",
+      "runs": 5,
+      "passed": 5,
+      "prompt_sha256": "fdbd7d5643b47907f6c87c6b262d90511ace77273318d8e6138b5d9d23e44fcd",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/S/green"
+    },
+    {
+      "scenario": "S2",
+      "arm": "baseline",
+      "runs": 5,
+      "passed": 0,
+      "prompt_sha256": "6b996feafebd58fd38c4c2c4746281864c3469d1597e33dad4f27eb56b741a64",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/S2/baseline"
+    },
+    {
+      "scenario": "S2",
+      "arm": "green",
+      "runs": 5,
+      "passed": 5,
+      "prompt_sha256": "4539762a50f03eceb12cdf429702efe09d254bf0db603571ff03b48d093ee782",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/S2/green"
+    },
+    {
+      "scenario": "S2",
+      "arm": "green-stable",
+      "runs": 5,
+      "passed": 5,
+      "prompt_sha256": "29c452ce2e6569ea12c49f6956e5b0928d686ab8cdd905f8d89068c7ca3405f2",
+      "raw_archive": "/var/folders/7d/jn501sx11w3_c1yk3ch_7rw00000gp/T/dmi-upstream-eval-raw-ODBRx2/S2/green-stable"
+    }
+  ]
+}
