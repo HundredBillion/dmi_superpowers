@@ -1,0 +1,71 @@
+{
+  "scenario": "S2",
+  "arm": "green",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "working-tree",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nPASS\nPASS\nPASS\nPASS\nReason: The transcript retains worker-17, scopes review to the repair, preserves focused tests without redundant suite runs, blocks completion with a three-round escalation limit, and claims no executed tools or tests.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nPASS\nPASS\nPASS\nPASS\n\nReason: The transcript resumes worker-17, scopes reviewer-8 to the repair delta, avoids redundant full-suite reruns while requiring focused regression tests, keeps T2 incomplete with a three-round escalation limit, and only describes planned dispatches without claiming execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nReason: The repair explicitly resumes worker-17 without spawning a replacement.\n\nPASS\nReason: Re-review is scoped to c1..HEAD, the Enter fix, and affected behavior.\n\nPASS\nReason: Existing test evidence is reused while focused checkbox and parent-form regression checks remain required.\n\nPASS\nReason: T2 remains incomplete until resolved, with escalation after three unsuccessful repair rounds.\n\nPASS\nReason: The response gives instructions without claiming tool or test execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nPASS\nPASS\nPASS\nPASS\nReason: The transcript resumes worker-17, scopes review to the repair, retains focused tests without redundant reruns, blocks completion pending resolution with escalation after three failed rounds, and claims no tools or tests were executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nReason: The repair resumes worker-17 rather than replacing it with worker-42.\n\nPASS\nReason: Re-review covers the repair delta and affected search-form behavior.\n\nPASS\nReason: Focused regression tests remain required; redundant full-suite reruns are avoided.\n\nPASS\nReason: T2 remains incomplete until resolution, with explicit escalation after three unsuccessful rounds.\n\nPASS\nReason: The transcript describes future dispatches and checks without claiming tools or tests were executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

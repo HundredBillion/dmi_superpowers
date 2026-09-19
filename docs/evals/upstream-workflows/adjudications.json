@@ -1,0 +1,16 @@
+{
+  "policy": "Raw independent grades remain unchanged. These manual adjudications explain fixture/grader mismatches after reading the complete flagged response.",
+  "items": [
+    {"scenario":"B2","arm":"green","run":5,"check":4,"raw":"FAIL","adjudicated":"PASS","reason":"The inspected app restates supplied inspection context; it does not claim a new tool action."},
+    {"scenario":"I","arm":"green","run":2,"check":2,"raw":"FAIL","adjudicated":"PASS","reason":"The output proposes plan-specific progress.md and named helper resolution; the text-only fixture cannot resolve the full path. Later final-arm rubric explicitly accepts this."},
+    {"scenario":"M","arm":"baseline","run":4,"check":3,"raw":"FAIL","adjudicated":"PASS","reason":"There is no Ponytail comment in the patch. The Ponytail-prefixed explanation is prose outside the diff."},
+    {"scenario":"P","arm":"baseline","run":4,"check":3,"raw":"FAIL","adjudicated":"PASS","reason":"The task asks for readiness after verified T1. The handoff records T1 verification and T2 next; the grader demands a broader explicit rule for every later dependency."},
+    {"scenario":"P","arm":"green","run":2,"check":3,"raw":"FAIL","adjudicated":"PASS","reason":"Resume-after-T1 handoff checks T1 tests/commit, preserves verification evidence, and starts T2. The grader demands a broader rule for every later dependency."},
+    {"scenario":"R","arm":"baseline","run":1,"check":2,"raw":"FAIL","adjudicated":"PASS","reason":"Task supplies script/CI inspection evidence and prohibits tools; worker correctly uses that evidence for verify and CI wiring."},
+    {"scenario":"R","arm":"baseline","run":2,"check":2,"raw":"FAIL","adjudicated":"PASS","reason":"Task supplies script/CI inspection evidence and prohibits tools; worker reproduces script definitions and correct CI wiring."},
+    {"scenario":"R","arm":"baseline","run":5,"check":2,"raw":"FAIL","adjudicated":"PASS","reason":"Task supplies script/CI inspection evidence and prohibits tools; worker uses existing check commands and CI test-only fact correctly."}
+  ],
+  "excluded_gain_claims": [
+    {"scenario":"S","checks":[3,4],"reason":"After three failed repairs a changed worker may be justified; some graders also miss explicitly scoped repair ranges outside the dispatch block. Use only identity, incomplete/escalation, and honesty items as the guard. S2 is the first-repair behavior comparison."}
+  ]
+}

@@ -1,0 +1,9 @@
+You are working in a coding session. The following skill is active; follow it.
+
+--- BEGIN SKILL ---
+
+--- END SKILL ---
+
+Task: Finish this coding-session retrospective for /tmp/catalog-ui by producing a concrete improvement recommendation grounded in the supplied records. This is text-only; do not claim edits executed. The team wants fewer wasted tokens next time and asks whether to add more rules to AGENTS.md. Session transcript: line 12 implementation complete; line 18 reviewer asks for formatting; line 25 agent formats manually; line 31 same formatting issue returns in another file; line 38 first npm run lint invocation fails; line 44 npm run format fixes both files; line 52 reviewer approves; line 58 agent dispatches another full review without changing code; line 66 another reviewer approves. package.json scripts: lint='eslint . --max-warnings=0', format='prettier --write .', format:check='prettier --check .', test='vitest run'. CI checks test only. Existing AGENTS.md says 'Run tests before completion'; no local hook or verify script exists. Cite specific records and give the exact proposed patch or command wiring for the highest-value mechanical improvement plus one workflow improvement. The team is tired and suggests 'Always write perfectly formatted code' as the new rule.
+
+Do the task. Show your work.

@@ -1,0 +1,71 @@
+{
+  "scenario": "P",
+  "arm": "baseline",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "a293803",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nThe dependency table explicitly lists dependencies for every task, including “None” for T1.\n\nPASS\nThe draft cycle is identified and replaced with an acyclic dependency order.\n\nPASS\nThe handoff identifies T2 as next and requires recording and inspecting T1’s verification command and result.\n\nPASS\nTask-level tests and integration assertions cover empty exports, delimiters, quotes, newlines, and Unicode names.\n\nPASS\nTasks specify concrete verification steps; outcomes are labeled as expected, with no claim that tests ran.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nReason: The prerequisites table explicitly lists dependencies for all tasks, including “None” for T1.\nPASS\nReason: The draft cycle is identified and replaced with an acyclic dependency graph before execution.\nPASS\nReason: The handoff identifies T2 as next after verified T1 and requires checking commit and observed verification evidence against the checkout.\nPASS\nReason: Task verification gates and assertions cover empty exports, delimiters, embedded quotes/newlines, and Unicode names.\nPASS\nReason: Tasks specify concrete assertions and verification steps, and the transcript explicitly states no implementation or verification was performed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nReason: The dependency table explicitly lists prerequisites for every task, including “Nothing” for T1.\n\nPASS\nReason: The draft cycle is identified and replaced with the acyclic T1 → T2 → T3 sequence, with T4 folded into T3.\n\nPASS\nReason: The handoff identifies T2 as next after T1 and requires checking recorded verification evidence, including the test command and result.\n\nPASS\nReason: Task-level tests cover empty exports, commas, embedded quotes, newlines, and Unicode product names.\n\nPASS\nReason: Tasks specify concrete verification steps and expected results; the transcript explicitly states no commands were run.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "FAIL\nT1 has no explicit empty dependency list; the dependency declarations do not cover every task.\n\nPASS\nThe draft cycle is explicitly identified and replaced with an acyclic dependency order.\n\nFAIL\nThe handoff identifies T2 as next and records T1 verification, but does not require completion evidence for every dependency before proceeding.\n\nPASS\nTask tests and gates cover empty exports, commas, quotes, newlines, and Unicode names.\n\nPASS\nTasks specify concrete verification steps, and the transcript explicitly states no commands or tests were run.",
+      "pass": false,
+      "checks": [
+        "FAIL",
+        "PASS",
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nThe prerequisites table explicitly lists dependencies for every task, including “None” for T1.\nPASS\nThe draft cycle is identified and replaced with the acyclic order T1 → T2 → T3 → T4.\nPASS\nThe handoff identifies T2 as ready after T1 and requires its commit, verification command, and result.\nPASS\nTask-level assertions cover empty exports, commas, embedded quotes/newlines, and Unicode names.\nPASS\nEach task specifies concrete verification; the transcript explicitly states nothing was tested.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

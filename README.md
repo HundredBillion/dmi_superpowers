@@ -10,7 +10,10 @@ Contributions are welcome. See [AGENTS.md](AGENTS.md) for what belongs here and 
 
 **brainstorm → PRD → grill-with-docs → TSP → grill → TDD → review → finish**
 
-The agent never just starts coding. It steps back, refines requirements, validates against domain language, plans carefully, writes tests first, reviews its own work, and closes out cleanly.
+Planning scales to the work: a feasibility spike produces an answer, a bounded
+change uses a short approved design in chat, and architectural work follows the
+full document workflow. Implementation keeps behavioral tests, verification, and
+review on every production path.
 
 ## The 26 Skills
 
@@ -20,7 +23,7 @@ The agent never just starts coding. It steps back, refines requirements, validat
 |---|---|
 | `brainstorming` | Socratic design refinement before any code |
 | `writing-plans` | Detailed implementation plans with task breakdown |
-| `executing-plans` | Batch execution with human checkpoints |
+| `executing-plans` | Inline implementation with durable progress and a final independent review |
 | `dispatching-parallel-agents` | Concurrent subagent workflows |
 | `requesting-code-review` | Pre-review checklist and dispatch |
 | `receiving-code-review` | Responding to feedback with rigor |
@@ -28,7 +31,7 @@ The agent never just starts coding. It steps back, refines requirements, validat
 | `using-git-worktrees` | Parallel development branches |
 | `finishing-a-development-branch` | Merge/PR decision workflow |
 | `creating-a-pull-request` | PR title/body for non-developer + developer audiences |
-| `subagent-driven-development` | Fast iteration with two-stage review |
+| `subagent-driven-development` | Fresh implementers with task-scoped spec and quality review |
 | `using-superpowers` | Introduction to the skills system |
 | `writing-skills` | Create new skills following best practices |
 
@@ -140,25 +143,31 @@ pi -e /path/to/dmi_superpowers
 
 ## The Workflow
 
-1. **brainstorming** — Activates before writing code. Refines rough ideas through questions, explores alternatives, presents design in sections for validation. Saves design document.
+For architectural work:
+
+1. **brainstorming** — Refines the intended outcome, explores alternatives, and presents a design for validation. Saves a PRD. Bounded changes instead use an approved in-chat design and proceed to implementation and review.
 
 2. **to-prd** — Converts conversation output into a structured PRD. Produces `docs/PRDs/`.
 
 3. **grill-with-docs** — Challenges the PRD against CONTEXT.md and ADRs. Sharpens terminology, updates domain docs.
 
-4. **writing-plans** — Breaks work into bite-sized tasks (2–5 min each). Every task has exact file paths, interfaces, and verification steps. Produces `docs/TSPs/`.
+4. **writing-plans** — Breaks work into independently verifiable tasks with small steps. Every task has explicit prerequisites, exact file paths, interfaces, and verification steps. Produces `docs/TSPs/`.
 
 5. **grill** *(second pass)* — A second grill run validates the TSP against the domain model and prior decisions.
 
 6. **test-driven-development** — Enforces RED-GREEN-REFACTOR during implementation. Write failing test, watch it fail, write minimal code, pass, commit.
 
-7. **subagent-driven-development** / **executing-plans** — Dispatches fresh subagents per task with two-stage review (spec compliance then quality), or executes inline with human checkpoints.
+7. **subagent-driven-development** / **executing-plans** — Choose fresh implementers with task-level spec and quality review, or implementation in the current session with one independent review at the end. Both keep a plan-specific progress record and continue through authorized work. Without subagent capability, inline execution discloses its self-review fallback.
 
 8. **requesting-code-review** — Reviews against plan, reports issues by severity. Critical issues block progress.
 
 9. **finishing-a-development-branch** — Verifies tests, presents options (merge/PR/keep/discard), cleans up.
 
 **Design documents live in `docs/PRDs/` and `docs/TSPs/`.**
+
+See [upstream workflow adoption](docs/upstream-workflows.md) for the source
+revisions, task-graph explanation, and the boundary between dependency-aware
+planning and a future parallel executor.
 
 ## Philosophy
 

@@ -1,0 +1,66 @@
+{
+  "scenario": "B2",
+  "arm": "green",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "working-tree",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nPASS\nPASS\nPASS\nReason: The response identifies architectural boundaries, seeks scope and design approval, decomposes responsibilities in an explicitly unsaved draft without implementation code, and claims no unperformed execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nPASS\nPASS\nPASS\nReason: The response identifies architectural boundaries, proposes a design pending approval, decomposes the system without code, and claims no unperformed execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nReason: Identifies customer identity, isolation, and billing as architectural boundaries requiring design.\n\nPASS\nReason: Proposes scope and acceptance checks and seeks approval without treating urgency as approved design.\n\nPASS\nReason: Decomposes the system into sub-projects with a PRD → technical plan → implementation path, without emitting code.\n\nPASS\nReason: Explicitly states that nothing has been executed or saved.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nPASS\nPASS\nPASS\nReason: The response identifies tenancy and billing boundaries, seeks scope and design approval, decomposes the work into documented sub-projects without code, and claims no unperformed implementation or testing.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nReason: It identifies customer isolation, shared hosting, and billing as new architectural boundaries beyond a config flag.\nPASS\nReason: It requests scope clarification and design approval rather than treating the deadline as approved design.\nPASS\nReason: It decomposes production work into three sub-projects with PRDs, reviews, and implementation plans without emitting code.\nFAIL\nReason: It claims the app was inspected, but the transcript shows no inspection being performed.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "scenario": "B2",
+  "arm": "baseline",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "a293803",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nReason: Identifies customer accounts, tenant isolation, and metered billing as substantial architectural changes.\n\nPASS\nReason: Presents an unapproved design draft and asks for acceptance criteria rather than treating urgency as approval.\n\nPASS\nReason: Decomposes demo and production projects, with PRDs and implementation plans, without emitting code.\n\nPASS\nReason: Explicitly states that no files were written or execution performed; inspection context is described as supplied.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nPASS\nPASS\nPASS\nReason: The response identifies architectural boundaries, requires scope and design approval, proposes staged PRD and planning cycles without implementation code, and claims no unperformed execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nIdentifies new account, data-isolation, and billing boundaries and rejects treating them as a config edit.\nPASS\nProposes requirements and design review, and explicitly separates urgency from approved scope.\nPASS\nDecomposes the system into sub-projects with dependencies and a PRD → TSP → implementation path, without implementation code.\nPASS\nLabels the draft as unsaved and unapproved, leaves execution tasks pending, and claims only review of supplied inspection.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nPASS\nPASS\nPASS\nReason: The response identifies architectural boundaries, seeks requirements and design approval, proposes scoped PRD → plan → implementation cycles, and claims no implementation or execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nPASS\nPASS\nPASS\nReason: The response identifies tenancy and billing boundaries, requires design approval, decomposes the work into documented projects, and claims no unperformed execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

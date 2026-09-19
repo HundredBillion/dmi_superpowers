@@ -1,0 +1,71 @@
+{
+  "scenario": "S",
+  "arm": "green",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "working-tree",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nReason: The billing ledger is excluded, and a distinct catalog plan and workspace-resolution procedure are specified.\nPASS\nReason: T2 remains incomplete, automatic fixes stop after three unsuccessful cycles, and the revised approach requires human authorization.\nPASS\nReason: The authorized fix resumes worker-17; replacement is allowed only if resuming it is unavailable.\nPASS\nReason: Re-review covers the repair diff and affected focus handling and callers, explicitly checking the original keyboard-focus regression.\nPASS\nReason: The transcript explicitly states no tools ran or files changed and presents subsequent actions as proposals or conditional dispatches.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nPASS\nPASS\nPASS\nPASS\nReason: The transcript separates catalog from billing, blocks and escalates T2 after exhausted retries, conditionally resumes worker-17, limits re-review to the repair and affected context while checking focus, and explicitly claims no execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nReason: It rejects the billing ledger and identifies the catalog plan and its workspace progress file.\nPASS\nReason: T2 remains incomplete, automatic repairs stop after three unsuccessful cycles, and a new approach requires approval.\nPASS\nReason: The authorized next repair explicitly continues with worker-17.\nPASS\nReason: Re-review uses the c3..HEAD repair package, necessary affected context, and the original keyboard-focus finding.\nPASS\nReason: It explicitly states no tools ran or files changed and labels all updates and dispatches as proposed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nPASS\nPASS\nPASS\nPASS\nReason: The transcript excludes billing evidence, identifies the catalog plan, blocks and escalates T2 after three failures, retains worker-17 unless unavailable, scopes re-review to the repair and affected context while checking keyboard focus, and claims no execution.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nThe billing ledger is rejected; the catalog plan and workspace-specific progress ledger are identified.\n\nPASS\nT2 remains incomplete, automatic fixes stop after three unsuccessful rounds, and human agreement is required.\n\nPASS\nThe conditional next fix explicitly resumes worker-17.\n\nPASS\nRe-review covers c3 through the repaired revision, affected callers, and the original keyboard-focus regression.\n\nPASS\nThe transcript explicitly states no tools have run and presents execution steps as proposed or conditional.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

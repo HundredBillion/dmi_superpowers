@@ -81,6 +81,8 @@ include this section.]
 ````markdown
 ### Task N: [Component Name]
 
+**Blocked by:** [Prerequisite task numbers, or `None` — include this field even for root tasks]
+
 **Files:**
 - Create: `exact/path/to/file.py`
 - Modify: `exact/path/to/existing.py:123-145`
@@ -168,7 +170,7 @@ After the grill-with-docs session completes, offer execution choice:
 
 **1. Subagent-Driven (recommended)** - I dispatch a fresh subagent per task, review between tasks, fast iteration
 
-**2. Inline Execution** - Execute tasks in this session using executing-plans, batch execution with checkpoints
+**2. Inline Execution** - Execute tasks in this session using executing-plans, with durable progress and a final independent review
 
 **Which approach?"**
 
@@ -178,4 +180,4 @@ After the grill-with-docs session completes, offer execution choice:
 
 **If Inline Execution chosen:**
 - **REQUIRED SUB-SKILL:** Use dmi-superpowers:executing-plans
-- Batch execution with checkpoints for review
+- Implement in this session, record durable progress, and obtain a final independent review (disclose self-review if independent review is unavailable)

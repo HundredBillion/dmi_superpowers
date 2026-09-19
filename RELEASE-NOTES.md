@@ -1,5 +1,23 @@
 # dmi_superpowers Release Notes
 
+## Unreleased
+
+Selected upstream workflow improvements, adapted without adding new skills:
+
+- Scale brainstorming artifacts to exploratory, bounded, or architectural work.
+- Make inline execution a first-class choice with plan-specific progress and a
+  final independent review; disclose fallback when independent review is unavailable.
+- Bound unsuccessful repair/re-review loops while leaving unresolved tasks blocked.
+- Require task prerequisites, including explicit `None` for root tasks; execution
+  remains sequential, not an automatic parallel worktree scheduler.
+- Isolate helper artifacts by canonical plan identity, reject invalid/empty review
+  ranges, and prevent polluter discovery or runner failures from reporting clean.
+
+See [adoption boundaries](docs/upstream-workflows.md) and the
+[evaluation evidence](docs/evals/upstream-workflows/README.md). Content simulations
+do not establish installed triggering, coding-quality gains, or token/time savings.
+No release version bump or installed-plugin update is included.
+
 ## v0.7.0 (2026-08-25)
 
 Adds one check to `writing-code-comments`: grep the note you just wrote for position

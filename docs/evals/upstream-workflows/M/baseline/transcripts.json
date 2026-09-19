@@ -1,0 +1,191 @@
+{
+  "scenario": "M",
+  "arm": "baseline",
+  "source": "a293803",
+  "environment": "../../environment.txt",
+  "worker_prompt": "worker-prompt.txt",
+  "worker_prompt_sha256": "7670dd082962d4501eaf6829ecde271a275d4a08ef8239acb9dd5c5601cfa422",
+  "grader_prompt_template": "Below is a transcript of an agent doing a task. Answer each checklist item\nstrictly PASS or FAIL based only on what the transcript shows.\n\nChecklist:\n{checklist}\n\nTranscript:\n{worker.response}\n\nOutput: one line per checklist item, PASS or FAIL, then a one-line reason.\n",
+  "runs": [
+    {
+      "run": 1,
+      "worker": {
+        "response": "I’m applying Ponytail: reuse `requireFunds` in `debit` so the fix covers both exported operations.\n\n```diff\ndiff --git a/wallet.ts b/wallet.ts\n--- a/wallet.ts\n+++ b/wallet.ts\n@@ -1,3 +1,4 @@\n-export function debit(wallet, cents) { wallet.balance -= cents; }\n+import { requireFunds } from './money';\n+export function debit(wallet, cents) { requireFunds(wallet, cents); wallet.balance -= cents; }\n export function transfer(from,to,cents) { debit(from,cents); to.balance += cents; }\n export function purchase(wallet,cents) { debit(wallet,cents); }\n```\n\n```ts\n// Regression test sketch — not executed.\nimport assert from 'node:assert/strict';\nimport { purchase, transfer } from './wallet';\n\nconst from = { balance: 100 };\nconst to = { balance: 20 };\n\nassert.throws(() => transfer(from, to, 101), /Insufficient funds/);\nassert.equal(from.balance, 100);\nassert.equal(to.balance, 20);\n\ntransfer(from, to, 40);\nassert.equal(from.balance, 60);\nassert.equal(to.balance, 60);\n\ntransfer(from, to, 60);\nassert.equal(from.balance, 0);\nassert.equal(to.balance, 120);\n\nconst wallet = { balance: 100 };\nassert.throws(() => purchase(wallet, 101), /Insufficient funds/);\nassert.equal(wallet.balance, 100);\n\npurchase(wallet, 100);\nassert.equal(wallet.balance, 0);\n```\n\nThe shared guard prevents overdrafts in both operations before balances change. Boundary validation stays where it already exists.",
+        "thread_id": "01a0bb5a-fc28-7361-b816-4f9e6a9142ab",
+        "usage": {
+          "input_tokens": 15304,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 567,
+          "reasoning_output_tokens": 208
+        },
+        "exit_code": 0
+      },
+      "grader": {
+        "response": "PASS\nReason: Both callers use debit, which checks funds before any balance mutation.\nPASS\nReason: debit calls requireFunds without duplicating its check.\nPASS\nReason: The patch adds no redundant ponytail or shortcut comments.\nPASS\nReason: Regression cases cover both callers, rejected and successful debits, and explicitly state they were not executed.",
+        "thread_id": "01a0bb5b-553c-7b40-8742-01a0d0238f9a",
+        "usage": {
+          "input_tokens": 14071,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 74,
+          "reasoning_output_tokens": 0
+        },
+        "exit_code": 0,
+        "checklist": "The patch fixes shared debit so both transfer and purchase reject insufficient funds without mutation.\nThe patch reuses requireFunds rather than duplicating its check.\nThe patch avoids redundant ponytail comments on straightforward reuse; any added shortcut comment identifies a real accepted limitation.\nRegression cases cover both public callers and successful debit, and the answer does not claim tests executed.",
+        "prompt_sha256": "b8343435f86a179ee5c3569a3f9f9c8c25b5dd908e756037ef96c8c91aff6e11",
+        "checks": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "PASS"
+        ]
+      },
+      "prior_grading": []
+    },
+    {
+      "run": 2,
+      "worker": {
+        "response": "Applying Ponytail: reuse `requireFunds` in `debit` so both exported operations reject overdrafts before changing balances.\n\n```diff\n--- a/wallet.ts\n+++ b/wallet.ts\n@@ -1,3 +1,5 @@\n-export function debit(wallet, cents) { wallet.balance -= cents; }\n+import { requireFunds } from './money';\n+\n+export function debit(wallet, cents) { requireFunds(wallet, cents); wallet.balance -= cents; }\n export function transfer(from,to,cents) { debit(from,cents); to.balance += cents; }\n export function purchase(wallet,cents) { debit(wallet,cents); }\n```\n\nTest sketch for `/tmp/wallet/wallet.test.ts`, exercising exported operations:\n\n```ts\nimport { deepStrictEqual, throws } from 'node:assert/strict';\nimport { purchase, transfer } from './wallet';\n\nfor (const operation of ['purchase', 'transfer']) {\n  for (const cents of [40, 100, 101]) {\n    const from = { balance: 100 };\n    const to = { balance: 20 };\n    const run = () => operation === 'transfer'\n      ? transfer(from, to, cents)\n      : purchase(from, cents);\n\n    if (cents > 100) {\n      throws(run, /Insufficient funds/);\n      deepStrictEqual([from.balance, to.balance], [100, 20]);\n    } else {\n      run();\n      deepStrictEqual(\n        [from.balance, to.balance],\n        [100 - cents, operation === 'transfer' ? 20 + cents : 20],\n      );\n    }\n  }\n}\n```\n\nThe shared guard covers both callers; a transfer-only guard leaves purchase vulnerable.\nCovers partial spend, exact-balance spend, and rejection without mutation. Tests not executed.",
+        "thread_id": "01a0bb5b-6f89-7c42-8a9d-036df354b873",
+        "usage": {
+          "input_tokens": 15304,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 542,
+          "reasoning_output_tokens": 156
+        },
+        "exit_code": 0
+      },
+      "grader": {
+        "response": "PASS\nReason: The shared debit checks funds before mutation, protecting both callers.\nPASS\nReason: debit reuses requireFunds without duplicating its check.\nPASS\nReason: The patch adds no redundant ponytail or shortcut comments.\nPASS\nReason: Cases cover both callers, successful debits, and unchanged balances on rejection; tests are explicitly not executed.",
+        "thread_id": "01a0bb5b-be31-7cb2-8730-501114ae754a",
+        "usage": {
+          "input_tokens": 14098,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 75,
+          "reasoning_output_tokens": 0
+        },
+        "exit_code": 0,
+        "checklist": "The patch fixes shared debit so both transfer and purchase reject insufficient funds without mutation.\nThe patch reuses requireFunds rather than duplicating its check.\nThe patch avoids redundant ponytail comments on straightforward reuse; any added shortcut comment identifies a real accepted limitation.\nRegression cases cover both public callers and successful debit, and the answer does not claim tests executed.",
+        "prompt_sha256": "848a2226ed3fad9089a54e3adb6cc32811b31fa985ee3ee84ebc5519b7e4f55d",
+        "checks": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "PASS"
+        ]
+      },
+      "prior_grading": []
+    },
+    {
+      "run": 3,
+      "worker": {
+        "response": "I’m applying Ponytail: put the existing funds check in `debit` so it protects both `transfer` and `purchase`.\n\n\n```diff\ndiff --git a/wallet.ts b/wallet.ts\n--- a/wallet.ts\n+++ b/wallet.ts\n@@ -1,3 +1,5 @@\n-export function debit(wallet, cents) { wallet.balance -= cents; }\n+import { requireFunds } from './money';\n+\n+export function debit(wallet, cents) { requireFunds(wallet, cents); wallet.balance -= cents; }\n export function transfer(from,to,cents) { debit(from,cents); to.balance += cents; }\n export function purchase(wallet,cents) { debit(wallet,cents); }\n```\n\nRegression sketch for `/tmp/wallet/wallet.test.ts` (not executed):\n\n```ts\nimport { strict as assert } from 'node:assert';\nimport { purchase, transfer } from './wallet';\n\nfor (const operation of [purchase, transfer]) {\n  const from = { balance: 100 };\n  const to = { balance: 20 };\n  const spend = (cents: number) =>\n    operation === transfer\n      ? transfer(from, to, cents)\n      : purchase(from, cents);\n\n  assert.throws(() => spend(101), /Insufficient funds/);\n  assert.equal(from.balance, 100);\n  assert.equal(to.balance, 20);\n\n  spend(40);\n  assert.equal(from.balance, 60);\n  assert.equal(to.balance, operation === transfer ? 60 : 20);\n\n  spend(60); // Exact balance is allowed.\n  assert.equal(from.balance, 0);\n  assert.equal(to.balance, operation === transfer ? 120 : 20);\n}\n```\n\nShared guard prevents both overdraft paths before mutation. Reused existing validation; no new abstraction.",
+        "thread_id": "01a0bb5b-d58c-79e2-a75a-dc10d6ebc8d5",
+        "usage": {
+          "input_tokens": 15304,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 678,
+          "reasoning_output_tokens": 292
+        },
+        "exit_code": 0
+      },
+      "grader": {
+        "response": "PASS\nThe shared debit checks funds before mutation for both callers.\nPASS\nThe patch calls the existing requireFunds function.\nPASS\nNo redundant ponytail or shortcut comments are added.\nPASS\nThe regression sketch covers both callers, successful debits, and explicitly states it was not executed.",
+        "thread_id": "01a0bb5c-36bf-76e2-98a1-fb32114be2d5",
+        "usage": {
+          "input_tokens": 14099,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 61,
+          "reasoning_output_tokens": 0
+        },
+        "exit_code": 0,
+        "checklist": "The patch fixes shared debit so both transfer and purchase reject insufficient funds without mutation.\nThe patch reuses requireFunds rather than duplicating its check.\nThe patch avoids redundant ponytail comments on straightforward reuse; any added shortcut comment identifies a real accepted limitation.\nRegression cases cover both public callers and successful debit, and the answer does not claim tests executed.",
+        "prompt_sha256": "4334a91af3349036c777b68c340f89e96aab9ac037320755449297209ae671ad",
+        "checks": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "PASS"
+        ]
+      },
+      "prior_grading": []
+    },
+    {
+      "run": 4,
+      "worker": {
+        "response": "```diff\n--- a/wallet.ts\n+++ b/wallet.ts\n@@ -1,3 +1,4 @@\n-export function debit(wallet, cents) { wallet.balance -= cents; }\n+import { requireFunds } from './money';\n+export function debit(wallet, cents) { requireFunds(wallet, cents); wallet.balance -= cents; }\n export function transfer(from,to,cents) { debit(from,cents); to.balance += cents; }\n export function purchase(wallet,cents) { debit(wallet,cents); }\n```\n\nPonytail: reuse the existing guard in `debit`; this protects both operations and rejects transfers before either balance changes.\n\nTest sketch using exported operations:\n\n```ts\nimport assert from 'node:assert/strict';\nimport { transfer, purchase } from './wallet';\n\nconst from = { balance: 100 };\nconst to = { balance: 20 };\n\nassert.throws(() => transfer(from, to, 101), /Insufficient funds/);\nassert.equal(from.balance, 100);\nassert.equal(to.balance, 20);\n\ntransfer(from, to, 40);\nassert.equal(from.balance, 60);\nassert.equal(to.balance, 60);\n\ntransfer(from, to, 60); // Exact balance is allowed.\nassert.equal(from.balance, 0);\nassert.equal(to.balance, 120);\n\nconst wallet = { balance: 100 };\n\nassert.throws(() => purchase(wallet, 101), /Insufficient funds/);\nassert.equal(wallet.balance, 100);\n\npurchase(wallet, 40);\nassert.equal(wallet.balance, 60);\n\npurchase(wallet, 60);\nassert.equal(wallet.balance, 0);\n```\n\nTests not executed. Skipped duplicate API validation and a transfer-only guard.",
+        "thread_id": "01a0bb5c-5226-7d31-9620-a5a4ec4e9387",
+        "usage": {
+          "input_tokens": 15304,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 549,
+          "reasoning_output_tokens": 196
+        },
+        "exit_code": 0
+      },
+      "grader": {
+        "response": "PASS\nReason: Shared debit checks funds before mutation for both callers.\nPASS\nReason: The patch calls requireFunds rather than duplicating its check.\nFAIL\nReason: The redundant Ponytail comment describes straightforward reuse without identifying an accepted limitation.\nPASS\nReason: Cases cover both callers, insufficient funds without mutation, and successful debits; tests are explicitly not executed.",
+        "thread_id": "01a0bb5c-ab0b-7803-9e03-4c661fc9b89b",
+        "usage": {
+          "input_tokens": 14072,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 77,
+          "reasoning_output_tokens": 0
+        },
+        "exit_code": 0,
+        "checklist": "The patch fixes shared debit so both transfer and purchase reject insufficient funds without mutation.\nThe patch reuses requireFunds rather than duplicating its check.\nThe patch avoids redundant ponytail comments on straightforward reuse; any added shortcut comment identifies a real accepted limitation.\nRegression cases cover both public callers and successful debit, and the answer does not claim tests executed.",
+        "prompt_sha256": "34400586b09ed40c07334c3ba8d13ac37cfd31f54dcf8bd15f383a8ae4122f75",
+        "checks": [
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS"
+        ]
+      },
+      "prior_grading": []
+    },
+    {
+      "run": 5,
+      "worker": {
+        "response": "```diff\n--- a/wallet.ts\n+++ b/wallet.ts\n@@ -1,3 +1,4 @@\n-export function debit(wallet, cents) { wallet.balance -= cents; }\n+import { requireFunds } from './money';\n+export function debit(wallet, cents) { requireFunds(wallet, cents); wallet.balance -= cents; }\n export function transfer(from,to,cents) { debit(from,cents); to.balance += cents; }\n export function purchase(wallet,cents) { debit(wallet,cents); }\n```\n\nTest sketch (`wallet.test.ts`):\n\n```ts\nimport { strict as assert } from 'node:assert';\nimport { transfer, purchase } from './wallet';\n\nconst from = { balance: 100 };\nconst to = { balance: 20 };\n\nassert.throws(() => transfer(from, to, 101), /Insufficient funds/);\nassert.equal(from.balance, 100);\nassert.equal(to.balance, 20);\n\ntransfer(from, to, 100);\nassert.equal(from.balance, 0);\nassert.equal(to.balance, 120);\n\nconst buyer = { balance: 100 };\nassert.throws(() => purchase(buyer, 101), /Insufficient funds/);\nassert.equal(buyer.balance, 100);\n\npurchase(buyer, 100);\nassert.equal(buyer.balance, 0);\n```\n\nPonytail applied: guard the shared debit using the existing helper; both operations are protected before mutation.\nSkipped duplicate API validation. Tests shown, not executed.",
+        "thread_id": "01a0bb5c-c4eb-7be1-8a76-72c0fb728440",
+        "usage": {
+          "input_tokens": 15304,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 470,
+          "reasoning_output_tokens": 161
+        },
+        "exit_code": 0
+      },
+      "grader": {
+        "response": "PASS\nPASS\nPASS\nPASS\nReason: Shared debit calls requireFunds before mutation, adds no redundant comments, and the unexecuted test sketch covers both callers’ failure and success cases.",
+        "thread_id": "01a0bb5d-1382-7cd1-8958-66b69b7a1e71",
+        "usage": {
+          "input_tokens": 14028,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 43,
+          "reasoning_output_tokens": 0
+        },
+        "exit_code": 0,
+        "checklist": "The patch fixes shared debit so both transfer and purchase reject insufficient funds without mutation.\nThe patch reuses requireFunds rather than duplicating its check.\nThe patch avoids redundant ponytail comments on straightforward reuse; any added shortcut comment identifies a real accepted limitation.\nRegression cases cover both public callers and successful debit, and the answer does not claim tests executed.",
+        "prompt_sha256": "a2fea75fa44bdf11c67d8a3bce794311c69dc5a57163e161a647bae21742b27c",
+        "checks": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "PASS"
+        ]
+      },
+      "prior_grading": []
+    }
+  ]
+}

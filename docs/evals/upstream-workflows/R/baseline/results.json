@@ -1,0 +1,66 @@
+{
+  "scenario": "R",
+  "arm": "baseline",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "a293803",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nCites lines 18–44 for formatting churn and 52–66 for redundant unchanged-code review.\nFAIL\nUses lint, format:check, and test-only CI wiring, but shows no inspection of existing script definitions or CI configuration.\nPASS\nRetains the initial review and requires re-review only when relevant conditions warrant it.\nPASS\nProvides actionable patches and commands, explicitly stating that no edits or commands were executed.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nFAIL\nPASS\nPASS\nReason: Line evidence, review deduplication, and actionable proposed wiring are present, but actual inspection of existing scripts and CI configuration is not shown.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nCites lines 18–44 for formatting churn and lines 52–66 for redundant unchanged-code review.\n\nPASS\nUses existing lint and format:check scripts and replaces test-only CI with deterministic verification.\n\nPASS\nStops repeated review after approval while retaining review after verification and when changes or unresolved concerns warrant it.\n\nPASS\nProvides concrete script, CI, and AGENTS.md proposals and explicitly states no edits or checks were executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nPASS\nPASS\nPASS\nReason: The recommendation cites both issues’ line evidence, uses existing checks and CI wiring, eliminates redundant reviews while preserving meaningful review, and provides actionable commands explicitly marked as unexecuted proposals.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nFAIL\nPASS\nPASS\nReason: The recommendation cites both evidence sequences, preserves meaningful review, and provides actionable proposed wiring without claiming execution, but shows no inspection confirming existing lint/format:check scripts or CI configuration.",
+      "pass": false,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "scenario": "S2",
+  "arm": "green-stable",
+  "model": "gpt-6-astra (CLI default; verified by non-JSON probe)",
+  "reasoning": "none (CLI default)",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "working-tree",
+  "results": [
+    {
+      "run": 1,
+      "grade": "PASS\nReason: The first repair explicitly resumes worker-17 rather than replacing it.\n\nPASS\nReason: Re-review covers the repair since c1 and affected checkbox and parent-form behavior.\n\nPASS\nReason: Focused regression tests remain required; passing tests are reused unless a concrete evidence gap exists.\n\nPASS\nReason: T2 remains incomplete until review passes and verification gaps close, with escalation after three unsuccessful rounds.\n\nPASS\nReason: The transcript gives instructions for future execution without claiming tools or tests were executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "PASS\nReason: The dispatch explicitly resumes worker-17 for the first repair.\n\nPASS\nReason: Re-review covers `c1..FIX_HEAD`, the finding, and regressions introduced by the repair.\n\nPASS\nReason: It retains focused checkbox and form tests, using existing evidence and requesting additional checks only for affected behavior or concrete gaps.\n\nPASS\nReason: T2 and dependents remain blocked until resolution, with escalation after three unsuccessful fix-and-review rounds.\n\nPASS\nReason: The response gives dispatch instructions and prerequisites without claiming tools or tests were executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "PASS\nReason: The repair resumes worker-17 without spawning a replacement.\n\nPASS\nReason: Re-review is bounded to c1..FIX_HEAD and affected behavior.\n\nPASS\nReason: Existing evidence is reused, while focused regression checks are retained.\n\nPASS\nReason: T2 remains incomplete until resolved, with escalation after three unsuccessful repair rounds.\n\nPASS\nReason: The response gives instructions and pending status without claiming tools or tests were executed.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "PASS\nReason: The repair explicitly resumes worker-17 without introducing a replacement.\n\nPASS\nReason: Re-review covers c1..FIX_HEAD and behavior affected by the repair.\n\nPASS\nReason: Focused regression tests remain required, and review uses reported evidence without redundant full-suite reruns.\n\nPASS\nReason: T2 remains incomplete until clean verdicts and verified evidence; three unsuccessful rounds trigger explicit escalation.\n\nPASS\nReason: The transcript describes planned actions and explicitly disclaims tool execution or existing artifacts.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "PASS\nResumes worker-17 and retains its existing context.\n\nPASS\nLimits re-review to c1..FIX_HEAD, the open finding, and affected behavior.\n\nPASS\nUses recorded evidence and focused checkbox and parent-form regression tests.\n\nPASS\nKeeps T2 incomplete until resolved and stops automatic repairs after three unsuccessful rounds.\n\nPASS\nExplicitly states that no dispatches, tests, or artifact generation have run.",
+      "pass": true,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

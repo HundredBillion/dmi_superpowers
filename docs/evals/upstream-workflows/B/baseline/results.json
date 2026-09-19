@@ -1,0 +1,60 @@
+{
+  "scenario": "B",
+  "arm": "baseline",
+  "model": "CLI default; not overridden",
+  "harness": "Codex CLI fresh ephemeral sessions",
+  "version": "codex-cli 0.155.1",
+  "source": "a293803",
+  "results": [
+    {
+      "run": 1,
+      "grade": "FAIL\nPASS\nPASS\nReason: It pauses for mandatory PRD approval instead of advancing execution, preserves scope and behavioral verification, and explicitly states that no edits, commits, or tests were performed.",
+      "pass": false,
+      "checks": [
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 2,
+      "grade": "FAIL\nReason: It requires a separate PRD approval step instead of advancing the approved change toward execution.\nPASS\nReason: It preserves the scope and explicit verification of default hiding, toggle show/hide, and empty-state behavior.\nPASS\nReason: It explicitly states that no files were saved or committed, code changed, or tests run.",
+      "pass": false,
+      "checks": [
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 3,
+      "grade": "FAIL\nReason: It makes PRD approval and further reviews mandatory gates instead of moving directly toward execution.\n\nPASS\nReason: It preserves scope and verifies default hidden, toggle show/hide, and empty-state behavior.\n\nPASS\nReason: It explicitly states that no files were written or committed and no code or tests were executed.",
+      "pass": false,
+      "checks": [
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 4,
+      "grade": "FAIL\nReason: It makes PRD approval and subsequent workflow gates mandatory instead of moving toward execution with a concise plan.\nPASS\nReason: It preserves scope and verification for default hidden, toggle show/hide, and empty-catalog behavior.\nPASS\nReason: It explicitly states that no document was saved or committed and no code changes or tests were executed.",
+      "pass": false,
+      "checks": [
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    },
+    {
+      "run": 5,
+      "grade": "FAIL\nReason: It requires PRD approval before further planning instead of moving directly toward execution.\nPASS\nReason: It preserves scope and verification for default hidden, toggle show/hide, and empty state.\nPASS\nReason: It explicitly states that no files were saved or committed, code changed, or tests run.",
+      "pass": false,
+      "checks": [
+        "FAIL",
+        "PASS",
+        "PASS"
+      ]
+    }
+  ]
+}

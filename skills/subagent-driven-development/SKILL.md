@@ -27,11 +27,16 @@ Review scan-for-conflicts step.
 See [examples.md](examples.md#model-selection) for model-tier selection
 guidance across implementer and reviewer roles.
 
+Resolve `SDD_SCRIPTS` to this installed skill's absolute `scripts` directory.
+Run helpers from the **target worktree**, not the plugin directory: they use
+the current Git repository to locate the plan's records. Resolve `PLAN_FILE`
+against that target worktree.
+
 ## Handling Implementer Status
 
 Implementer subagents report one of four statuses. Handle each appropriately:
 
-**DONE:** Generate the review package (`scripts/review-package BASE HEAD`, from this skill's directory — it prints the unique file path it wrote; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with the printed path.
+**DONE:** Generate the review package (`bash "$SDD_SCRIPTS/review-package" PLAN_FILE BASE HEAD` — stdout is the file path; BASE is the commit you recorded before dispatching the implementer — never `HEAD~1`, which silently drops all but the last commit of a multi-commit task), then dispatch the task reviewer with that path. A rejected range is a finding to investigate, not a clean review.
 
 See [examples.md](examples.md#done_with_concerns) for handling DONE_WITH_CONCERNS.
 
@@ -54,6 +59,36 @@ complete: you hold the TSP and cross-task context the reviewer
 lacks. If you confirm an item is a real gap, treat it as a failed spec
 review — send it back to the implementer and re-review.
 
+## Bounded Fix Rounds
+
+Keep the implementer's identity in the plan ledger. A fix round is one repair
+and its re-review. Resume that implementer with the open findings and named
+covering tests; when resuming is unavailable, give a fresh worker the task
+brief, existing report, and findings. A worker that is stuck needs new context,
+a smaller task, or a capability escalation, not the same request repeated.
+
+Record `FIX_BASE` as the revision the reviewer last saw. Review the new
+`FIX_BASE..HEAD` package against the open findings and check for breakage caused
+by the fix, including affected callers. Carry unrelated observations to the
+final review; do not reopen unchanged code as a new full task review. Existing
+test evidence for unchanged code remains usable; changed code needs new evidence.
+
+After each round, record:
+
+`Task N: fix round R/3 | commits | addressed findings | open findings | test evidence`
+
+After **three unsuccessful rounds**, stop automatic fix dispatches. Keep the
+task **blocked/incomplete**, record the remaining findings and attempted fixes,
+and present the next proposed approach to your human partner. Resume only with
+a resolved blocker or a new agreed approach; record that decision before a new
+bounded attempt. A retry limit never makes an unresolved Critical/Important
+finding complete, and dependent tasks stay blocked. Minor observations are
+recorded for final review rather than extending this loop.
+
+Apply the same bound to final-review repairs, grouping substantive findings
+into one fix dispatch per round. Preserve every unresolved finding in the
+handoff; do not present the branch as ready to merge while any remain.
+
 ## Constructing Reviewer Prompts
 
 Per-task reviews are task-scoped gates. The broad review happens once, at the
@@ -72,7 +107,7 @@ final whole-branch review. When you fill a reviewer template:
 - See [examples.md](examples.md#global-constraints-block) for guidance on
   the global-constraints block.
 - Hand the reviewer its diff as a file: run this skill's
-  `scripts/review-package BASE HEAD` and pass the reviewer the file path
+  `bash "$SDD_SCRIPTS/review-package" PLAN_FILE BASE HEAD` and pass the reviewer the file path
   it prints (or, without bash: `git log --oneline`, `git diff --stat`,
   and `git diff -U10` for the range, redirected to one uniquely named
   file). The output never enters your own context, and the reviewer sees
@@ -94,7 +129,7 @@ final whole-branch review. When you fill a reviewer template:
   Do not dismiss the finding because the TSP mandates it, and do not
   dispatch a fix that contradicts the TSP without asking.
 - The final whole-branch review gets a package too: run
-  `scripts/review-package MERGE_BASE HEAD` (MERGE_BASE = the commit the
+  `bash "$SDD_SCRIPTS/review-package" PLAN_FILE MERGE_BASE HEAD` (MERGE_BASE = the commit the
   branch started from, e.g. `git merge-base main HEAD`) and include the
   printed path in the final review dispatch, so the final reviewer reads
   one file instead of re-deriving the branch diff with git commands.
@@ -114,7 +149,7 @@ See [examples.md](examples.md#file-handoffs-rationale) for why artifacts
 are handed over as files rather than pasted. Hand artifacts over as files:
 
 - **Task brief:** before dispatching an implementer, run this skill's
-  `scripts/task-brief PLAN_FILE N` — it extracts the task's full text to a
+  `bash "$SDD_SCRIPTS/task-brief" PLAN_FILE N` — it extracts the task's full text to a
   uniquely named file and prints the path. Compose the dispatch so the
   brief stays the single source of requirements. Your dispatch should
   contain: (1) one line on where this task fits in the project; (2) the
@@ -135,10 +170,18 @@ controllers that lost their place have re-dispatched entire completed task
 sequences — the single most expensive failure observed. Track progress in
 a ledger file, not only in todos.
 
-- At skill start, check for a ledger:
-  `cat "$(git rev-parse --show-toplevel)/.superpowers/sdd/progress.md"`. Tasks listed there
-  as complete are DONE — do not re-dispatch them; resume at the first task
-  not marked complete.
+- At skill start, run `bash "$SDD_SCRIPTS/sdd-workspace" PLAN_FILE` from the
+  target worktree. Its stdout is this plan's workspace path. Read the `plan-path`
+  identity there and use only `<workspace>/progress.md`; other plans and the
+  old shared `.superpowers/sdd/progress.md` are not this plan's record.
+- Start the ledger with the plan identity, source requirements, and branch
+  starting commit. Track each task's status, prerequisites, actual commits,
+  test evidence paths, and review outcome. On resume, reconcile completion
+  entries against those commits and evidence before resuming unfinished work.
+- Select an unfinished task whose declared prerequisites are verified complete.
+  If none is ready, name the failed gate, missing prerequisite, or cycle instead
+  of skipping dependencies. Legacy plans without dependency fields keep their
+  stated order after checking the shared interfaces.
 - When a task's review comes back clean, append one line to the ledger in
   the same message as your other bookkeeping:
   `Task N: complete (commits <base7>..<head7>, review clean)`.
@@ -178,7 +221,7 @@ execution and vs. Executing Plans, efficiency gains, quality gates, and cost.
   dispatch prompt ("treat it as Minor at most") — the TSP's example code is
   a starting point, not evidence that its weaknesses were chosen
 - Dispatch a task reviewer without a diff file — generate it first
-  (`scripts/review-package BASE HEAD`) and name the printed path in the
+  (`bash "$SDD_SCRIPTS/review-package" PLAN_FILE BASE HEAD`) and name the printed path in the
   prompt
 - Move to next task while the review has open Critical/Important issues
 - Re-dispatch a task the progress ledger already marks complete — check
@@ -192,7 +235,8 @@ execution and vs. Executing Plans, efficiency gains, quality gates, and cost.
 **If reviewer finds issues:**
 - Implementer (same subagent) fixes them
 - Reviewer reviews again
-- Repeat until approved
+- Follow Bounded Fix Rounds; after three unsuccessful rounds, keep the task
+  incomplete and escalate instead of dispatching again
 - Don't skip the re-review
 
 **If subagent fails task:**

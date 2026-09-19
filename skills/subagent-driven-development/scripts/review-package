@@ -4,26 +4,32 @@
 # call. Using the recorded per-task BASE (not HEAD~1) keeps multi-commit
 # tasks intact.
 #
-# Usage: review-package BASE HEAD [OUTFILE]
-# Default OUTFILE: <repo-root>/.superpowers/sdd/review-<base7>..<head7>.diff
+# Usage: bash review-package PLAN_FILE BASE HEAD [OUTFILE]
+# Default OUTFILE: <plan-workspace>/review-<base7>..<head7>.diff
 # (named per range, so a re-review after fixes gets a distinct fresh file).
 set -euo pipefail
 
-if [ $# -lt 2 ] || [ $# -gt 3 ]; then
-  echo "usage: review-package BASE HEAD [OUTFILE]" >&2
+if [ $# -lt 3 ] || [ $# -gt 4 ]; then
+  echo "usage: review-package PLAN_FILE BASE HEAD [OUTFILE]" >&2
   exit 2
 fi
 
-base=$1
-head=$2
+plan=$1
+[ -f "$plan" ] || { echo "no such plan file: $plan" >&2; exit 2; }
+base=$(git rev-parse --verify --quiet --end-of-options "${2}^{commit}") || { echo "bad BASE: $2" >&2; exit 2; }
+head=$(git rev-parse --verify --quiet --end-of-options "${3}^{commit}") || { echo "bad HEAD: $3" >&2; exit 2; }
 
-git rev-parse --verify --quiet "$base" >/dev/null || { echo "bad BASE: $base" >&2; exit 2; }
-git rev-parse --verify --quiet "$head" >/dev/null || { echo "bad HEAD: $head" >&2; exit 2; }
+[ "$base" != "$head" ] || { echo "empty review range: BASE and HEAD resolve to the same commit" >&2; exit 2; }
+git merge-base --is-ancestor "$base" "$head" || { echo "BASE must be an ancestor of HEAD" >&2; exit 2; }
+if git diff --quiet "$base" "$head" --; then
+  echo "empty review diff: no net changes between BASE and HEAD" >&2
+  exit 2
+fi
 
-if [ $# -eq 3 ]; then
-  out=$3
+if [ $# -eq 4 ]; then
+  out=$4
 else
-  dir=$("$(cd "$(dirname "$0")" && pwd)/sdd-workspace")
+  dir=$(bash "$(cd "$(dirname "$0")" && pwd)/sdd-workspace" "$plan")
   out="$dir/review-$(git rev-parse --short "$base")..$(git rev-parse --short "$head").diff"
 fi
 
@@ -41,4 +47,5 @@ fi
 } > "$out"
 
 commits=$(git rev-list --count "${base}..${head}")
-echo "wrote ${out}: ${commits} commit(s), $(wc -c < "$out" | tr -d ' ') bytes"
+echo "wrote ${out}: ${commits} commit(s), $(wc -c < "$out" | tr -d ' ') bytes" >&2
+printf '%s\n' "$out"
