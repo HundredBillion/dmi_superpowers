@@ -6,10 +6,11 @@ import { mkdtempSync } from 'node:fs';
 
 // Archive generated evaluation artifacts, not repository source edits.
 const [scenarioId = 'B', arm = 'baseline', mode = 'run'] = process.argv.slice(2);
+const baselineArm = /^baseline(?:-|$)/.test(arm);
 const root = resolve(import.meta.dirname);
 const scenario = JSON.parse(readFileSync(join(root, `${scenarioId}.json`), 'utf8'));
 const source = scenario.skills.map(path => {
-  if (arm !== 'baseline') return readFileSync(path, 'utf8');
+  if (!baselineArm) return readFileSync(path, 'utf8');
   const frozen = spawnSync('git', ['show', `a293803:${path}`], { encoding: 'utf8' });
   if (frozen.status !== 0) throw new Error(`Cannot read frozen skill ${path}: ${frozen.stderr}`);
   return frozen.stdout;
@@ -52,6 +53,6 @@ for (let run = 1; run <= 5; run++) {
   writeFileSync(join(out, `${run}-grader-prompt.txt`), graderPrompt);
   const grade = invoke('grader', graderPrompt);
   results.push({ run, grade, pass: !/\bFAIL\b/.test(grade), checks: [...grade.matchAll(/\b(PASS|FAIL)\b/g)].map(m => m[1]) });
-  writeFileSync(join(out, 'results.json'), JSON.stringify({scenario: scenarioId, arm, model: 'gpt-6-astra (CLI default; verified by non-JSON probe)', reasoning: 'none (CLI default)', harness: 'Codex CLI fresh ephemeral sessions', version: spawnSync('codex', ['--version'], {encoding:'utf8'}).stdout.trim(), source: arm === 'baseline' ? 'a293803' : 'working-tree', results}, null, 2) + '\n');
+  writeFileSync(join(out, 'results.json'), JSON.stringify({scenario: scenarioId, arm, model: 'gpt-6-astra (CLI default; verified by non-JSON probe)', reasoning: 'none (CLI default)', harness: 'Codex CLI fresh ephemeral sessions', version: spawnSync('codex', ['--version'], {encoding:'utf8'}).stdout.trim(), source: baselineArm ? 'a293803' : 'working-tree', results}, null, 2) + '\n');
   console.log(`${scenarioId} ${arm} ${run}/5: ${grade}`);
 }

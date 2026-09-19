@@ -7,6 +7,11 @@ candidate skills come from the working tree and are captured once before each
 five-run arm. Workers receive the entire source literally, not a request to
 read a possibly modified skill. See `environment.txt` for the model and harness.
 
+Final candidate arms are B/green, B2/green, I/green-stable, S2/green-stable,
+and P/green. Earlier I/S candidate arms are retained to show iteration history.
+S is a guard with the exclusions below; M and R have baseline evidence only
+because the observed behavior did not justify changing those skills.
+
 `<scenario>/<arm>/worker-prompt.txt` is the exact shared worker prompt for all
 five repetitions. `transcripts.json` preserves numbered worker responses,
 grader responses/criteria, exact prompt reconstruction templates, thread IDs,
@@ -14,12 +19,23 @@ token usage, and prior grading. `results.json` preserves raw scores. All worker 
 concrete proposed artifacts or dispatches in a text-only continuation. They
 do not authorize real implementation or claim tests were executed.
 
-Run an arm from the repository root:
+`index.json` lists all 17 arms (85 worker runs) and the recoverable temporary
+archive of raw event streams. Compaction reconstructed every grader prompt and
+verified its SHA-256 before moving raw files. No raw evidence was deleted.
+`adjudications.json` records manual corrections separately from raw grades.
+
+Run a new arm from the repository root, choosing an unused name:
 
 ```sh
-node docs/evals/upstream-workflows/run.mjs B baseline
-node docs/evals/upstream-workflows/run.mjs B green
+node docs/evals/upstream-workflows/run.mjs B baseline-2
+node docs/evals/upstream-workflows/run.mjs B candidate-2
 ```
+
+The name `baseline` and names starting `baseline-` select frozen a293803 source; other
+names select the current working-tree skill. Existing arms cannot be
+overwritten. Original `baseline` and `green` names are already archived here;
+preserve them and use fresh names for repeats. Regrading preserves the original
+worker prompt/output and archives the prior grades.
 
 Scenarios:
 
@@ -29,6 +45,7 @@ Scenarios:
 | B2 | New tenancy and billing disguised as a tiny config change |
 | I | Explicit inline execution with available subagents |
 | S | Repeated unsuccessful Important-finding repairs and foreign ledger |
+| S2 | First repair with available original worker and pressure for broad repeated review |
 | P | CSV-export implementation plan with cyclic draft task dependencies |
 | M | Wallet fix shared by transfer and purchase in Ponytail mode |
 | R | Retrospective with formatting churn and redundant unchanged-code review |
@@ -36,6 +53,39 @@ Scenarios:
 R has no baseline skill: it tests whether the model already derives the
 proposed retrospective behavior from concrete session records. A passing
 baseline does not justify adding a new skill.
+
+## Final itemwise results
+
+All counts are out of five. Final arms are listed above. Unqualified numbers
+are raw independent grades; disputed grades and their manual interpretation
+are shown separately and preserved in `adjudications.json`.
+
+| Scenario / checklist item | Baseline raw | Final raw | Interpretation |
+|---|---:|---:|---|
+| B: bounded approved change proceeds without redundant document gates | 0 | 5 | Observed improvement |
+| B: scope/verification; honest execution reporting (each) | 5 | 5 | Preserved |
+| B2: architectural boundary, design gate, decomposition (each) | 5 | 5 | Preserved |
+| B2: honest execution reporting | 5 | 4 | Candidate manual 5; supplied inspection context was misgraded |
+| I: honor explicit inline choice | 5 | 5 | Already worked |
+| I: proposed durable task record | 0 | 5 | Same clarified rubric in both final arms |
+| I: independent final review | 0 | 5 | Observed improvement |
+| I: honest execution reporting | 5 | 5 | Preserved |
+| S guard: separate plan identity, incomplete/escalation, honesty (each) | 5 | 5 | Preserved; other two items excluded from gain claims |
+| S2: reuse worker, focused review, focused verification, honesty (each) | 5 | 5 | Already worked |
+| S2: incomplete until resolved plus finite escalation condition | 0 | 5 | Observed improvement is the finite retry bound |
+| P: explicit dependencies on every task, including root None | 4 | 5 | Observed structural improvement |
+| P: acyclic order, implied CSV cases, honest verification (each) | 5 | 5 | Already worked |
+| P: evidence-based readiness after verified T1 | 4 | 4 | Manual 5 in both arms; grader over-broadened the checkpoint |
+| M: shared root fix, reuse helper, regression coverage/honesty (each) | 5 | — | No candidate change justified |
+| M: no redundant source comment | 4 | — | Manual 5; explanation outside diff was misgraded |
+| R: transcript evidence, meaningful review, actionable/honest artifact (each) | 5 | — | No candidate change justified |
+| R: use existing script/CI evidence for deterministic checks | 2 | — | Manual 5; graders demanded tools despite supplied evidence |
+
+Whole-scenario baseline → candidate counts are B **0→5** (unchanged by
+adjudication), I **0→5**, S2 **0→5**, P raw **4→4** / adjudicated **4→5**, and
+B2 raw **5→4** / adjudicated **5→5**. M baseline raw **4**, adjudicated **5**;
+R baseline raw **2**, adjudicated **5**. These are workflow-artifact compliance
+counts, not measurements of token savings, speed, or implementation correctness.
 
 ## Interpretation limits
 
