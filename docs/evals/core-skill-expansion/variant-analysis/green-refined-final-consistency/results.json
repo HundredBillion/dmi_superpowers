@@ -1,0 +1,61 @@
+{
+  "scenario": "variant-analysis",
+  "arm": "green-refined-final-consistency",
+  "runs": [
+    {
+      "run": 1,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "pass": true
+    },
+    {
+      "run": 2,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "pass": true
+    },
+    {
+      "run": 3,
+      "checks": [
+        "FAIL",
+        "FAIL",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "pass": false
+    },
+    {
+      "run": 4,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "pass": true
+    },
+    {
+      "run": 5,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "pass": true
+    }
+  ]
+}

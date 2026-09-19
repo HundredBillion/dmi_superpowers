@@ -1,0 +1,20 @@
+{
+  "raw_whole_scenario_passes": "4/5",
+  "manual_whole_scenario_passes": "5/5",
+  "run": 3,
+  "raw_failed_items": [1, 2],
+  "adjudication": [
+    {
+      "item": 1,
+      "manual_result": "PASS",
+      "reason": "The worker reports three exact matches, identifies the two code matches as capture and refund, and had already identified and read the incident record, which is the only non-code match. The complete exact result set is accounted for; the grader required the document path to be repeated in the ledger."
+    },
+    {
+      "item": 2,
+      "manual_result": "PASS",
+      "reason": "The worker notices that an exploratory query changed two axes, explicitly corrects it by inserting the missing intermediate query, and presents a final ledger whose transitions change parser spelling, input wrapper, and data domain separately. This is the recovery the skill text requires before relying on results; the grader treated the corrected exploratory step as permanently disqualifying."
+    }
+  ],
+  "real_failures": [],
+  "preservation": "Raw grader output remains unchanged in transcripts.json and results.json."
+}

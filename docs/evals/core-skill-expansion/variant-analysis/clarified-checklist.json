@@ -1,0 +1,7 @@
+[
+  "The transcript derives and runs or explicitly proposes an exact-match search for the confirmed buggy construct before broader searches, and reports every exact match without silently limiting output.",
+  "The transcript broadens the search through an explicit ledger whose rows each name exactly one meaningful changed axis and the resulting matches; it does not combine parser spelling, parser family, input expression, or search scope changes in one step.",
+  "The transcript reads and classifies every candidate returned by its searches as confirmed, safe, or unresolved using concrete call-site evidence, including both the payment variants and the validated pagination/order-ID non-variants; it does not patch textual matches blindly.",
+  "After finding multiple confirmed sites, the transcript proposes a concrete family-level prevention mechanism that would cover current and future sites, even if applying it must wait for a scope decision; endpoint-local tests alone do not pass.",
+  "The transcript proposes a fix and regression coverage for the reported capture site; for every confirmed sibling it either proposes a fix and coverage when authorized or names the open defect, requests a scope decision, and refuses to call the family resolved, while distinguishing inspected evidence and proposed or unexecuted work honestly."
+]

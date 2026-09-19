@@ -1,0 +1,36 @@
+{
+  "raw_whole_scenario_passes": "0/5",
+  "raw_itemwise_passes": {
+    "exact_first_exhaustive_search": "5/5",
+    "one_dimension_at_a_time_generalization": "4/5",
+    "evidence_based_candidate_classification": "5/5",
+    "reported_fix_sibling_coverage_and_prevention": "0/5"
+  },
+  "blind_replacement_guard": {
+    "result": "5/5 workers kept the validated pagination and order-ID parsers unchanged",
+    "evidence": "Every worker classified both sites as safe based on full-input lexical validation and direct-call behavior."
+  },
+  "scope_handling": {
+    "result": "5/5 workers refused to silently expand the lead's capture-only patch scope",
+    "evidence": "Every worker named refund, payout, and wallet top-up as confirmed open defects, requested an explicit scope decision, and refused to call the family resolved.",
+    "rubric_effect": "This directly conflicts with the fourth checklist item's requirement that the proposed change include regression coverage for every affected sibling. The raw FAIL is correct under the unchanged checklist; it should not be presented as evidence that the skill ought to override authorization."
+  },
+  "new_failure_patterns": [
+    {
+      "runs": [1, 2, 3, 4, 5],
+      "pattern": "All proposals limited prevention to capture boundary validation and capture regression tests. None proposed an enforceable family-wide boundary or static rule while three confirmed siblings remained open."
+    },
+    {
+      "runs": [4],
+      "pattern": "The final search changed parser spelling, parser family, and search scope in one query (`parseInt|parseFloat` over `.`), despite earlier staged searches."
+    }
+  ],
+  "representative_scope_statements": [
+    "A capture-only release cannot honestly be described as closing the whole bug family.",
+    "The sibling defects need an explicit scope decision, so I can't describe a capture-only patch as closing the bug family.",
+    "Do not close the monetary parsing bug family as resolved.",
+    "Their patches are intentionally absent from this capture-only proposal; this release must not be described as closing the entire family.",
+    "Assign follow-up ownership and scope explicitly before closing the broader incident."
+  ],
+  "interpretation": "The candidate produces a large improvement on search and triage without blind replacement. A subsequent wording revision should make the one-axis search ledger harder to bypass and distinguish local regression coverage from prevention of recurrence across a confirmed multi-site family. Scope conflicts should continue to escalate rather than authorize silent expansion."
+}
