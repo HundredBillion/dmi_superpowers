@@ -10,7 +10,7 @@ skill's directory.
 | `variant-analysis` | 0/5 | 5/5 adjudicated* | [record](variant-analysis/README.md) |
 | `source-grounded-development` | 0/5 | 5/5 | [record](source-grounded-development/summary.md) |
 | `migrating-safely` | 0/5 | 4/5 adjudicated | [record](migrating-safely/summary.md) |
-| `property-based-testing` | 0/5 | pending | [record](property-based-testing/summary.md) |
+| `property-based-testing` | 0/5 | 4/5 raw final-2 | [record](property-based-testing/summary.md) |
 
 \* Variant analysis scored 4/5 raw in the final run; manual adjudication found
 the remaining failure was a grader false negative, with all five workers meeting
