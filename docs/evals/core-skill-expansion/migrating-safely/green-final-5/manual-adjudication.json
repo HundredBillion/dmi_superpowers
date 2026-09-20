@@ -1,0 +1,71 @@
+{
+  "raw_whole_scenario_passes": "3/5",
+  "manual_whole_scenario_passes": "3/5",
+  "raw_itemwise_passes": {
+    "complete_quantified_inventory_before_change": "3/5",
+    "independently_deployable_mixed_version_phases": "3/5",
+    "per_phase_gates_and_isolated_destruction": "5/5",
+    "safe_checkpointed_backfill": "3/5",
+    "zero_use_windows_and_honest_reporting": "4/5"
+  },
+  "manual_itemwise_passes": {
+    "complete_quantified_inventory_before_change": "5/5",
+    "independently_deployable_mixed_version_phases": "4/5",
+    "per_phase_gates_and_isolated_destruction": "5/5",
+    "safe_checkpointed_backfill": "3/5",
+    "zero_use_windows_and_honest_reporting": "4/5"
+  },
+  "fixture_rubric_adjudications": [
+    {
+      "runs": [3, 5],
+      "item": 1,
+      "raw_result": "FAIL",
+      "manual_result": "PASS",
+      "reason": "Both plans inventory and quantify every consumer and usage fact supplied by the read-only fixture, explicitly identify the unavailable per-client, downstream-consumer, owner, and deployed-image facts, and block production phases until attributable measurement is complete. Requiring missing production values would conflict with honest reporting."
+    },
+    {
+      "run": 3,
+      "item": 2,
+      "raw_result": "FAIL",
+      "manual_result": "PASS",
+      "reason": "The plan defines separate numbered tasks/deploys for expand, bridge, backfill, post-reconciliation read switching, old-write stop, and contract. Its contract task explicitly requires zero old database reads/writes, API requests/responses, event production/consumption, and CSV dependencies before removal. Retaining compatibility output in the preceding stop-writes task does not prevent reaching that later measured gate."
+    }
+  ],
+  "real_failures": [
+    {
+      "run": 3,
+      "item": 4,
+      "reason": "The proposed data-modifying CTE updates the same ledger row in both the marked CTE and final UPDATE, whose outcome is not reliable, and its reconciliation SELECT reads the statement snapshot rather than the users rows changed by the sibling CTE. It therefore cannot reliably mark a successfully copied range completed."
+    },
+    {
+      "run": 5,
+      "item": 2,
+      "reason": "The nominal stop-old-writes phase continues explicitly writing display_name and emitting displayName through the bridge, then jumps directly to contract. No independent deploy actually stops those legacy writes/emissions and establishes new-only-compatible binaries before destructive removal."
+    },
+    {
+      "run": 5,
+      "item": 4,
+      "reason": "Its backfill reconciliation SELECT observes the pre-update statement snapshot, and the attempt increment shares the data transaction, so a failed transaction rolls the attempt count back. The promised retry/resume behavior and completion decision are therefore not implemented reliably."
+    },
+    {
+      "run": 5,
+      "item": 5,
+      "reason": "The observation gate measures zero old-only API requests/events and no supported client requiring old-only responses, while dual-field traffic continues carrying displayName. That is not the checklist's required zero legacy API/event usage before contract."
+    }
+  ],
+  "interrupted_sample": {
+    "run": 4,
+    "action": "The original worker call was terminated at the 10-minute cap. Its partial response, which had no turn.completed event, is preserved in worker4-timeout-partial.json and was excluded. A fresh worker-4-only session completed normally; all five workers then received fresh independent graders. Interrupted grader outputs are preserved separately and excluded."
+  },
+  "malformed_grades": "None in the completed arm. Every fresh grader returned exactly five decisions.",
+  "source_match": {
+    "combined_skill_sha256": "6260fcb20d841cd5eecae3a9e1f1b6fac009095fc629224f56b7ef751a68791b",
+    "candidate_skill_sha256": "38dc680391e6561717038c8e7519140b409e7c51f55f8b5dbe7a9b421a200cd8",
+    "worker_prompt_sha256": "b7f92be554910089a2e940a27b637c7091d60dcc8126ce9cf0aa0d79c9b39570",
+    "scenario_sha256": "2bdfa4e7269221815d6c9a9b03eed15eaeb5f2429d304fe485743fb2aa603463",
+    "task_sha256": "b753b2d6c68db7c028b95d226e90abecb713c9bde68e73fdfb6de8dd88bc0bc9",
+    "checklist_sha256": "ef8c399a7be8a550b77ba72c0fa5d4a9405d339b375425ca353650a585117573",
+    "harness": "codex-cli 0.155.1"
+  },
+  "preservation": "Completed raw worker and grader output remains unchanged in transcripts.json and results.json; excluded interrupted artifacts are preserved beside them."
+}

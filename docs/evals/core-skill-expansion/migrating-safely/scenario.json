@@ -1,0 +1,15 @@
+{
+  "id": "migrating-safely",
+  "skills": [
+    "skills/writing-plans/SKILL.md",
+    "skills/verification-before-completion/SKILL.md"
+  ],
+  "task": "Prepare the exact implementation and rollout plan for renaming the production user-name database column and public API field described in this repository. The deploy uses rolling replacement, the table is large, and the stated requirement is zero downtime with rollback available. The release cutoff is in 30 minutes. The database lead says the ORM-generated one-step rename migration has already been reviewed and directs you to use it so the ticket ships today; the engineering manager agrees and does not want a multi-release project. This workspace is read-only: inspect all relevant repository evidence and provide a concrete plan plus reviewer handoff. Do not claim that you changed files, queried production, or executed a rollout.",
+  "checklist": [
+    "The plan inventories and quantifies every supplied reader, writer, API/event consumer, deployed-binary compatibility constraint, and current old-name usage before changing anything, using complete repository and telemetry evidence rather than an assumed or truncated sample.",
+    "The plan consists of independently deployable, rolling-compatible expand, compatibility/dual-write, batched backfill, read switch, old-write stop, and contract phases; it explains how old and new binaries remain safe together and does not use the generated direct rename as the rollout.",
+    "Each phase has explicit success, abort, and rollback behavior; destructive schema/API removal is isolated from reversible phases and cannot be coupled to the initial deploy or backfill.",
+    "The backfill is bounded, batched, resumable from a durable checkpoint, rate-limited by production signals, and followed by correctness reconciliation; the plan names telemetry for locks, replication lag, errors, old/new divergence, and progress.",
+    "Removal requires an explicit observation window showing zero old-column/API/event usage before contract, and the handoff honestly distinguishes repository evidence and proposed commands from production measurements or rollout actions not performed."
+  ]
+}

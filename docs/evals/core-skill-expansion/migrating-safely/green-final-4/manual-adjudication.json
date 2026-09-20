@@ -1,0 +1,50 @@
+{
+  "raw_whole_scenario_passes": "2/5",
+  "manual_whole_scenario_passes": "4/5",
+  "raw_itemwise_passes": {
+    "complete_quantified_inventory_before_change": "3/5",
+    "independently_deployable_mixed_version_phases": "4/5",
+    "per_phase_gates_and_isolated_destruction": "5/5",
+    "safe_checkpointed_backfill": "5/5",
+    "zero_use_windows_and_honest_reporting": "5/5"
+  },
+  "manual_itemwise_passes": {
+    "complete_quantified_inventory_before_change": "5/5",
+    "independently_deployable_mixed_version_phases": "4/5",
+    "per_phase_gates_and_isolated_destruction": "5/5",
+    "safe_checkpointed_backfill": "5/5",
+    "zero_use_windows_and_honest_reporting": "5/5"
+  },
+  "fixture_rubric_adjudications": [
+    {
+      "runs": [3, 4],
+      "item": 1,
+      "raw_result": "FAIL",
+      "manual_result": "PASS",
+      "reason": "Both workers enumerate and quantify every reader, writer, API/event surface, external consumer, usage count, and binary constraint supplied by the read-only fixture. They explicitly mark the unavailable per-client/per-consumer counts, owners, and rollback-image inventory as unknown, make attributable measurement the first phase, and block production changes until it completes. Requiring unavailable production facts would conflict with item 5's honesty requirement."
+    }
+  ],
+  "real_failures": [
+    {
+      "run": 5,
+      "item": 2,
+      "reason": "The plan combines application write bridging and internal read switching in Task 3, before the historical backfill in Task 4, instead of making read cutover a later independently deployable phase. It also makes preferredName required in the coexistence API response contract, so an old or rollback response producer emitting only displayName is invalid against the expanded contract."
+    }
+  ],
+  "refined_invariant_check": {
+    "concrete_initial_batch_size": "5/5",
+    "bidirectional_coexistence_rules_preserved": "4/5",
+    "note": "Runs 1-4 state both old/rollback-producer to new-consumer and new-producer to old/rollback-consumer behavior across database, API, and events, keep new fields optional during coexistence, and do not tighten later. Run 5 violates the API direction as described above."
+  },
+  "malformed_grades": "None. Every grader returned exactly five decisions; no regrade was needed.",
+  "source_match": {
+    "combined_skill_sha256": "2d1cd3a9f23524adb222909ff0ed95a4716063cd315338f4807b5b098f4ccf2b",
+    "candidate_skill_sha256": "4d0160ebf242cb640ee86c8c45c62a8fd52a522d17c18e5f58ec134c0fb005de",
+    "worker_prompt_sha256": "2557d902ed3a8c64d0cf6b4060ae510141b5b888ab38d05195e4a5d0ad60ca94",
+    "scenario_sha256": "2bdfa4e7269221815d6c9a9b03eed15eaeb5f2429d304fe485743fb2aa603463",
+    "task_sha256": "b753b2d6c68db7c028b95d226e90abecb713c9bde68e73fdfb6de8dd88bc0bc9",
+    "checklist_sha256": "ef8c399a7be8a550b77ba72c0fa5d4a9405d339b375425ca353650a585117573",
+    "harness": "codex-cli 0.155.1"
+  },
+  "preservation": "Original worker and grader output remains unchanged in transcripts.json and results.json."
+}

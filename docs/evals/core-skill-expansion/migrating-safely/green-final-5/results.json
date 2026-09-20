@@ -1,0 +1,61 @@
+{
+  "scenario": "migrating-safely",
+  "arm": "green-final-5",
+  "runs": [
+    {
+      "run": 1,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "pass": true
+    },
+    {
+      "run": 2,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "pass": true
+    },
+    {
+      "run": 3,
+      "checks": [
+        "FAIL",
+        "FAIL",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    },
+    {
+      "run": 4,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "pass": true
+    },
+    {
+      "run": 5,
+      "checks": [
+        "FAIL",
+        "FAIL",
+        "PASS",
+        "FAIL",
+        "FAIL"
+      ],
+      "pass": false
+    }
+  ]
+}
