@@ -1,5 +1,16 @@
 # dmi_superpowers Release Notes
 
+## v0.8.0 (2026-09-20)
+
+Adds four evaluated coding-quality skills: `variant-analysis`,
+`source-grounded-development`, `migrating-safely`, and
+`property-based-testing`. The release also adds routing documentation and
+evaluation records for each skill. Planning with Files, Graphify, and SkillOpt
+remain intentionally excluded.
+
+See [the core-skill evaluation record](docs/evals/core-skill-expansion/README.md)
+for baseline/final scores and documented limitations.
+
 ## Unreleased
 
 Adds four evaluated coding-quality skills:

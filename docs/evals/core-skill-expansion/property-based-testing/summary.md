@@ -171,3 +171,13 @@ checked-in post-evaluation wording hashes to
 `85607e3810dd6024bf224a7fac51c780e6b0579962c2c1719d409e8f8e458193`,
 and the prompt hash is
 `e932264bad19a89eb3c7cec619ed0c9fc52a51768abb7167304cafdcfabf6ba6`.
+
+## Post-refinement GREEN result
+
+The post-refinement `green-final-2` arm scores **4/5 whole scenarios**. Four
+workers pass all five guarantees; one worker still omits part of the required
+malformed/empty domain partition. The raw item scores are 5/5 for property
+selection, non-tautological design, shrinking/replay, and dependency honesty;
+edge-domain coverage is 4/5. This is the final measured result for the release.
+The complete prompt, transcripts, and results are retained under
+`green-final-2/`.
