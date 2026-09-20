@@ -6,7 +6,7 @@ Contributions are welcome. See [AGENTS.md](AGENTS.md) for what belongs here and 
 
 ## What It Is
 
-`dmi_superpowers` packages 26 skills that guide coding agents through a disciplined workflow:
+`dmi_superpowers` packages 30 skills that guide coding agents through a disciplined workflow:
 
 **brainstorm → PRD → grill-with-docs → TSP → grill → TDD → review → finish**
 
@@ -15,7 +15,7 @@ change uses a short approved design in chat, and architectural work follows the
 full document workflow. Implementation keeps behavioral tests, verification, and
 review on every production path.
 
-## The 26 Skills
+## The 30 Skills
 
 ### Kept from superpowers (core workflow)
 
@@ -60,6 +60,15 @@ review on every production path.
 | Skill | Purpose |
 |---|---|
 | `prototype` | Rapid prototyping skill |
+
+### Added coding-quality skills
+
+| Skill | Purpose |
+|---|---|
+| `variant-analysis` | Find sibling defects after confirming a root cause |
+| `source-grounded-development` | Ground version-sensitive decisions in official sources |
+| `migrating-safely` | Plan expand–migrate–contract changes with rollback gates |
+| `property-based-testing` | Test domain-wide properties with generators and shrinking |
 
 ### Utility / mode skills
 

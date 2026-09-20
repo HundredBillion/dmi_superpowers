@@ -1,0 +1,61 @@
+{
+  "scenario": "property-based-testing",
+  "arm": "baseline",
+  "runs": [
+    {
+      "run": 1,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    },
+    {
+      "run": 2,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS",
+        "PASS"
+      ],
+      "pass": true
+    },
+    {
+      "run": 3,
+      "checks": [
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    },
+    {
+      "run": 4,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    },
+    {
+      "run": 5,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    }
+  ]
+}

@@ -59,5 +59,5 @@ Repo-specific expectations on top of the skill:
 
 ## Facts
 
-- Skill namespace: `dmi-superpowers:`  ·  26 skills — see README for the inventory
+- Skill namespace: `dmi-superpowers:`  ·  30 skills — see README for the inventory
 - Plugin manifest: `.claude-plugin/plugin.json` / `marketplace.json`

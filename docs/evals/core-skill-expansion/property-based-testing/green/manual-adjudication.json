@@ -1,0 +1,57 @@
+{
+  "raw_whole_scenario_passes": "1/5",
+  "manual_whole_scenario_passes": "2/5",
+  "raw_itemwise_passes": {
+    "recognizes_property_opportunity": "2/5",
+    "strong_non_tautological_property": "3/5",
+    "edge_generators_without_vacuity": "1/5",
+    "shrinking_and_counterexample_quality": "2/5",
+    "dependency_authority_and_honest_execution": "5/5"
+  },
+  "manual_itemwise_passes": {
+    "recognizes_property_opportunity": "3/5",
+    "strong_non_tautological_property": "3/5",
+    "edge_generators_without_vacuity": "2/5",
+    "shrinking_and_counterexample_quality": "2/5",
+    "dependency_authority_and_honest_execution": "5/5"
+  },
+  "adjudications": [
+    {
+      "run": 4,
+      "items": [1, 3],
+      "raw_results": ["FAIL", "FAIL"],
+      "manual_results": ["PASS", "PASS"],
+      "reason": "The response explicitly says a generated property is the required follow-up, explains that it covers unique Unicode-scalar keys/values and roundtrip, idempotence, and independent ordering boundaries, and names empty strings, delimiters, BMP/supplementary partitions, malformed escapes, invalid UTF-8, missing separators, and duplicate decoded keys. It proposes structured generation and no filtering or swallowed failures. The exact approved-library patch remains blocked, but the two checklist guarantees are present semantically."
+    }
+  ],
+  "real_gaps": [
+    {
+      "runs": [1, 2],
+      "reason": "Both workers identify the general roundtrip/idempotence opportunity, then discard it in favor of the requested single Unicode example because fast-check is not approved. They do not provide a contingent property design, generators, malformed domain, shrinking, or replay protocol."
+    },
+    {
+      "run": 3,
+      "reason": "The worker uses nested loops over a fixed boundary corpus. Its independent ordering oracle is strong, but the suite omits empty-record and malformed-input partitions and has no shrinking or per-counterexample replay protocol; the first loop failure terminates the aggregate property."
+    }
+  ],
+  "new_rationalizations": [
+    "The highest value single example is enough under the release constraint.",
+    "Keep this to the requested single public API example because dependency approval is unavailable.",
+    "A bounded generated domain inside one Vitest case is an acceptable property despite having no shrinking."
+  ],
+  "preserved_strengths": [
+    "All five workers continued to respect the direct-dependency approval boundary and report unexecuted tests honestly.",
+    "No worker used broad filters or claimed shrinking from an unexecuted dependency.",
+    "Runs 4 and 5 preserved a real shrinking-capable property proposal rather than pretending the example patch completed property coverage."
+  ],
+  "source_match": {
+    "combined_skill_sha256": "2c0c246f4d884aa94133a90d312df00eb68d71d6d8d1a2c23ecee30a084e3276",
+    "candidate_skill_sha256": "6b8472bf61c70b9bf99549b60519210e7ae3ae16e6994f35aa636fa3572bbef0",
+    "worker_prompt_sha256": "dfb40d5b5cc510b444f813978289415564c082f183f64e15da1ac540a84ec18a",
+    "scenario_sha256": "eeb05d9cd1a625d63ee9b28fedaf6b240b13c6fa08e8b2e5a4bc91598037ef5d",
+    "task_sha256": "e899528eec2c99014d0252540296247df316d78d4fe7640f25878bbd318735ee",
+    "checklist_sha256": "30db7a83139fff5566e3bc817e8c02385609fd04fb7a2f28c30d38b201682d33",
+    "harness": "codex-cli 0.155.1"
+  },
+  "preservation": "Original worker and grader output remains unchanged in transcripts.json and results.json."
+}

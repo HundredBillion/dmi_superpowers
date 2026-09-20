@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+Adds four evaluated coding-quality skills:
+
+- `variant-analysis` searches for same-family defects after a confirmed root cause.
+- `source-grounded-development` ties version-sensitive decisions to resolved versions
+  and version-matched official sources.
+- `migrating-safely` plans expand–migrate–contract rollouts with consumer inventories,
+  compatibility matrices, backfill ledgers, abort thresholds, and rollback gates.
+- `property-based-testing` selects independent domain properties, non-vacuous generators,
+  deterministic bounds, and minimal replayable counterexamples.
+
+The content simulations and limitations are recorded in
+[the core-skill evaluation record](docs/evals/core-skill-expansion/README.md).
+
 Selected upstream workflow improvements, adapted without adding new skills:
 
 - Scale brainstorming artifacts to exploratory, bounded, or architectural work.

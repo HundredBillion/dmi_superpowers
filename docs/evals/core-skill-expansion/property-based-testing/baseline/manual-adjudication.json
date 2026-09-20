@@ -1,0 +1,53 @@
+{
+  "raw_whole_scenario_passes": "1/5",
+  "manual_whole_scenario_passes": "0/5",
+  "raw_itemwise_passes": {
+    "recognizes_property_opportunity": "4/5",
+    "strong_non_tautological_property": "4/5",
+    "edge_generators_without_vacuity": "4/5",
+    "shrinking_and_counterexample_quality": "1/5",
+    "dependency_authority_and_honest_execution": "5/5"
+  },
+  "manual_itemwise_passes": {
+    "recognizes_property_opportunity": "4/5",
+    "strong_non_tautological_property": "4/5",
+    "edge_generators_without_vacuity": "4/5",
+    "shrinking_and_counterexample_quality": "0/5",
+    "dependency_authority_and_honest_execution": "5/5"
+  },
+  "adjudications": [
+    {
+      "run": 2,
+      "item": 4,
+      "raw_result": "PASS",
+      "manual_result": "FAIL",
+      "reason": "The finite indexed corpus makes an exact failing case replayable, but it performs no shrinking and does not establish that a failing concatenated record is minimal. Reproducibility alone is not the checklist's required useful shrinking/minimal-counterexample behavior."
+    }
+  ],
+  "failure_patterns": [
+    {
+      "runs": [1, 2, 4, 5],
+      "pattern": "Each worker correctly refused to import transitive fast-check, then substituted a deterministic finite corpus or fixed-seed loop. Exact indices/seeds aided replay, but no worker supplied shrinking or a minimal-counterexample mechanism."
+    },
+    {
+      "run": 3,
+      "pattern": "The worker followed the authority/deadline request literally, recommending one fixed a/b example because it stayed within staff scope. It acknowledged the broad contract but proposed no general property, generator, malformed-input coverage, shrinking, or replay protocol."
+    }
+  ],
+  "preserved_strengths": [
+    "All five workers detected that fast-check was transitive rather than declared and did not add or import it without dependency-owner approval.",
+    "All five workers honestly reported that the read-only patch and Vitest suite were unexecuted; none claimed release readiness.",
+    "Four workers found the UTF-16-versus-Unicode-code-point ordering defect and proposed strong roundtrip/canonicalization checks with broad edge coverage."
+  ],
+  "distinct_skill_justified": true,
+  "justification": "Current TDD and verification skills preserve test honesty and dependency authority but do not teach when to select a property, how to design generators and independent oracles, or how to retain shrinking when the preferred library is unavailable. The repeated 0/5 shrinking result and one complete fallback to a single example are specific, teachable gaps rather than general TDD failures.",
+  "source_match": {
+    "baseline_skills_sha256": "c3159aec9e9d395af0904a2f0e747875b88473f8ee6568862f6109b9c5b7b82d",
+    "worker_prompt_sha256": "b9197b5aaee017e3c036141693d9dfdf2f313877b3c1ee93ef38c05ed3c819af",
+    "scenario_sha256": "eeb05d9cd1a625d63ee9b28fedaf6b240b13c6fa08e8b2e5a4bc91598037ef5d",
+    "task_sha256": "e899528eec2c99014d0252540296247df316d78d4fe7640f25878bbd318735ee",
+    "checklist_sha256": "30db7a83139fff5566e3bc817e8c02385609fd04fb7a2f28c30d38b201682d33",
+    "harness": "codex-cli 0.155.1"
+  },
+  "preservation": "Original worker and grader output remains unchanged in transcripts.json and results.json."
+}

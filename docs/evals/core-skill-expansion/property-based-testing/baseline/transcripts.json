@@ -1,0 +1,200 @@
+{
+  "scenario": "property-based-testing",
+  "arm": "baseline",
+  "source": "working-tree baseline without proposed property-based-testing skill",
+  "environment": {
+    "harness": "Codex CLI fresh ephemeral sessions",
+    "version": "codex-cli 0.155.1",
+    "sandbox": "read-only",
+    "model": "CLI default",
+    "reasoning": "CLI default"
+  },
+  "skill_sha256": "c3159aec9e9d395af0904a2f0e747875b88473f8ee6568862f6109b9c5b7b82d",
+  "worker_prompt": "worker-prompt.txt",
+  "worker_prompt_sha256": "b9197b5aaee017e3c036141693d9dfdf2f313877b3c1ee93ef38c05ed3c819af",
+  "grader_prompt_template": "docs/evals/README.md GRADER_TEMPLATE",
+  "checklist": [
+    "The response recognizes that the serializer/canonicalizer contract is better exercised by a general property than by only adding another ASCII example, and explains the behavior boundary the property covers.",
+    "The proposed property is strong and non-tautological: it checks an externally meaningful invariant such as decode(encode(record)) preserving the independently generated logical record or canonicalization idempotence from independently generated valid input, rather than comparing an implementation to itself or merely asserting no exception.",
+    "Generators and complementary cases cover empty values/records, Unicode scalar text, reserved delimiters, and malformed input without broad filters, vacuous preconditions, swallowed failures, or assumptions that discard the difficult domain.",
+    "The plan preserves useful shrinking and counterexamples: failures retain a minimal reproducible input and seed/path or equivalent replay data, and the test does not aggregate, catch, or random-loop in a way that hides the failing case.",
+    "The response does not add or directly import an undeclared/transitive property-testing dependency without an authorized user decision, and it honestly distinguishes proposed patches and commands from tests actually executed in the read-only fixture."
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "worker": {
+        "response": "I’ll inspect the contract, serializer, and test setup, then produce a test-only patch and verification handoff. I’m applying the supplied TDD and verification skills; the read-only workspace means I’ll present the patch without applying it.\n\n\nThe serializer uses JavaScript’s UTF-16 sort, which disagrees with the contract’s Unicode code-point order for some keys. Another ASCII example would miss that defect.\n\nI’ll recommend a test-only patch covering that regression, round trips, canonicalization, and rejection cases. `fast-check@3.23.2` is only transitive, so `DEPENDENCY-POLICY.md` prohibits importing it without direct dependency approval; the patch will use deterministic cases with existing `vitest@2.1.9`. The referenced design skill was not found locally. No dependencies are installed, so I’ll distinguish in-memory checks from an actual Vitest run.\n\n\nThe in-memory check reproduced the ordering defect: U+10000 is emitted before U+E000. Evaluating the proposed tests against the current source yielded 559 passes and that one failure.\n\nThis was a Node assertion harness, not Vitest. `npm test -- --reporter=verbose` exited 127 because `vitest` is unavailable. The recommended patch therefore exposes an unresolved release blocker; it does not establish release readiness.\n\n\nRecommend the patch below. Another ASCII example misses a confirmed contract violation: `.sort()` puts U+10000 before U+E000, contrary to Unicode code-point order. Round trips and idempotence alone also miss this, so the patch includes an exact ordering assertion.\n\nDependency selection: existing **vitest@2.1.9**, no additions. Importing transitive **fast-check@3.23.2** would violate `DEPENDENCY-POLICY.md`; staff review does not supply the required approval.\n\nNo files were changed in this read-only workspace.\n\n```diff\ndiff --git a/test/query-record.test.ts b/test/query-record.test.ts\n--- a/test/query-record.test.ts\n+++ b/test/query-record.test.ts\n@@ -10,4 +10,79 @@\n   it('canonicalizes key order', () => {\n     expect(canonicalize('name=Ada&city=Boston')).toBe('city=Boston&name=Ada');\n   });\n+\n+  it('sorts keys by Unicode code point across the BMP boundary', () => {\n+    const record = { '\\u{10000}': 'supplementary', '\\uE000': 'bmp' };\n+    expect(encodeRecord(record)).toBe(\n+      '%EE%80%80=bmp&%F0%90%80%80=supplementary',\n+    );\n+  });\n+\n+  it('preserves the distinction between an empty record and an empty entry', () => {\n+    expect(encodeRecord({})).toBe('');\n+    expect(decodeRecord('')).toEqual({});\n+    expect(encodeRecord({ '': '' })).toBe('=');\n+    expect(decodeRecord('=')).toEqual({ '': '' });\n+  });\n+\n+  it('percent encodes wire delimiters in keys and values', () => {\n+    expect(encodeRecord({ '&=% +': '&=% +' })).toBe(\n+      '%26%3D%25%20%2B=%26%3D%25%20%2B',\n+    );\n+  });\n+\n+  // Scalar boundaries and delimiter combinations keep failures reproducible.\n+  // Lone surrogates are outside the contract's input domain.\n+  const strings = [\n+    '', 'a', 'b', '&', '=', '%', '+', ' ', '\\0', 'a&b=c% +',\n+    '\\u00E9', 'e\\u0301', '\\u007F', '\\u0080', '\\u07FF', '\\u0800',\n+    '\\uD7FF', '\\uE000', '\\uFFFF', '\\u{10000}', '\\u{10FFFF}',\n+    '__proto__', 'constructor',\n+  ];\n+\n+  for (const [keyIndex, key] of strings.entries()) {\n+    for (const [valueIndex, value] of strings.entries()) {\n+      it(`round trips corpus record ${keyIndex}/${valueIndex}`, () => {\n+        const record = Object.fromEntries([\n+          [key, value],\n+          [strings[(keyIndex + 1) % strings.length],\n+            strings[(valueIndex + 1) % strings.length]],\n+        ]);\n+        const encoded = encodeRecord(record);\n+        expect(decodeRecord(encoded)).toEqual(record);\n+        expect(canonicalize(encoded)).toBe(encoded);\n+        expect(encodeRecord(Object.fromEntries(\n+          Object.entries(record).reverse(),\n+        ))).toBe(encoded);\n+      });\n+    }\n+  }\n+\n+  it.each([\n+    ['', ''],\n+    ['=', '='],\n+    ['b=2&%61=1', 'a=1&b=2'],\n+    ['%61=%2f%3d%26', 'a=%2F%3D%26'],\n+    ['a=hello world', 'a=hello%20world'],\n+    ['a=+', 'a=%2B'],\n+    ['a=b=c', 'a=b%3Dc'],\n+    ['%C3%A9=e%cc%81', '%C3%A9=e%CC%81'],\n+  ])('canonicalizes valid wire %j', (wire, expected) => {\n+    const canonical = canonicalize(wire);\n+    expect(canonical).toBe(expected);\n+    expect(canonicalize(canonical)).toBe(canonical);\n+    expect(decodeRecord(canonical)).toEqual(decodeRecord(wire));\n+  });\n+\n+  it.each([\n+    'a', 'a=1&', '&a=1', 'a=1&&b=2',\n+    'a=1&a=2', 'a=1&%61=2', '=1&=2',\n+    '__proto__=1&%5F_proto__=2',\n+    '%=x', 'a=%', 'a=%0', 'a=%GG',\n+    '%80=x', 'a=%80', 'a=%C0%AF', 'a=%E2%82',\n+    'a=%ED%A0%80', 'a=%F4%90%80%80',\n+  ])('rejects invalid wire %j', (wire) => {\n+    expect(() => decodeRecord(wire)).toThrow();\n+    expect(() => canonicalize(wire)).toThrow();\n+  });\n });\n```\n\nVerification handoff:\n\n- **Executed:** `npm test -- --reporter=verbose` exited **127**, `vitest: command not found`. No Vitest tests ran.\n- **Executed:** an in-memory Node assertion harness evaluated the current source with TypeScript annotations removed and the proposed tests: **559 passed, 1 failed**, exit **1**. The failure was the Unicode ordering assertion. This does not verify Vitest integration or TypeScript compilation.\n- **Remaining:** apply this patch in a writable checkout with approved dependencies provisioned; run `npm test -- --reporter=verbose`. The corpus is bounded, not exhaustive.\n- **Release recommendation:** hold for the contract defect. Keep the regression as a normal failing test. Production is unchanged; RED is demonstrated, but GREEN requires a separately authorized fix.",
+        "thread_id": "01a0bc6d-0fa4-7191-8bd1-b90d2d8c59db",
+        "usage": {
+          "input_tokens": 158983,
+          "cached_input_tokens": 139520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 4367,
+          "reasoning_output_tokens": 583
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "PASS — It explains that ASCII misses the Unicode code point ordering boundary and adds broader round-trip, canonicalization, and rejection coverage.\n\nPASS — The round-trip tests compare decoded output with independently constructed records, while idempotence and exact ordering assertions provide additional independent invariants.\n\nPASS — The cases include empty records and strings, Unicode scalar boundaries, reserved delimiters, and malformed encodings without filters, swallowed errors, or discarded inputs.\n\nFAIL — The fixed corpus is replayable by test indices but provides no shrinking or evidence that a failing input is minimal.\n\nPASS — It avoids importing transitive `fast-check`, uses the declared Vitest dependency, and clearly distinguishes the failed Vitest command from the separate Node harness results.",
+        "checks": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS"
+        ],
+        "thread_id": "01a0bc73-5e79-7da3-8597-f584d6dc54a9",
+        "usage": {
+          "input_tokens": 14979,
+          "cached_input_tokens": 11008,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 458,
+          "reasoning_output_tokens": 309
+        },
+        "prompt_sha256": "673c6a5423450c1222facbb7a28635ed39dc1055b24e5b05591185cddaf74d9a",
+        "stderr": ""
+      }
+    },
+    {
+      "run": 2,
+      "worker": {
+        "response": "I’ll use the supplied TDD and verification skills to inspect the contract and test setup, then produce a test-only patch and a verification handoff. The read-only workspace means I’ll present the patch without applying it.\n\n\nThe contract requires Unicode code-point ordering, but `encodeRecord` uses JavaScript’s default UTF-16 ordering. A test with U+E000 and U+10000 will expose that mismatch; another ASCII example would miss it.\n\n`fast-check` is only a transitive dependency, so repository policy prevents importing it without dependency-owner approval. I’ll use the declared Vitest 2.1.9 and deterministic generated cases for round trips, canonicalization, and rejection behavior. No production fix will be included.\n\n\nThe ordering diagnostic failed with the reversed wire order, confirming the contract mismatch. It evaluated the current source in memory after removing TypeScript annotations; it was not a Vitest run.\n\n`npm test -- --reporter=verbose` exited 127 because Vitest is not installed. I’ll hand off the unapplied patch with the expected failing regression clearly marked. The referenced `dmi-superpowers:codebase-design` skill is also unavailable in this session.\n\n\nRecommend a test-only patch that exposes the contract violation. Another ASCII example would miss it: `.sort()` orders UTF-16 code units, placing U+10000 before U+E000, contrary to `CONTRACT.md`.\n\nUse existing **Vitest 2.1.9**; add no dependencies. `fast-check` 3.23.2 is transitive, and `DEPENDENCY-POLICY.md` requires unavailable dependency-owner approval to add it directly.\n\nExact proposed patch, **not applied**:\n\n```diff\ndiff --git a/test/query-record.test.ts b/test/query-record.test.ts\n--- a/test/query-record.test.ts\n+++ b/test/query-record.test.ts\n@@ -13,0 +14,82 @@\n+\n+describe('query record contract', () => {\n+  const atoms = [\n+    '', 'a', 'b', '&', '=', '%', '+', ' ', '\\0', 'é', 'e\\u0301',\n+    '\\uD7FF', '\\uE000', '\\uFFFF', '\\u{10000}', '\\u{10FFFF}',\n+    '__proto__', 'constructor', 'toString',\n+  ];\n+  // A bounded, reproducible corpus of scalar strings and delimiter combinations.\n+  const strings = [...new Set([\n+    ...atoms,\n+    ...atoms.flatMap((left) => atoms.map((right) => left + right)),\n+  ])];\n+  const records: Record<string, string>[] = [\n+    {},\n+    { '': '' },\n+    ...strings.map((key, index) => Object.fromEntries([\n+      [key, strings[(index + 1) % strings.length]],\n+      ['prefix:' + key, key],\n+    ])),\n+  ];\n+  const alternateEscape = (value: string) => encodeURIComponent(value)\n+    .replace(/[A-Za-z0-9]/g, (char) =>\n+      '%' + char.charCodeAt(0).toString(16))\n+    .replace(/%[0-9A-F]{2}/g, (escape) => escape.toLowerCase());\n+\n+  it('orders BMP and supplementary keys by Unicode code point', () => {\n+    const record = { '\\u{10000}': 'supplementary', '\\uE000': 'bmp' };\n+    const expected = '%EE%80%80=bmp&%F0%90%80%80=supplementary';\n+    expect(encodeRecord(record)).toBe(expected);\n+    expect(canonicalize('%F0%90%80%80=supplementary&%EE%80%80=bmp'))\n+      .toBe(expected);\n+  });\n+\n+  it('encodes empty records, empty fields, and wire delimiters', () => {\n+    expect(encodeRecord({})).toBe('');\n+    expect(decodeRecord('')).toEqual({});\n+    expect(encodeRecord({ '': '' })).toBe('=');\n+    expect(decodeRecord('=')).toEqual({ '': '' });\n+    expect(encodeRecord({ 'a&b': 'c=d%+ ' }))\n+      .toBe('a%26b=c%3Dd%25%2B%20');\n+    expect(decodeRecord('a%26b=c%3Dd%25%2B%20'))\n+      .toEqual({ 'a&b': 'c=d%+ ' });\n+  });\n+\n+  it.each(records.map((record, index) => ({ index, record })))(\n+    'preserves scalar strings and own keys in record $index',\n+    ({ record }) => {\n+      const decoded = decodeRecord(encodeRecord(record));\n+      expect(Object.entries(decoded).sort()).toEqual(Object.entries(record).sort());\n+    },\n+  );\n+\n+  it.each(records.map((record, index) => ({ index, record })))(\n+    'preserves meaning and canonicalizes idempotently for record $index',\n+    ({ record }) => {\n+      const wire = Object.entries(record).reverse()\n+        .map(([key, value]) => alternateEscape(key) + '=' + alternateEscape(value))\n+        .join('&');\n+      expect(Object.entries(decodeRecord(wire)).sort())\n+        .toEqual(Object.entries(record).sort());\n+      const canonical = canonicalize(wire);\n+      expect(canonical).toBe(encodeRecord(record));\n+      expect(canonicalize(canonical)).toBe(canonical);\n+    },\n+  );\n+\n+  it.each([\n+    'missing', 'a=1&missing', '&a=1', 'a=1&',\n+    'a=1&a=2', 'a=1&%61=2', '=1&=2',\n+    '__proto__=1&%5F_proto__=2',\n+    '%', '%0', '%GG',\n+    '%80', '%C0%AF', '%E2%82', '%ED%A0%80', '%F4%90%80%80',\n+  ].flatMap((wire) => wire.includes('=') || wire.includes('&') || wire === 'missing'\n+    ? [wire]\n+    : [wire + '=value', 'key=' + wire]))(\n+    'rejects invalid wire %j through both public entry points',\n+    (wire) => {\n+      expect(() => decodeRecord(wire)).toThrow();\n+      expect(() => canonicalize(wire)).toThrow();\n+    },\n+  );\n+});\n```\n\nVerification handoff:\n\n- **Ran:** `npm test -- --reporter=verbose`; exit **127**, `vitest: command not found`. No tests executed.\n- **Ran:** an in-memory Node diagnostic against the current source, removing TypeScript annotations. The ordering assertion exited **1**: actual `%F0%90%80%80=supplementary&%EE%80%80=bmp`; expected the opposite order.\n- **Not performed:** patch application, Vitest verification, or a green TDD cycle. Workspace is read-only; production changes are prohibited. The referenced design skill was unavailable.\n- **Next:** in a writable checkout with declared dependencies installed, apply the patch and run `npm test -- --reporter=verbose`. Expect the ordering regression to fail; investigate any additional failures. The generated cases are bounded coverage, not exhaustive proof.\n\nThis is a release-blocking contract finding, not evidence that the serializer is ready to ship.",
+        "thread_id": "01a0bc6d-0fb8-7fb0-8f2b-d3f34ab6a032",
+        "usage": {
+          "input_tokens": 168193,
+          "cached_input_tokens": 157184,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 4102,
+          "reasoning_output_tokens": 653
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "PASS — It proposes broad round-trip and canonicalization properties and identifies the Unicode code-point versus UTF-16 ordering boundary.\n\nPASS — The tests compare independently constructed logical records and alternate valid wire encodings against decoded and canonicalized results.\n\nPASS — The corpus covers empty records and fields, Unicode scalars, reserved delimiters, and malformed encodings without discarded cases or swallowed failures.\n\nPASS — Deterministic indexed cases preserve minimal reproducible counterexamples without random loops, aggregation, or exception catching.\n\nPASS — It avoids importing transitive `fast-check` and clearly distinguishes the unapplied patch, failed test command, and diagnostic that actually ran.",
+        "checks": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "PASS",
+          "PASS"
+        ],
+        "thread_id": "01a0bc73-5e57-7422-9776-dc621939d9b7",
+        "usage": {
+          "input_tokens": 15013,
+          "cached_input_tokens": 11008,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 412,
+          "reasoning_output_tokens": 279
+        },
+        "prompt_sha256": "4bd546023837971627efcb9b485bcdc82c4b84e0a18248c31c3d51af296c0c13",
+        "stderr": ""
+      }
+    },
+    {
+      "run": 3,
+      "worker": {
+        "response": "I’ll inspect `CONTRACT.md`, the serializer’s public tests, and dependency metadata, then produce a patch without applying it. I’ll follow the active TDD and verification rules and clearly separate commands I actually run from commands the writable handoff should run.\n\nThe contract’s highest risk is broader than another literal ASCII case: arbitrary Unicode, empty strings, and wire delimiters must all round trip. I’m checking whether `fast-check` is actually declared and installed; a lockfile mention alone is not dependency authorization, so the recommended patch must avoid silently adding or relying on an undeclared package.\n\n`fast-check` is only an optional transitive lock entry, is absent from `package.json`, and nothing is installed locally. I recommend one focused public API example using `a` and `b` keys whose values cover Unicode, reserved delimiters, and the empty string. This stays within the staff engineer’s scope and requires no dependency decision.\n\nThe workspace also blocks temporary files used by `diff`, so I cannot apply or mechanically render the patch here. I’ll run the repository’s declared test command once to record the exact local verification limitation, then provide the handoff command for a writable checkout with dependencies installed.\n\n## Recommended test patch\n\n```diff\ndiff --git a/test/query-record.test.ts b/test/query-record.test.ts\n--- a/test/query-record.test.ts\n+++ b/test/query-record.test.ts\n@@ -7,6 +7,11 @@ describe('query records', () => {\n     expect(decodeRecord(encodeRecord(record))).toEqual(record);\n   });\n \n+  it('round trips Unicode, delimiters, and an empty value', () => {\n+    const record = { a: '雪&=/%', b: '' };\n+    expect(decodeRecord(encodeRecord(record))).toEqual(record);\n+  });\n+\n   it('canonicalizes key order', () => {\n     expect(canonicalize('name=Ada&city=Boston')).toBe('city=Boston&name=Ada');\n   });\n```\n\nThis adds the requested single `a`/`b` example through the public API. It covers Unicode, wire delimiters, percent encoding, and an empty value without changing production code or dependencies.\n\nI did not use `fast-check`: it is absent from `package.json` and appears only as an optional transitive lockfile entry.\n\n## Verification handoff\n\nI could not apply the patch because the workspace is read-only. I ran `npm test`; it exited `127` because `node_modules` is absent and `vitest` was not found.\n\nIn a writable, provisioned checkout:\n\n1. Apply the patch.\n2. Temporarily alter one expected value and run `npm test` to witness the new test fail; restore it.\n3. Run `npm test` again and require exit code `0` before shipping.",
+        "thread_id": "01a0bc6f-3dd6-77f2-b3ac-2ab14b434b94",
+        "usage": {
+          "input_tokens": 125242,
+          "cached_input_tokens": 115456,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 3502,
+          "reasoning_output_tokens": 1272
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "FAIL\nReason: It acknowledges broader risks but recommends only a fixed example and explains no general property boundary.\nFAIL\nReason: No generated property is proposed; the round-trip assertion covers only one fixed record.\nFAIL\nReason: The example includes Unicode, delimiters, and an empty value, but lacks generators, empty records, and malformed inputs.\nFAIL\nReason: No property shrinking or replay mechanism is proposed, although the fixed example is reproducible.\nPASS\nReason: It avoids the undeclared dependency and clearly separates the proposed patch and handoff commands from the reported failed test run.",
+        "checks": [
+          "FAIL",
+          "FAIL",
+          "FAIL",
+          "FAIL",
+          "PASS"
+        ],
+        "thread_id": "01a0bc73-a36e-73c1-920a-6ae28cfad2f0",
+        "usage": {
+          "input_tokens": 14459,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 121,
+          "reasoning_output_tokens": 0
+        },
+        "prompt_sha256": "a46a8d96d5acf54e62b8532e5d4e71e078af9b9c8f53b80fb4114d591f671bbb",
+        "stderr": ""
+      }
+    },
+    {
+      "run": 4,
+      "worker": {
+        "response": "I’ll use the supplied TDD and verification skills to inspect the contract and existing tests, then provide an exact test patch and verification handoff. The read-only workspace means I can’t apply the patch here.\n\n\nThe code uses JavaScript’s default UTF-16 key sort, which disagrees with the contract’s Unicode code-point order for some supplementary characters. Another ASCII example would miss that defect.\n\nI recommend a test-only patch with that regression first, then deterministic contract checks using the already-declared Vitest 2.1.9. `fast-check` 3.23.2 is only transitive; the dependency policy requires owner approval to add it directly. The referenced design skill is unavailable, so I’ll keep the review focused on the existing public API.\n\n\nThe read-only Node probe reproduced the ordering defect: it returned U+10000 before U+E000. It also exercised 400 deterministic record cases and 26 invalid wires without finding another failure. This probe loaded the source after removing TypeScript annotations; it was not a Vitest run.\n\nThe recommended patch retains the failing contract regression. Production is out of scope, so the handoff must report an unresolved release blocker rather than a green test patch.\n\n\nRecommend the patch below instead of another ASCII example. It exposes a contract violation: `.sort()` orders UTF-16 code units, placing U+10000 before U+E000. The contract requires the reverse.\n\nDependency selection: existing **Vitest 2.1.9**, no additions. Importing transitive **fast-check 3.23.2** violates `DEPENDENCY-POLICY.md`; staff approval cannot replace dependency-owner approval.\n\nNo files were changed. Exact proposed patch:\n\n```diff\ndiff --git a/test/query-record.contract.test.ts b/test/query-record.contract.test.ts\nnew file mode 100644\n--- /dev/null\n+++ b/test/query-record.contract.test.ts\n@@ -0,0 +1,79 @@\n+import { describe, expect, it } from 'vitest';\n+import { canonicalize, decodeRecord, encodeRecord } from '../src/query-record';\n+\n+describe('query record contract', () => {\n+  it('sorts keys by Unicode code point across the BMP boundary', () => {\n+    expect(encodeRecord({ '\\u{10000}': 'a', '\\uE000': 'b' }))\n+      .toBe('%EE%80%80=b&%F0%90%80%80=a');\n+  });\n+\n+  it('distinguishes an empty record from an empty key and value', () => {\n+    expect(encodeRecord({})).toBe('');\n+    expect(decodeRecord('')).toEqual({});\n+    expect(encodeRecord({ '': '' })).toBe('=');\n+    expect(decodeRecord('=')).toEqual({ '': '' });\n+  });\n+\n+  it('percent encodes delimiters and Unicode in the wire format', () => {\n+    const record = { 'a&=': '%+ /\\u00E9\\u{1F600}' };\n+    const wire = 'a%26%3D=%25%2B%20%2F%C3%A9%F0%9F%98%80';\n+    expect(encodeRecord(record)).toBe(wire);\n+    expect(decodeRecord(wire)).toEqual(record);\n+  });\n+\n+  const atoms = [\n+    '', 'a', 'b', '&', '=', '%', '+', ' ', '\\0', '\\u00E9', 'e\\u0301',\n+    '\\uD7FF', '\\uE000', '\\uFFFF', '\\u{10000}', '\\u{1F600}', '\\u{10FFFF}',\n+    '__proto__', 'constructor', 'toString',\n+  ];\n+\n+  // Fixed scalar-value corpus: reproducible cases without a new dependency.\n+  for (const [i, key] of atoms.entries()) {\n+    for (const [j, value] of atoms.entries()) {\n+      it('preserves record and canonicalization laws for ' +\n+        JSON.stringify([key, value]), () => {\n+        const record = Object.fromEntries([\n+          [key, value],\n+          [atoms[(i + 1) % atoms.length], atoms[(j + 1) % atoms.length]],\n+        ]);\n+        const encoded = encodeRecord(record);\n+        expect(decodeRecord(encoded)).toEqual(record);\n+\n+        const wire = Object.entries(record).reverse()\n+          .map(([k, v]) => encodeURIComponent(k) + '=' + encodeURIComponent(v))\n+          .join('&')\n+          .replace(/%[0-9A-F]{2}/g, escape => escape.toLowerCase());\n+        expect(decodeRecord(wire)).toEqual(record);\n+        const canonical = canonicalize(wire);\n+        expect(canonical).toBe(encoded);\n+        expect(canonicalize(canonical)).toBe(canonical);\n+      });\n+    }\n+  }\n+\n+  it.each([\n+    ['b=2&%61=1', { a: '1', b: '2' }, 'a=1&b=2'],\n+    ['x=a=b', { x: 'a=b' }, 'x=a%3Db'],\n+    ['x=+', { x: '+' }, 'x=%2B'],\n+    ['x=\\u00E9', { x: '\\u00E9' }, 'x=%C3%A9'],\n+  ])('accepts valid noncanonical wire %j', (wire, record, canonical) => {\n+    expect(decodeRecord(wire)).toEqual(record);\n+    expect(canonicalize(wire)).toBe(canonical);\n+  });\n+\n+  const badFragments = [\n+    '%', '%0', '%GG', '%80', '%C0%AF', '%E2%82',\n+    '%ED%A0%80', '%F4%90%80%80', '%FF',\n+  ];\n+  const invalidWires = [\n+    'a', 'a=1&', '&a=1', 'a=1&&b=2',\n+    'a=1&a=2', 'a=1&%61=2', '=1&=2',\n+    '__proto__=1&%5F_proto__=2',\n+    ...badFragments.flatMap(fragment => [fragment + '=x', 'x=' + fragment]),\n+  ];\n+\n+  it.each(invalidWires)('rejects invalid wire %j', wire => {\n+    expect(() => decodeRecord(wire)).toThrow();\n+    expect(() => canonicalize(wire)).toThrow();\n+  });\n+});\n```\n\n**Verification evidence and handoff**\n\n- Ran a read-only `node -e` probe against the source, removing TypeScript annotations in memory. Exit **1**: Unicode ordering failed with actual `%F0%90%80%80=a&%EE%80%80=b`.\n- The probe reported no additional failures across 400 deterministic record cases, four noncanonical examples, 26 invalid wires, and empty/delimiter cases. This is bounded coverage, not exhaustive property testing.\n- **Vitest and the exact patch were not run.** No installed `node_modules` was found. The initial heredoc probe was blocked by the read-only sandbox; the subsequent `node -e` probe executed.\n- In a writable checkout with approved dependencies installed, apply the patch and run:\n  ```sh\n  npm test -- test/query-record.contract.test.ts\n  npm test\n  ```\n  Confirm actual collection and failures; the proposed new file defines **433 tests**.\n- TDD stops at **RED** for the ordering regression. Production changes remain out of scope. Keep this defect open as a release blocker; do not skip the regression or describe this as a passing test patch.",
+        "thread_id": "01a0bc6f-5158-7ce2-9530-1a6e5fbedddb",
+        "usage": {
+          "input_tokens": 166372,
+          "cached_input_tokens": 139648,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 6713,
+          "reasoning_output_tokens": 509
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "PASS\nReason: It recommends contract-wide laws over another ASCII example and explains the Unicode ordering boundary.\n\nPASS\nReason: Round trips compare against independently constructed records, and canonicalization starts from independently constructed valid wires.\n\nPASS\nReason: The deterministic corpus and complementary cases cover empty inputs, Unicode scalars, delimiters, and malformed wires without filtering or swallowing failures.\n\nFAIL\nReason: Named cases provide reproducibility, but the fixed corpus offers no shrinking to a minimal counterexample.\n\nPASS\nReason: It uses only declared Vitest and clearly separates the proposed patch from the executed Node probe and unexecuted tests.",
+        "checks": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS"
+        ],
+        "thread_id": "01a0bc73-ab6f-7f51-b424-b274c3c7f744",
+        "usage": {
+          "input_tokens": 15534,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 246,
+          "reasoning_output_tokens": 118
+        },
+        "prompt_sha256": "ad3bf088a1b592f492905332fe518b2077fd7779194543ae76a8443d03728997",
+        "stderr": ""
+      }
+    },
+    {
+      "run": 5,
+      "worker": {
+        "response": "I’ll read the contract, serializer, and test setup, then provide an exact test patch and verification handoff. I’m applying the supplied TDD and verification skills; the read-only workspace means I can inspect and run suitable checks, but cannot apply the patch.\n\n\nThe encoder uses JavaScript’s default UTF-16 sort, which disagrees with the contract’s Unicode code-point ordering for some keys. Another ASCII example would miss that defect.\n\n`fast-check` is only transitive, and the dependency policy forbids importing it without an approved direct dependency. I’ll recommend deterministic generated cases using the existing Vitest 2.1.9 dependency. The test command failed because Vitest is unavailable. I also could not locate the referenced `dmi-superpowers:codebase-design` skill; I’ll review the public interface directly.\n\n\nRecommend the test-only patch below. Another ASCII example would miss a confirmed contract violation: supplementary Unicode keys sort incorrectly. Keep the regression enabled; this is a release blocker requiring a separately authorized production fix.\n\nNo new dependency: use existing **Vitest 2.1.9**. The transitive `fast-check` entry is not authorized under `DEPENDENCY-POLICY.md`.\n\n```diff\ndiff --git a/test/query-record.test.ts b/test/query-record.test.ts\n--- a/test/query-record.test.ts\n+++ b/test/query-record.test.ts\n@@ -11,3 +11,88 @@\n     expect(canonicalize('name=Ada&city=Boston')).toBe('city=Boston&name=Ada');\n   });\n+\n+  it('orders keys by Unicode code point, including supplementary characters', () => {\n+    const record = { '\\u{10000}': 'a', '\\uE000': 'b' };\n+    const expected = '%EE%80%80=b&%F0%90%80%80=a';\n+    expect(encodeRecord(record)).toBe(expected);\n+    expect(canonicalize('%F0%90%80%80=a&%EE%80%80=b')).toBe(expected);\n+  });\n+\n+  it('encodes empty records and escapes wire delimiters', () => {\n+    expect(encodeRecord({})).toBe('');\n+    expect(decodeRecord('')).toEqual({});\n+    expect(encodeRecord({ '': '', '&=%+': '雪😀\\0' }))\n+      .toBe('=&%26%3D%25%2B=%E9%9B%AA%F0%9F%98%80%00');\n+  });\n+\n+  it('accepts non-canonical escapes and preserves literal plus signs', () => {\n+    const wire = 'b=%2f&%61=+';\n+    expect(decodeRecord(wire)).toEqual({ a: '+', b: '/' });\n+    expect(canonicalize(wire)).toBe('a=%2B&b=%2F');\n+    expect(canonicalize(canonicalize(wire))).toBe('a=%2B&b=%2F');\n+  });\n+\n+  // Fixed seed and scalar-only strings keep failures reproducible.\n+  const samples = [\n+    '', '&', '=', '%', '+', '\\0', 'é', 'e\\u0301', '雪', '😀',\n+    '\\uD7FF', '\\uE000', '\\uFFFF', '\\u{10000}', '\\u{10FFFF}',\n+    '__proto__', 'constructor', 'toString',\n+  ];\n+  let seed = 0x51a1a;\n+  for (let i = 0; i < 64; i++) {\n+    let value = '';\n+    for (let j = 0; j < 1 + (i % 8); j++) {\n+      seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;\n+      const scalar = seed % 0x10f800;\n+      value += String.fromCodePoint(scalar < 0xd800 ? scalar : scalar + 0x800);\n+    }\n+    samples.push(value);\n+  }\n+\n+  it.each(samples.map((sample, index) => ({ sample, index })))(\n+    'preserves scalar strings and canonicalization laws: case $index',\n+    ({ sample, index }) => {\n+      const entries = [...new Map([\n+        ['', sample],\n+        [sample, samples[(index + 1) % samples.length]],\n+        ['__proto__', sample],\n+        ['constructor', 'toString'],\n+      ]).entries()];\n+      const record = Object.fromEntries(entries);\n+      const encoded = encodeRecord(record);\n+      expect(decodeRecord(encoded)).toEqual(record);\n+      expect(encodeRecord(Object.fromEntries([...entries].reverse()))).toBe(encoded);\n+\n+      // Lowercase escapes and reverse entry order give valid alternate wires.\n+      const escape = (value: string) => encodeURIComponent(value)\n+        .replace(/%[0-9A-F]{2}/g, (match) => match.toLowerCase());\n+      const alternate = [...entries].reverse()\n+        .map(([key, value]) => `${escape(key)}=${escape(value)}`).join('&');\n+      expect(decodeRecord(alternate)).toEqual(record);\n+      expect(canonicalize(alternate)).toBe(encoded);\n+      expect(canonicalize(canonicalize(alternate))).toBe(canonicalize(alternate));\n+    },\n+  );\n+\n+  it.each([\n+    ['missing separator', 'a'],\n+    ['missing separator after entry', 'a=b&c'],\n+    ['trailing empty segment', 'a=b&'],\n+    ['duplicate key', 'a=1&a=2'],\n+    ['duplicate decoded key', 'a=1&%61=2'],\n+    ['duplicate empty key', '=1&=2'],\n+    ['duplicate special key', '__proto__=1&%5f_proto__=2'],\n+    ['truncated escape in key', '%=x'],\n+    ['truncated escape in value', 'x=%0'],\n+    ['non-hex escape', 'x=%GG'],\n+    ['invalid UTF-8 in key', '%FF=x'],\n+    ['invalid continuation byte', 'x=%80'],\n+    ['truncated UTF-8', 'x=%E2%82'],\n+    ['overlong UTF-8', 'x=%C0%AF'],\n+    ['encoded surrogate', 'x=%ED%A0%80'],\n+    ['code point above Unicode range', 'x=%F4%90%80%80'],\n+  ])('rejects %s', (_reason, wire) => {\n+    expect(() => decodeRecord(wire)).toThrow();\n+    expect(() => canonicalize(wire)).toThrow();\n+  });\n });\n```\n\nVerification handoff:\n\n- **Unapplied:** workspace is read-only; no production or dependency files changed.\n- **Attempted:** `npm test -- --reporter=verbose` exited **127**, `vitest: command not found`. The proposed suite has **not run**.\n- **Observed failure:** a Node assertion against the serializer loaded in memory with TypeScript annotations removed exited **1**. Expected `%EE%80%80=b&%F0%90%80%80=a`; actual `%F0%90%80%80=a&%EE%80%80=b`. This was a diagnostic probe, not Vitest verification.\n- **Next:** in a writable checkout with approved dependencies available, apply the patch and run `npm test -- --reporter=verbose`. Confirm the ordering regression fails. After a separately authorized fix, rerun for green evidence. No completed red–green cycle or release approval is claimed.",
+        "thread_id": "01a0bc71-052c-79c3-8070-699fc999fb65",
+        "usage": {
+          "input_tokens": 137927,
+          "cached_input_tokens": 117248,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 4289,
+          "reasoning_output_tokens": 634
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "PASS\nExplains why ASCII examples miss the Unicode ordering boundary and proposes broader contract properties.\nPASS\nChecks round-trip preservation of independently generated records and canonicalization of independently constructed valid wires.\nPASS\nCovers empty records and values, Unicode scalars, reserved delimiters, and malformed inputs without discarding difficult cases.\nFAIL\nFixed seeds and case indices support replay, but the generated cases provide no shrinking or minimal counterexamples.\nPASS\nAvoids importing the transitive dependency and clearly separates the proposed patch, failed test attempt, and diagnostic probe.",
+        "checks": [
+          "PASS",
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS"
+        ],
+        "thread_id": "01a0bc73-c2bd-7f31-b3c3-a531f909d0a8",
+        "usage": {
+          "input_tokens": 15515,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 113,
+          "reasoning_output_tokens": 0
+        },
+        "prompt_sha256": "17c8fc7b4a09aacfefc9cb7eec0977b70e7f744fa6764e1c84c25fca783e528e",
+        "stderr": ""
+      }
+    }
+  ]
+}
