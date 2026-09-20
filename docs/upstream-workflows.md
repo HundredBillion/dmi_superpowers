@@ -33,6 +33,23 @@ their own runtime when a different harness is used.
 See the [evaluation record](evals/upstream-workflows/README.md) for before/after
 results, regression guards, exact prompts, and grading caveats. Upstream results
 motivate evaluation; they are not measurements of DMI's quality or token savings.
+
+## Core coding-skill additions
+
+The four additional skills were informed by current upstream repositories, then
+rewritten for DMI's cross-harness vocabulary and evaluated against focused fixtures:
+
+- Trail of Bits' [skills](https://github.com/trailofbits/skills) supplied the
+  variant-analysis and property-testing concepts (repository license: CC BY-SA 4.0).
+- Addy Osmani's [agent-skills](https://github.com/addyosmani/agent-skills) supplied
+  source-driven development and safe-migration concepts (repository license: MIT).
+
+No upstream file was copied verbatim. The skill text is original DMI wording, and
+the evaluation record preserves baseline, candidate, grader prompts, hashes, and
+adjudications for each skill in [core-skill-expansion](evals/core-skill-expansion/README.md).
+Planning with Files, Graphify, and SkillOpt were deliberately not added. A future
+LLM-wiki or graph/RAG implementation is a separate product design, not a standing
+coding skill in this plugin.
 The CSV fixture already elicited implied edge-case tests without new rules.
 Ponytail's caller tracing and existing-helper reuse also passed without additions;
 one raw grader failure confused answer prose with a source-code comment.

@@ -1,0 +1,52 @@
+{
+  "raw_whole_scenario_passes": "0/5",
+  "manual_whole_scenario_passes": "0/5",
+  "raw_itemwise_passes": {
+    "recognizes_property_opportunity": "5/5",
+    "strong_non_tautological_property": "5/5",
+    "edge_generators_without_vacuity": "0/5",
+    "shrinking_and_counterexample_quality": "5/5",
+    "dependency_authority_and_honest_execution": "5/5"
+  },
+  "manual_itemwise_passes": {
+    "recognizes_property_opportunity": "5/5",
+    "strong_non_tautological_property": "5/5",
+    "edge_generators_without_vacuity": "0/5",
+    "shrinking_and_counterexample_quality": "4/5",
+    "dependency_authority_and_honest_execution": "5/5"
+  },
+  "adjudications": [
+    {
+      "run": 5,
+      "item": 4,
+      "raw_result": "PASS",
+      "manual_result": "FAIL",
+      "reason": "The dependency-free nested loops enumerate a fixed key corpus. A failing pair is printed and directly replayable, but there is no shrinker, minimization process, seed/path, or guarantee that a larger failing pair is reduced to the smallest useful counterexample. This repeats the RED finite-corpus failure."
+    }
+  ],
+  "real_gaps": [
+    {
+      "runs": [1, 2, 3, 4],
+      "reason": "Each response now preserves an exact approval-gated property with structured Unicode generation, an independent oracle, shrinking, replay data, and a pending command. However, each implements only the first ordering property and explicitly defers empty-record and/or malformed-input partitions to later TDD cycles. The proposed patch therefore does not cover the fixture's complete edge domain."
+    },
+    {
+      "run": 5,
+      "reason": "The response avoids the approval decision by replacing property generation with a dependency-free fixed corpus. It covers only ordering boundaries, omits empty-value/record and malformed-input behavior, and loses shrinking/minimization."
+    }
+  ],
+  "refinement_effect": {
+    "property_as_tracer_and_pending_design": "The refinement raises property recognition and strength to 5/5 and raw shrinking/replay to 5/5; four workers retain concrete contingent property patches instead of falling back to one example.",
+    "remaining_conflict": "Workers interpret the baseline TDD one-test-at-a-time rule as permission to defer the other required domain partitions. The property tracer is sound but is presented as sufficient handoff coverage for a task whose contract includes malformed and empty partitions."
+  },
+  "source_match": {
+    "combined_skill_sha256": "2b861a0dcdcf3e42a53c885ce8272528d94f02b245f827bad5024b555754847c",
+    "candidate_skill_sha256": "cba0d6f247b7b919e9832807c68e1d3d2c21120d82d3a5a331492d37a28c57c3",
+    "worker_prompt_sha256": "e932264bad19a89eb3c7cec619ed0c9fc52a51768abb7167304cafdcfabf6ba6",
+    "scenario_sha256": "eeb05d9cd1a625d63ee9b28fedaf6b240b13c6fa08e8b2e5a4bc91598037ef5d",
+    "task_sha256": "e899528eec2c99014d0252540296247df316d78d4fe7640f25878bbd318735ee",
+    "checklist_sha256": "30db7a83139fff5566e3bc817e8c02385609fd04fb7a2f28c30d38b201682d33",
+    "harness": "codex-cli 0.155.1"
+  },
+  "worker_timeout_policy": "All five workers completed under enforced 10-minute caps; no resume was required.",
+  "preservation": "Original worker and grader output remains unchanged in transcripts.json and results.json."
+}

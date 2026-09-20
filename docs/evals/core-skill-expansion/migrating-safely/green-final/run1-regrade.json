@@ -1,0 +1,22 @@
+{
+  "arm": "green-final",
+  "run": 1,
+  "reason": "Original grader returned fewer checklist decisions than requested",
+  "response": "PASS\nInventories all supplied consumers and compatibility constraints using all 16 repository files and quantified usage snapshots, while identifying missing external evidence.\nPASS\nDefines independently deployable migration phases, explains mixed-version safety, and explicitly rejects the generated direct rename.\nPASS\nProvides success, abort, and rollback behavior for every phase, with destructive removal separately gated.\nPASS\nSpecifies bounded batches, atomic durable checkpoints, production-signal throttling, reconciliation, and required operational telemetry.\nPASS\nRequires explicit zero-use observation windows and clearly distinguishes repository evidence and proposed actions from unperformed production work.",
+  "checks": [
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS"
+  ],
+  "thread_id": "01a0bbfd-c0f4-77c1-a931-6eb4f31f63c7",
+  "usage": {
+    "input_tokens": 25309,
+    "cached_input_tokens": 11520,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 233,
+    "reasoning_output_tokens": 112
+  },
+  "stderr": ""
+}

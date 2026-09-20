@@ -1,0 +1,56 @@
+{
+  "scenario": "variant-analysis",
+  "arm": "green",
+  "runs": [
+    {
+      "run": 1,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL"
+      ],
+      "pass": false
+    },
+    {
+      "run": 2,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL"
+      ],
+      "pass": false
+    },
+    {
+      "run": 3,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL"
+      ],
+      "pass": false
+    },
+    {
+      "run": 4,
+      "checks": [
+        "PASS",
+        "FAIL",
+        "PASS",
+        "FAIL"
+      ],
+      "pass": false
+    },
+    {
+      "run": 5,
+      "checks": [
+        "PASS",
+        "PASS",
+        "PASS",
+        "FAIL"
+      ],
+      "pass": false
+    }
+  ]
+}

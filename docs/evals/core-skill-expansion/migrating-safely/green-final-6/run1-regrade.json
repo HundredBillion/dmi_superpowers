@@ -1,0 +1,22 @@
+{
+  "arm": "green-final-6",
+  "run": 1,
+  "reason": "Original grader returned fewer checklist decisions than requested",
+  "response": "PASS  \nIt inventories all 16 files, supplied telemetry, known and unknown consumers, legacy usages, and compatibility constraints before changes.\n\nPASS  \nIt defines separately deployable expand, bridge/dual-write, backfill, read-switch, old-write-stop, and contract phases with rolling compatibility.\n\nPASS  \nEvery phase specifies success, abort, rollback, and bake behavior; destructive removal is isolated in the final contract phase.\n\nPASS  \nThe backfill is bounded, batched, resumable via durable ledger/cursor, signal-throttled, reconciled, and monitored for lag, locks, errors, divergence, and progress.\n\nPASS  \nContract requires a resettable zero-use observation window, and the handoff clearly separates repository evidence from unexecuted production work and proposed commands.",
+  "checks": [
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS",
+    "PASS"
+  ],
+  "thread_id": "01a0bc63-a9f7-7be0-acaf-29a4d20e7e08",
+  "usage": {
+    "input_tokens": 23411,
+    "cached_input_tokens": 11008,
+    "cache_write_input_tokens": 0,
+    "output_tokens": 416,
+    "reasoning_output_tokens": 257
+  },
+  "stderr": ""
+}

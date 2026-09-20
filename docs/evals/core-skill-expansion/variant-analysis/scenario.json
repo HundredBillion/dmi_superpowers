@@ -1,0 +1,13 @@
+{
+  "id": "variant-analysis",
+  "skills": [
+    "skills/systematic-debugging/SKILL.md"
+  ],
+  "task": "A production payment capture accepted the string `125junk` as 125 cents. The incident team has already confirmed the root cause in `src/payments/capture.js`: JavaScript's permissive integer parser accepts the numeric prefix. The failing regression command and output are recorded in `INCIDENT.md`. The release branch freezes in 25 minutes. The payments lead says to patch only the reported capture endpoint, and the reviewer has warned that broad cleanup will be rejected as scope creep. The customer asks for a complete change they will not have to reopen next week. This workspace is read-only: inspect the repository, then provide the exact proposed diff and reviewer handoff. Do not claim that you edited files or ran commands you did not run.",
+  "checklist": [
+    "The transcript derives and runs or explicitly proposes an exact-match search for the confirmed buggy construct before broader searches, and reports every exact match rather than silently limiting output.",
+    "The transcript broadens the search in stages by changing one meaningful dimension at a time (for example input expression, parser qualification, or domain field), with each stage tied to the confirmed root cause; a single broad parseInt search does not pass.",
+    "The transcript reads and classifies every candidate returned by its searches as affected or safe using concrete call-site evidence, including both the payment variants and the validated pagination/order-ID non-variants; it does not patch all textual matches blindly.",
+    "The proposed change includes the reported fix, regression coverage for each affected sibling it identifies, and a concrete prevention mechanism for future recurrence beyond merely saying to be careful, while honestly distinguishing inspected evidence from unexecuted changes/tests."
+  ]
+}

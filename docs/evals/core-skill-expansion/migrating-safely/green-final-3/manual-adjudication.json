@@ -1,0 +1,55 @@
+{
+  "raw_whole_scenario_passes": "2/5",
+  "manual_whole_scenario_passes": "3/5",
+  "raw_itemwise_passes": {
+    "complete_quantified_inventory_before_change": "2/5",
+    "independently_deployable_mixed_version_phases": "4/5",
+    "per_phase_gates_and_isolated_destruction": "5/5",
+    "safe_checkpointed_backfill": "5/5",
+    "zero_use_windows_and_honest_reporting": "5/5"
+  },
+  "manual_itemwise_passes": {
+    "complete_quantified_inventory_before_change": "5/5",
+    "independently_deployable_mixed_version_phases": "3/5",
+    "per_phase_gates_and_isolated_destruction": "5/5",
+    "safe_checkpointed_backfill": "4/5",
+    "zero_use_windows_and_honest_reporting": "5/5"
+  },
+  "fixture_rubric_adjudications": [
+    {
+      "runs": [2, 3, 4],
+      "item": 1,
+      "raw_result": "FAIL",
+      "manual_result": "PASS",
+      "reason": "Each worker inventories every supplied database, API, event, external CSV, binary-coexistence, and usage fact. Each identifies that the read-only fixture supplies only aggregate API/event counts and no owner/deployment inventory, then makes attributable telemetry and ownership a blocking measure phase before any production change. Requiring unavailable measurements would conflict with the honesty requirement. Run 3's claimed four writers are its three database writers plus the supplied profile-event producer, all of which appear in its census."
+    }
+  ],
+  "real_failures": [
+    {
+      "run": 3,
+      "item": 2,
+      "reason": "The coexistence API response schema requires both displayName and preferredName. An old or rollback producer that emits only displayName is invalid against that expanded contract, despite the plan correctly keeping preferredName optional in the event schema."
+    },
+    {
+      "run": 4,
+      "item": 2,
+      "reason": "The coexistence API response and event schemas require preferredName immediately. Old and rollback producers emit only displayName, so mixed-version validation fails before those producers retire."
+    },
+    {
+      "run": 4,
+      "item": 4,
+      "reason": "The plan names a range ledger, retry policy, throttle thresholds, reconciliation, and all required progress metrics, but never chooses a batch size before production. It instead leaves batch-size review to the database lead, which violates the refined no-deferral gate."
+    }
+  ],
+  "malformed_grades": "None. Every grader returned exactly five decisions; no regrade was needed.",
+  "source_match": {
+    "combined_skill_sha256": "40d3875b50198e247c23f1c907f40cb1638ec6a547e8ade148dab53229b6c368",
+    "candidate_skill_sha256": "c223ab0d42e9be16f56ada41a4d52f8a554f069215c033e0d2b90bcb2026a9f1",
+    "worker_prompt_sha256": "4a3ffc3e887da62e548aa58953b266c09b718c10fa62e413269aa32c4183516e",
+    "scenario_sha256": "2bdfa4e7269221815d6c9a9b03eed15eaeb5f2429d304fe485743fb2aa603463",
+    "task_sha256": "b753b2d6c68db7c028b95d226e90abecb713c9bde68e73fdfb6de8dd88bc0bc9",
+    "checklist_sha256": "ef8c399a7be8a550b77ba72c0fa5d4a9405d339b375425ca353650a585117573",
+    "harness": "codex-cli 0.155.1"
+  },
+  "preservation": "Original worker and grader output remains unchanged in transcripts.json and results.json."
+}

@@ -1,0 +1,27 @@
+{
+  "raw_results_note": "Run 1's original grader returned four decisions for five checklist items by combining items 4 and 5. A fresh independent regrade returned five PASS decisions and is preserved in run1-regrade.json.",
+  "manual_whole_scenario_passes": "4/5",
+  "manual_itemwise_passes": {
+    "complete_quantified_inventory_before_change": "5/5",
+    "independently_deployable_mixed_version_phases": "5/5",
+    "per_phase_gates_and_isolated_destruction": "5/5",
+    "safe_checkpointed_backfill": "4/5",
+    "zero_use_windows_and_honest_reporting": "5/5"
+  },
+  "adjudications": [
+    {
+      "runs": [3, 4, 5],
+      "item": 1,
+      "manual_result": "PASS",
+      "reason": "The fixture supplies no individual production counts for warehouse, compliance, unknown API clients, or unknown direct consumers. Each plan records those facts as unknown rather than zero, makes per-consumer telemetry and ownership the first phase, and blocks every schema or contract change on completing that census. Requiring invented measurements in a read-only planning fixture would conflict with item 5's honesty requirement."
+    }
+  ],
+  "real_failures": [
+    {
+      "run": 3,
+      "item": 4,
+      "reason": "The backfill is data-state resumable but defines no durable progress checkpoint or progress metric, despite the checklist and skill requiring both."
+    }
+  ],
+  "preservation": "Original worker and grader output remains unchanged in transcripts.json and results.json."
+}

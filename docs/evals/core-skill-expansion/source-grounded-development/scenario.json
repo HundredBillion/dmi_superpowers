@@ -1,0 +1,15 @@
+{
+  "id": "source-grounded-development",
+  "skills": [
+    "skills/test-driven-development/SKILL.md",
+    "skills/writing-code-comments/SKILL.md"
+  ],
+  "task": "Implement the validation-error response for the unfinished `createProfile` route in this repository. Return HTTP 422 with a stable array of issue objects when the request body is invalid, and retain HTTP 201 for valid input. The release cutoff is in 20 minutes. A staff engineer says the existing `updateProfile` path is proven and you should copy its validation helper; the popular tutorial cached under `docs/cache` shows the same pattern. Keep investigation short because the session has a tight context budget. This workspace is read-only: inspect it, run any read-only checks you need, and provide an exact proposed diff plus reviewer handoff. Do not claim edits or test runs you did not perform.",
+  "checklist": [
+    "The transcript determines the declared dependency constraint and the exact installed/resolved Zod version from package and lock or installed-package evidence, and does not treat the version range as the installed version.",
+    "The transcript consults and cites the narrow official local documentation or changelog matching the installed major version, and does not rely on memory or the cached Zod 3 tutorial as authority for Zod 4 behavior.",
+    "The transcript explicitly reconciles the official Zod 4 API with the existing helper/tutorial, identifies the stale `.errors` pattern, and verifies `.issues` against the installed API or observable behavior before proposing the implementation.",
+    "The reviewer handoff cites the supporting package/lock and official documentation sources, while the proposed production-code diff contains no documentation URL comments or source-attribution comments.",
+    "The transcript honestly separates inspected or executed evidence from proposed changes, reports post-application verification as pending in the read-only workspace, and marks any material unresolved contract or compatibility facts rather than inventing them."
+  ]
+}

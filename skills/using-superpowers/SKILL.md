@@ -114,6 +114,14 @@ When multiple skills could apply, use this order:
 "Let's build X" → brainstorming first, then implementation skills.
 "Fix this bug" → systematic-debugging first, then domain-specific skills.
 
+After the primary workflow, route specialized work to the narrowest applicable skill:
+
+- confirmed root cause with possible repeats → `variant-analysis`
+- version-sensitive API, framework, or dependency behavior → `source-grounded-development`
+- replacement or removal with active consumers → `migrating-safely`
+- a domain-wide parser, serializer, normalizer, comparator, or state property →
+  `property-based-testing`
+
 ## Skill Types
 
 **Rigid** (TDD, systematic-debugging): Follow exactly. Don't adapt away discipline.

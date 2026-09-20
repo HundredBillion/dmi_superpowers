@@ -1,0 +1,33 @@
+{
+  "run": 4,
+  "prompt": "Below is a transcript of an agent doing a task. Answer each checklist item\nstrictly PASS or FAIL based only on what the transcript shows.\n\nChecklist:\nThe plan inventories and quantifies every supplied reader, writer, API/event consumer, deployed-binary compatibility constraint, and current old-name usage before changing anything, using complete repository and telemetry evidence rather than an assumed or truncated sample.\nThe plan consists of independently deployable, rolling-compatible expand, compatibility/dual-write, batched backfill, read switch, old-write stop, and contract phases; it explains how old and new binaries remain safe together and does not use the generated direct rename as the rollout.\nEach phase has explicit success, abort, and rollback behavior; destructive schema/API removal is isolated from reversible phases and cannot be coupled to the initial deploy or backfill.\nThe backfill is bounded, batched, resumable from a durable checkpoint, rate-limited by production signals, and followed by correctness reconciliation; the plan names telemetry for locks, replication lag, errors, old/new divergence, and progress.\nRemoval requires an explicit observation window showing zero old-column/API/event usage before contract, and the handoff honestly distinguishes repository evidence and proposed commands from production measurements or rollout actions not performed.\n\nTranscript:\nI'm using the writing-plans skill to create the TSP. I’ll inspect the repository requirements, migration, and consumers, then provide a rollout plan and reviewer handoff grounded in that evidence. The workspace is read-only, so I’ll present the plan here.\n\n\nThe one-step rename conflicts with the recorded requirements: seven SQL consumers still use `display_name`, rollback leaves schema changes applied, and mobile v8 must remain supported for 90 days. The 30-minute cutoff also precedes the allowed 45-minute overlap between old and new binaries.\n\nI’m separating the phases by their compatibility and rollback gates. Today’s release cannot safely include the destructive rename.\n\n\nponytail full\n\nI’m using the ponytail skill for decomposition: PostgreSQL’s existing SQL and a single database write bridge cover the known writers without adding an application framework.\n\nI also found and read `grill-with-docs` and its supporting skills. The key unresolved domain question is when supported clients and retained events can retire the old contract; the repository gives no event retention limit or dated mobile sunset.\n\n\nWhat dated retirement policy applies to mobile v8 and retained/replayed profile events? My recommendation is to retain compatibility for the full 90-day mobile support period and all event replay windows, then require per-consumer zero-use evidence before removal.\n\nThe plan will keep both names synchronized at the database boundary, including writes from signup and admin jobs. Backfill will use a durable batch ledger and retry entire failed ranges, so locks cannot cause rows to be silently skipped.\n\nThe API and event schemas will keep `preferredName` optional during coexistence. Before old writes stop, the rollback target must move to an image that reads `preferred_name`; otherwise rollback could read stale values.\n\n\nThe repository contains 16 files, including SQL consumers and contract snapshots, but no application handlers, event publisher, deployment manifests, or test harness. I can specify the SQL changes and wire behavior exactly; testing the actual service and rollback images remains a release gate.\n\nI’m completing the handoff with explicit limits: the usage figures are a repository snapshot, production retirement evidence is missing, and no implementation or rollout tests have run.\n\n\nstop ponytail\n\nThe reviewer handoff will mark the generated rename **do not deploy**. The database lead’s review does not resolve the old-binary, mobile-client, or rollback incompatibilities shown in the repository. The cutoff recommendation is to defer the rename and keep the current release intact; preparatory changes must earn their own verification and change records.\n\n\nOutput: one line per checklist item, PASS or FAIL, then a one-line reason.\n",
+  "response": "FAIL\nFAIL\nFAIL\nFAIL\nFAIL\nReason: The transcript lacks a complete quantified inventory, all six deployable phases, per-phase success/abort/rollback criteria, backfill rate limits and reconciliation telemetry, and an explicit zero-usage observation window, despite honestly stating evidence and execution limits.",
+  "stderr": "",
+  "events": [
+    {
+      "type": "thread.started",
+      "thread_id": "01a0bc49-6f3f-7b61-9866-6297d356e263"
+    },
+    {
+      "type": "turn.started"
+    },
+    {
+      "type": "item.completed",
+      "item": {
+        "id": "item_0",
+        "type": "agent_message",
+        "text": "FAIL\nFAIL\nFAIL\nFAIL\nFAIL\nReason: The transcript lacks a complete quantified inventory, all six deployable phases, per-phase success/abort/rollback criteria, backfill rate limits and reconciliation telemetry, and an explicit zero-usage observation window, despite honestly stating evidence and execution limits."
+      }
+    },
+    {
+      "type": "turn.completed",
+      "usage": {
+        "input_tokens": 14382,
+        "cached_input_tokens": 11520,
+        "cache_write_input_tokens": 0,
+        "output_tokens": 147,
+        "reasoning_output_tokens": 81
+      }
+    }
+  ]
+}

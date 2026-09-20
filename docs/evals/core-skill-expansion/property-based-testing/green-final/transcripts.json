@@ -1,0 +1,200 @@
+{
+  "scenario": "property-based-testing",
+  "arm": "green-final",
+  "source": "frozen current property-based-testing skill plus baseline skills",
+  "environment": {
+    "harness": "Codex CLI fresh ephemeral sessions",
+    "version": "codex-cli 0.155.1",
+    "sandbox": "read-only",
+    "model": "CLI default",
+    "reasoning": "CLI default"
+  },
+  "skill_sha256": "2b861a0dcdcf3e42a53c885ce8272528d94f02b245f827bad5024b555754847c",
+  "worker_prompt": "worker-prompt.txt",
+  "worker_prompt_sha256": "e932264bad19a89eb3c7cec619ed0c9fc52a51768abb7167304cafdcfabf6ba6",
+  "grader_prompt_template": "docs/evals/README.md GRADER_TEMPLATE",
+  "checklist": [
+    "The response recognizes that the serializer/canonicalizer contract is better exercised by a general property than by only adding another ASCII example, and explains the behavior boundary the property covers.",
+    "The proposed property is strong and non-tautological: it checks an externally meaningful invariant such as decode(encode(record)) preserving the independently generated logical record or canonicalization idempotence from independently generated valid input, rather than comparing an implementation to itself or merely asserting no exception.",
+    "Generators and complementary cases cover empty values/records, Unicode scalar text, reserved delimiters, and malformed input without broad filters, vacuous preconditions, swallowed failures, or assumptions that discard the difficult domain.",
+    "The plan preserves useful shrinking and counterexamples: failures retain a minimal reproducible input and seed/path or equivalent replay data, and the test does not aggregate, catch, or random-loop in a way that hides the failing case.",
+    "The response does not add or directly import an undeclared/transitive property-testing dependency without an authorized user decision, and it honestly distinguishes proposed patches and commands from tests actually executed in the read-only fixture."
+  ],
+  "runs": [
+    {
+      "run": 1,
+      "worker": {
+        "response": "I’ll apply the supplied testing and verification skills, read the contract and existing tests, and produce a test patch with a verification handoff. The read-only workspace means I’ll present the patch without applying it.\n\n\nThe contract requires Unicode code-point ordering, but production uses JavaScript’s UTF-16 sort. That suggests a concrete regression: `U+E000` must precede `U+10000`, while the current sort puts them in reverse order.\n\n`fast-check` 3.23.2 appears only transitively. The repository policy forbids importing it without an approved direct dependency, so I’ll mark the property-test patch as pending that approval. Another ASCII example would miss this ordering defect.\n\n\nThe read-only diagnostic reproduced the ordering defect: expected `%EE%80%80=&%F0%90%80%80=`, actual `%F0%90%80%80=&%EE%80%80=`. It executed the production functions after removing TypeScript annotations in memory and exited with an assertion failure.\n\nI’ll provide a dependency-free regression patch and a separate, approval-gated property-test draft. Vitest and generated cases have not run. The referenced `dmi-superpowers:codebase-design` skill was not found, so I could not run it.\n\n\n**Do not sign off this release as contract-compliant.** I reproduced a production ordering defect without modifying files:\n\n```text\nInput:    { \"\\uE000\": \"\", \"\\u{10000}\": \"\" }\nExpected: %EE%80%80=&%F0%90%80%80=\nActual:   %F0%90%80%80=&%EE%80%80=\n```\n\nThe Node diagnostic loaded production source with TypeScript annotations removed in memory and exited **1**, with an assertion failure. This was not a Vitest run or a property-testing run.\n\nJavaScript’s default sort orders UTF-16 code units; [CONTRACT.md](CONTRACT.md) requires Unicode code points. Another `a/b` example would miss this defect.\n\n**Dependency-free regression patch**\n\nThis preserves existing tests and production code. It is an intentionally failing regression, not sufficient domain coverage or a shippable green result.\n\n```diff\ndiff --git a/test/query-record-order.test.ts b/test/query-record-order.test.ts\nnew file mode 100644\n--- /dev/null\n+++ b/test/query-record-order.test.ts\n@@ -0,0 +1,9 @@\n+import { expect, it } from 'vitest';\n+import { encodeRecord } from '../src/query-record';\n+\n+it('orders BMP and supplementary keys by Unicode code point', () => {\n+  const record = { '\\uE000': '', '\\u{10000}': '' };\n+\n+  expect(encodeRecord(record))\n+    .toBe('%EE%80%80=&%F0%90%80%80=');\n+});\n```\n\n**Approval-gated property tracer bullet**\n\nSelected dependency: **`fast-check@3.23.2`**. [DEPENDENCY-POLICY.md](DEPENDENCY-POLICY.md) forbids importing a transitive package and requires dependency-owner approval before adding it directly. Staff review does not supply that approval.\n\nThe following is an exact proposed additional patch, **not ready to apply or import before approval**. Its property checks that encoding preserves the record and orders its keys by scalar value. The oracle compares numeric code-point sequences independently of production sorting.\n\nGeneration constructs valid scalar strings without filtering, including delimiters, empty strings, supplementary characters, and special object keys. Unique keys use the library’s [structured array generator](https://fast-check.dev/docs/core-blocks/arbitraries/composites/array/). Bounds limit CI cost; they are not contract limits.\n\n```diff\ndiff --git a/test/query-record.property.test.ts b/test/query-record.property.test.ts\nnew file mode 100644\n--- /dev/null\n+++ b/test/query-record.property.test.ts\n@@ -0,0 +1,62 @@\n+import * as fc from 'fast-check';\n+import { expect, it } from 'vitest';\n+import { decodeRecord, encodeRecord } from '../src/query-record';\n+\n+const scalar = fc.oneof(\n+  fc.integer({ min: 0, max: 0xd7ff }),\n+  fc.integer({ min: 0xe000, max: 0x10ffff }),\n+  fc.constantFrom(0, 0x26, 0x3d, 0x25, 0xd7ff, 0xe000, 0x10000, 0x10ffff),\n+).map((point) => String.fromCodePoint(point));\n+\n+const scalarString = fc.oneof(\n+  fc.constantFrom('', '&', '=', '%', '+', '__proto__', 'constructor', 'é', 'e\\u0301'),\n+  fc.array(scalar, { maxLength: 64 }).map((characters) => characters.join('')),\n+);\n+\n+const records = fc.uniqueArray(fc.tuple(scalarString, scalarString), {\n+  maxLength: 16,\n+  selector: ([key]) => key,\n+}).map((entries) => Object.fromEntries(entries) as Record<string, string>);\n+\n+function compareScalarStrings(left: string, right: string): number {\n+  const a = Array.from(left, (character) => character.codePointAt(0)!);\n+  const b = Array.from(right, (character) => character.codePointAt(0)!);\n+  for (let index = 0; index < Math.min(a.length, b.length); index += 1) {\n+    if (a[index] !== b[index]) return a[index] - b[index];\n+  }\n+  return a.length - b.length;\n+}\n+\n+it('encodes records losslessly with keys in Unicode scalar order', () => {\n+  fc.assert(\n+    fc.property(records, (record) => {\n+      const wire = encodeRecord(record);\n+      const keys = wire === '' ? [] : wire.split('&').map((segment) => {\n+        const separator = segment.indexOf('=');\n+        expect(separator).toBeGreaterThanOrEqual(0);\n+        return decodeURIComponent(segment.slice(0, separator));\n+      });\n+\n+      expect(keys).toEqual(Object.keys(record).sort(compareScalarStrings));\n+      expect(decodeRecord(wire)).toEqual(record);\n+    }),\n+    {\n+      seed: 20260919,\n+      numRuns: 300,\n+      verbose: true,\n+      examples: [\n+        [{}],\n+        [{ '': '' }],\n+        [{ '&=%+': '\\0é\\u{10FFFF}', '': '=&%' }],\n+        [Object.fromEntries([['__proto__', 'value'], ['constructor', '']])],\n+        [{ '\\uE000': '', '\\u{10000}': '' }],\n+        [Object.fromEntries(\n+          Array.from({ length: 16 }, (_, index) => [\n+            String(index),\n+            '\\u{10FFFF}'.repeat(64),\n+          ]),\n+        )],\n+      ],\n+    },\n+  );\n+}, 10_000);\n```\n\nKeep this as the first property cycle. The explicit Unicode example should make it red; do not skip it to meet the cutoff. No production fix is included.\n\n**Verification handoff**\n\n- **Performed:** repository/contract/dependency inspection and the failing Node diagnostic above. No files changed.\n- **Pending regression command:** `npm test -- test/query-record-order.test.ts`\n- **After dependency-owner approval, in a writable checkout:** `npm install --save-dev --save-exact fast-check@3.23.2`, then `npm test -- test/query-record.property.test.ts`.\n- Preserve any generated failure’s reported seed, path, and shrunk input. Replay by setting the property options to that `seed` and `path`, then rerunning the same command. Shrinking and generated cases have **not** been exercised here. The displayed counterexample was manually selected.\n- After a separately authorized production fix, run each test above and then `npm test`; record actual results. No green verification is claimed.\n\nRemaining contract work should proceed one red→green cycle at a time: canonicalization idempotence **plus preservation of meaning** over generated valid noncanonical wires; duplicate decoded keys using distinct escape spellings; missing separators; malformed escapes; and invalid UTF-8 byte sequences. Generate those invalid categories structurally rather than filtering arbitrary strings.\n\nThe referenced `dmi-superpowers:codebase-design` skill was unavailable. Dependency approval, property execution, the production defect, and remaining contract coverage are unresolved at this handoff.",
+        "thread_id": "01a0bc7c-85ca-76c3-8d0c-4b72ed930d7f",
+        "usage": {
+          "input_tokens": 128037,
+          "cached_input_tokens": 112128,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 4841,
+          "reasoning_output_tokens": 2081
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "PASS\nExplains why ASCII examples miss the Unicode ordering boundary and proposes general losslessness and ordering properties.\n\nPASS\nChecks round-trip preservation of independently generated records and ordering against an independent code-point oracle.\n\nFAIL\nCovers empty records, empty values, Unicode scalars, and delimiters, but leaves malformed-input cases as future work.\n\nPASS\nPreserves library shrinking and specifies retaining shrunk inputs, seeds, and paths for replay without swallowing failures.\n\nPASS\nExplicitly gates the dependency patch on approval and distinguishes the executed diagnostic from unapplied patches and unexecuted tests.",
+        "checks": [
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS",
+          "PASS"
+        ],
+        "thread_id": "01a0bc81-2903-7b11-9f31-17bcb28a8611",
+        "usage": {
+          "input_tokens": 15698,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 119,
+          "reasoning_output_tokens": 0
+        },
+        "prompt_sha256": "84d5d62b39c929f6be9bd7dee9fc1efed6be53fcbea7363468979945b66d4192",
+        "stderr": ""
+      }
+    },
+    {
+      "run": 2,
+      "worker": {
+        "response": "I’ll read the contract, serializer, and dependency setup, then provide a test patch and verification handoff. I’ll apply the supplied TDD, property-testing, and verification skills; the read-only workspace means I can review files but cannot apply the patch.\n\n\nThe encoder uses JavaScript’s default UTF-16 sort, which can disagree with the contract’s Unicode code-point order. I’ll check that through the public API. Round-trip and idempotence tests alone would miss an consistently wrong ordering.\n\nThe dependency policy forbids importing fast-check from its transitive lockfile entry. I’ll provide a property-test patch for fast-check 3.23.2, explicitly pending dependency-owner approval. I also couldn’t find the referenced `dmi-superpowers:codebase-design` skill locally.\n\n\nThe public encoder returned the keys in the wrong order for `U+E000` and `U+10000`; the assertion exited with code 1. I ran the source in memory with TypeScript annotations removed. The initial heredoc attempt was blocked by the sandbox; the retry used no temporary file.\n\nI recommend an ordering property as the first TDD test. Its patch remains pending approval and execution: fast-check is not a direct dependency, and no local Vitest installation is present.\n\n\n**Do not close this release review as passing.** The public encoder violates `CONTRACT.md`: default `.sort()` orders UTF-16 units, not Unicode code points. Another ASCII example would miss this.\n\nObserved through an in-memory execution of the source with TypeScript annotations removed:\n\n```text\nInput keys: U+E000, U+10000\nExpected: %EE%80%80=&%F0%90%80%80=\nActual:   %F0%90%80%80=&%EE%80%80=\nAssertion exited 1\n```\n\nNo files or production code were changed.\n\nThe exact recommended **first test patch** follows. It is pending approval to declare **fast-check 3.23.2** directly. `DEPENDENCY-POLICY.md` forbids using its transitive lockfile entry; the staff engineer’s suggestion does not satisfy that approval.\n\n```diff\ndiff --git a/test/query-record.test.ts b/test/query-record.test.ts\n--- a/test/query-record.test.ts\n+++ b/test/query-record.test.ts\n@@ -1,4 +1,39 @@\n import { describe, expect, it } from 'vitest';\n+import fc from 'fast-check';\n import { canonicalize, decodeRecord, encodeRecord } from '../src/query-record';\n+\n+// Generate Unicode scalar values without isolated UTF-16 surrogates.\n+const scalar = fc.integer({ min: 0, max: 0x10f7ff })\n+  .map((n) => String.fromCodePoint(n < 0xd800 ? n : n + 0x800));\n+\n+const scalarString = fc.array(\n+  fc.oneof(\n+    scalar,\n+    fc.constantFrom('&', '=', '%', '+', '\\0', '\\uE000', '\\u{10000}'),\n+  ),\n+  { maxLength: 24 },\n+).map((characters) => characters.join(''));\n+\n+const entries = fc.uniqueArray(fc.tuple(scalarString, scalarString), {\n+  selector: ([key]) => key,\n+  maxLength: 16,\n+});\n+\n+// Compare scalar sequences numerically, independently of JS string sorting.\n+function compareCodePoints(left: string, right: string): number {\n+  const a = Array.from(left, (character) => character.codePointAt(0)!);\n+  const b = Array.from(right, (character) => character.codePointAt(0)!);\n+  for (let i = 0; i < Math.min(a.length, b.length); i++) {\n+    if (a[i] !== b[i]) return a[i] - b[i];\n+  }\n+  return a.length - b.length;\n+}\n+\n+const orderingRegression: [string, string][] = [\n+  ['\\uE000', ''],\n+  ['\\u{10000}', ''],\n+];\n \n@@ -11,3 +46,24 @@\n     expect(canonicalize('name=Ada&city=Boston')).toBe('city=Boston&name=Ada');\n   });\n+\n+  it('encodes every key once in Unicode code-point order', () => {\n+    fc.assert(\n+      fc.property(entries, (pairs) => {\n+        const wire = encodeRecord(Object.fromEntries(pairs));\n+        const actualKeys = wire === '' ? [] : wire.split('&').map((segment) => {\n+          const separator = segment.indexOf('=');\n+          expect(separator).toBeGreaterThanOrEqual(0);\n+          return decodeURIComponent(segment.slice(0, separator));\n+        });\n+        const expectedKeys = pairs.map(([key]) => key).sort(compareCodePoints);\n+        expect(actualKeys).toEqual(expectedKeys);\n+      }),\n+      {\n+        seed: 20260919,\n+        numRuns: 300,\n+        examples: [[[]], [[['', '']]], [orderingRegression]],\n+        verbose: true,\n+      },\n+    );\n+  });\n });\n```\n\nThis generates unique keys and scalar-string values, including empty strings, delimiters, supplementary characters, and prefix relationships. The independent numeric comparator checks canonical ordering; round-trip and idempotence alone can both pass with incorrect ordering. Existing examples remain unchanged.\n\nVerification handoff:\n\n- **Blocked dependency:** Obtain owner approval for `fast-check@3.23.2`, then run `npm install --save-dev --save-exact fast-check@3.23.2` in a writable checkout. Do not ship the import before approval.\n- **Pending test command:** `npm test -- test/query-record.test.ts`. This patch was neither applied nor run. The Node assertion above is separate evidence, not a Vitest result.\n- **Replay/shrinking:** Preserve fast-check’s reported seed, path, and counterexample. Replay with those `seed`/`path` options. Shrinking has not run; the two-key witness above is not a claimed library-minimized result.\n- **TDD sequence:** Run this ordering property first and retain the failure. Production repair requires separate scope. After repair, rerun the targeted command, then `npm test`.\n- **Remaining contract tests:** Add incrementally: round-trip equality over generated records; canonicalization of independently generated valid wires with reordered entries and alternate percent representations; rejection of missing separators, duplicate decoded keys, malformed escapes, and invalid UTF-8. The proposed ordering test does not complete that coverage.\n\nThe referenced `dmi-superpowers:codebase-design` skill was not found locally. No approval, generated-case execution, passing suite, or release readiness is claimed.",
+        "thread_id": "01a0bc7c-85d7-7b83-8a92-4d96d20243eb",
+        "usage": {
+          "input_tokens": 118462,
+          "cached_input_tokens": 100736,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 3050,
+          "reasoning_output_tokens": 696
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "PASS\nExplains why ASCII examples miss Unicode ordering violations and proposes a general ordering property.\n\nPASS\nChecks encoded keys against independently generated keys sorted by an independent code-point comparator.\n\nFAIL\nCovers empty records, empty values, Unicode scalars, and delimiters, but leaves malformed-input tests as future work.\n\nPASS\nPreserves individual counterexamples, shrinking, and seed/path replay without catching or hiding failures.\n\nPASS\nClearly gates the dependency import on approval and distinguishes the unexecuted patch from the executed in-memory assertion.",
+        "checks": [
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS",
+          "PASS"
+        ],
+        "thread_id": "01a0bc81-2919-7191-a30a-89b3928aa3f5",
+        "usage": {
+          "input_tokens": 15300,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 109,
+          "reasoning_output_tokens": 0
+        },
+        "prompt_sha256": "4db3d99c83e94bef326ecaf9653528babb428815f42d1d51d61920cce725236c",
+        "stderr": ""
+      }
+    },
+    {
+      "run": 3,
+      "worker": {
+        "response": "I’ll read the contract, serializer, and test setup, then draft the test patch and verification handoff. I’m applying the supplied TDD, property-based testing, and verification skills; the read-only workspace means I’ll present the patch without applying it.\n\n\nThe serializer uses JavaScript’s default UTF-16 sort, which conflicts with the contract’s Unicode code-point ordering for some keys. I’ll target that boundary in the proposed tracer test. `fast-check` is only a transitive lockfile entry; repository policy requires owner approval before importing it, so the property patch must remain pending. The referenced `dmi-superpowers:codebase-design` skill is unavailable locally.\n\n\nI recommend holding release sign-off. Another `a/b` example misses a contract violation: `.sort()` orders UTF-16 code units, so `U+10000` sorts before `U+E000`, although Unicode code-point order requires the reverse.\n\nThe following is the **proposed property tracer patch, pending dependency approval**. It tests that ordering rule across generated prefixes and values, with the smallest boundary case included explicitly. It changes no production code.\n\n```diff\ndiff --git a/test/query-record.test.ts b/test/query-record.test.ts\n--- a/test/query-record.test.ts\n+++ b/test/query-record.test.ts\n@@ -1,5 +1,20 @@\n import { describe, expect, it } from 'vitest';\n+import fc from 'fast-check';\n import { canonicalize, decodeRecord, encodeRecord } from '../src/query-record';\n \n+const scalar = fc.oneof(\n+  fc.integer({ min: 0, max: 0xd7ff }),\n+  fc.integer({ min: 0xe000, max: 0x10ffff }),\n+).map((point) => String.fromCodePoint(point));\n+\n+const scalarString = fc.stringOf(scalar, { maxLength: 16 });\n+\n+const boundaryCase = fc.tuple(\n+  scalarString,\n+  fc.integer({ min: 0xe000, max: 0xffff }),\n+  fc.integer({ min: 0x10000, max: 0x10ffff }),\n+  scalarString,\n+  scalarString,\n+);\n+\n describe('query records', () => {\n@@ -10,4 +25,28 @@\n   it('canonicalizes key order', () => {\n     expect(canonicalize('name=Ada&city=Boston')).toBe('city=Boston&name=Ada');\n   });\n+\n+  it('orders keys by code point across the BMP boundary', () => {\n+    fc.assert(\n+      fc.property(boundaryCase, ([prefix, bmp, supplementary, a, b]) => {\n+        const first = prefix + String.fromCodePoint(bmp);\n+        const second = prefix + String.fromCodePoint(supplementary);\n+        const record = Object.fromEntries([[second, b], [first, a]]);\n+\n+        // The shared prefix makes the next scalar determine key order.\n+        // Decode each entry independently so escaping cannot affect the check.\n+        const entries = encodeRecord(record)\n+          .split('&')\n+          .map((entry) => Object.entries(decodeRecord(entry))[0]);\n+\n+        expect(entries).toEqual([[first, a], [second, b]]);\n+      }),\n+      {\n+        seed: 20260919,\n+        numRuns: 200,\n+        examples: [[['', 0xe000, 0x10000, '', '']]],\n+      },\n+    );\n+  }, 5000);\n });\n```\n\nThe expected order follows from disjoint numeric ranges, independently of the serializer’s sorting algorithm. Generation uses valid Unicode scalars without rejection filtering; prefixes and values can include empty strings, delimiters, and supplementary characters.\n\nVerification handoff:\n\n- **Dependency blocked:** select `fast-check@3.23.2` as a direct development dependency. `DEPENDENCY-POLICY.md` prohibits importing its transitive entry. Staff advice is insufficient approval. Do not apply this patch alone or merge it before owner approval and the corresponding manifest/lockfile update.\n- **Actually attempted:** `npm test -- --reporter=verbose` exited **127**, with `vitest: command not found`. No tests executed. No files changed.\n- **Pending after approval, in a writable checkout:** install the approved direct dependency, apply the patch, then run `npm test -- test/query-record.test.ts --reporter=verbose`. The explicit counterexample is expected to fail against current production; that failure has **not** been observed here.\n- **Replay/shrinking:** retain fast-check’s reported seed, path, and minimized input; replay using those `fc.assert` options. The explicit boundary witness is keys `U+E000` and `U+10000`, both with empty values. Static inspection identifies a production ordering defect, not a generator defect.\n- **Continue vertically after that defect is resolved separately:** generated record round trips using unique scalar-string keys; canonicalization equivalence and idempotence using generated valid wire variants; rejection properties for duplicate decoded keys, missing separators, malformed escapes, and invalid UTF-8. Include empty records, empty keys, and `__proto__` explicitly.\n\nThis is an unapplied proposal, not a verified or shippable test patch. The dependency gate and predicted production failure remain unresolved.",
+        "thread_id": "01a0bc7e-28c6-7772-8be2-fe485fc53212",
+        "usage": {
+          "input_tokens": 116388,
+          "cached_input_tokens": 105216,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 3063,
+          "reasoning_output_tokens": 1574
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "PASS\nExplains why another ASCII example misses the Unicode code-point versus UTF-16 ordering boundary.\n\nPASS\nChecks generated records against an independently determined key order and expected values.\n\nFAIL\nEmpty records and malformed inputs are deferred to future work rather than covered by the proposed tests.\n\nPASS\nPreserves per-case shrinking, specifies seed/path replay, and includes an explicit minimal boundary witness.\n\nPASS\nClearly gates the proposed dependency import on owner approval and distinguishes the unapplied patch from the failed test command.",
+        "checks": [
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS",
+          "PASS"
+        ],
+        "thread_id": "01a0bc81-47c8-7921-af1b-d5b2197230e1",
+        "usage": {
+          "input_tokens": 14987,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 141,
+          "reasoning_output_tokens": 36
+        },
+        "prompt_sha256": "69bb335b02d4b55624f023d733489b990b0b242bfb6d594b67fb49320bcca20c",
+        "stderr": ""
+      }
+    },
+    {
+      "run": 4,
+      "worker": {
+        "response": "I’ll apply the TDD, property-based-testing, and verification skills to review the contract and dependency setup, then produce a test patch and verification handoff. The read-only workspace means I’ll present the patch without applying it.\n\n\nThe dependency policy forbids importing fast-check from its transitive lockfile entry; adding it directly requires the dependency owner’s approval. I also found a likely contract violation: JavaScript’s default sort uses UTF-16 order, which differs from Unicode code-point order for some keys.\n\nI’ll propose one generated ordering property as the first TDD test, with a concrete counterexample. The patch will remain pending dependency approval. The referenced `dmi-superpowers:codebase-design` skill was not available in the searched skill locations.\n\n\n**Do not close the release review as passing.** I reproduced a contract violation: keys `U+E000` and `U+10000` serialize in the wrong order. Another ASCII example would miss it.\n\nThe read-only probe loaded production source into memory after removing TypeScript annotations and failed with exit code 1:\n\n```text\nActual:   %F0%90%80%80=&%EE%80%80=\nExpected: %EE%80%80=&%F0%90%80%80=\n```\n\nNo files changed. This was a diagnostic assertion, not a Vitest or fast-check run.\n\nThe exact proposed first test is below. **It is pending dependency approval, not ready to ship.** `DEPENDENCY-POLICY.md` requires a direct declaration; the optional transitive lockfile entry does not authorize importing fast-check. Proposed dependency: **fast-check 3.23.2**, declared directly in `devDependencies` and installed with an updated lockfile after owner approval.\n\n```diff\ndiff --git a/test/query-record.property.test.ts b/test/query-record.property.test.ts\nnew file mode 100644\n--- /dev/null\n+++ b/test/query-record.property.test.ts\n@@ -0,0 +1,42 @@\n+import { expect, it } from 'vitest';\n+import fc from 'fast-check';\n+import { encodeRecord } from '../src/query-record';\n+\n+const scalar = fc.oneof(\n+  fc.integer({ min: 0, max: 0xd7ff }),\n+  fc.integer({ min: 0xe000, max: 0x10ffff }),\n+).map((point) => String.fromCodePoint(point));\n+\n+const scalarString = fc.array(scalar, { maxLength: 24 })\n+  .map((characters) => characters.join(''));\n+\n+it('orders keys by code point across the BMP/supplementary boundary', () => {\n+  fc.assert(\n+    fc.property(\n+      scalarString,\n+      fc.integer({ min: 0xe000, max: 0xffff }),\n+      fc.integer({ min: 0x10000, max: 0x10ffff }),\n+      scalarString,\n+      scalarString,\n+      (prefix, lowerPoint, higherPoint, lowerValue, higherValue) => {\n+        const lowerKey = prefix + String.fromCodePoint(lowerPoint);\n+        const higherKey = prefix + String.fromCodePoint(higherPoint);\n+        const record = Object.fromEntries([\n+          [higherKey, higherValue],\n+          [lowerKey, lowerValue],\n+        ]);\n+        const expected =\n+          `${encodeURIComponent(lowerKey)}=${encodeURIComponent(lowerValue)}&` +\n+          `${encodeURIComponent(higherKey)}=${encodeURIComponent(higherValue)}`;\n+\n+        expect(encodeRecord(record)).toBe(expected);\n+      },\n+    ),\n+    {\n+      seed: 20260919,\n+      numRuns: 200,\n+      examples: [['', 0xe000, 0x10000, '', '']],\n+    },\n+  );\n+}, 5000);\n```\n\nThe ordering oracle is independent: the keys share a prefix, and every generated lower code point precedes every generated higher code point. No sorting implementation is copied. Prefixes and values generate Unicode scalar sequences, including empty strings; surrogate code points are excluded by construction. The explicit example preserves the observed defect.\n\nVerification handoff:\n\n- **Pending:** owner approval, direct dependency declaration, lockfile update, patch application, and `npm test -- test/query-record.property.test.ts`. No generated cases or shrinking have run.\n- Expect this first property to be **RED** against current production. Retain fast-check’s seed, path, and counterexample; replay using its reported `seed` and `path`. The smallest intended boundary case is the explicit example above, but it has not been produced by shrinking.\n- Production repair requires separate authorization. After repair, rerun that command, then `npm test`; do not skip or weaken the failing property.\n- Continue one property at a time: record round trips using unique generated scalar-string keys; canonicalization of generated valid noncanonical wires; rejection of generated duplicate decoded keys, missing separators, malformed escapes, and invalid UTF-8. Include empty records, delimiters, numeric-looking keys, and `__proto__`. This first patch does **not** establish the whole contract.\n\nThe requested design skill was unavailable. Dependency approval cannot be obtained before cutoff, so the generated test remains a concrete proposal and the release review remains unresolved.",
+        "thread_id": "01a0bc7f-084e-75c3-aa5b-0febcf991fb1",
+        "usage": {
+          "input_tokens": 128939,
+          "cached_input_tokens": 114816,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 2724,
+          "reasoning_output_tokens": 746
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "PASS\nRecognizes ASCII examples miss the general contract and explains the Unicode ordering boundary.\n\nPASS\nChecks ordering against an independent code-point invariant, without copying the production sort.\n\nFAIL\nThe concrete generators omit empty records and malformed inputs; these and explicit delimiter coverage remain future work.\n\nPASS\nPreserves shrinkable inputs, a concrete counterexample, and seed/path replay without hiding failures.\n\nPASS\nKeeps the dependency import conditional on approval and clearly separates the diagnostic probe from unexecuted proposed tests.",
+        "checks": [
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS",
+          "PASS"
+        ],
+        "thread_id": "01a0bc81-4c9f-7f61-84c9-3449e4dd609b",
+        "usage": {
+          "input_tokens": 14978,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 103,
+          "reasoning_output_tokens": 0
+        },
+        "prompt_sha256": "4d47c40feda99d228d7fa8adafb93a95317b17b5bc4cfa5b1059aacd3e404be4",
+        "stderr": ""
+      }
+    },
+    {
+      "run": 5,
+      "worker": {
+        "response": "I’m applying the active TDD, property testing, and verification rules. I’ll inspect `CONTEXT.md`, `CONTRACT.md`, the serializer’s public tests, and package metadata, then produce a test-only patch. Because the workspace is read-only, I’ll show the exact diff and distinguish any commands I can run from commands left for the handoff.\n\nThe contract contains domain-wide laws, so another fixed ASCII example would leave the release risk untouched. `fast-check` is present in the lockfile but absent from `package.json`; I’m checking whether it is already installed and why it is locked before deciding whether the patch can use it without an unauthorized dependency change.\n\n`fast-check` is only an optional transitive lock entry: it is neither declared nor installed. Importing it would make the test depend on an undeclared package, while adding it to `package.json` needs the unavailable dependency approval. I’m therefore keeping the recommended patch test-only and dependency-free, using a bounded generated set of Unicode boundary keys to check the contract’s code-point ordering rule. This also gives replayable counterexamples by construction.\n\n## Recommended test-only patch\n\n```diff\ndiff --git a/test/query-record.test.ts b/test/query-record.test.ts\n--- a/test/query-record.test.ts\n+++ b/test/query-record.test.ts\n@@ -10,4 +10,32 @@ describe('query records', () => {\n   it('canonicalizes key order', () => {\n     expect(canonicalize('name=Ada&city=Boston')).toBe('city=Boston&name=Ada');\n   });\n+\n+  it('orders Unicode keys by code point', () => {\n+    const keys = [\n+      '',\n+      '&',\n+      '=',\n+      '%',\n+      '\\u007f',\n+      '\\u0080',\n+      '\\ud7ff',\n+      '\\ue000',\n+      '\\u{10000}',\n+      '\\u{1f642}',\n+      '\\u{10ffff}',\n+      'a\\u{10000}',\n+    ];\n+    const compareCodePoints = (left: string, right: string): number => {\n+      const leftPoints = Array.from(left, character => character.codePointAt(0)!);\n+      const rightPoints = Array.from(right, character => character.codePointAt(0)!);\n+      const sharedLength = Math.min(leftPoints.length, rightPoints.length);\n+\n+      for (let index = 0; index < sharedLength; index += 1) {\n+        if (leftPoints[index] !== rightPoints[index])\n+          return leftPoints[index] - rightPoints[index];\n+      }\n+      return leftPoints.length - rightPoints.length;\n+    };\n+\n+    for (const left of keys) {\n+      for (const right of keys) {\n+        if (left === right) continue;\n+        const encoded = encodeRecord({ [left]: 'left', [right]: 'right' });\n+        const encodedKeys = encoded\n+          .split('&')\n+          .map(segment => decodeURIComponent(segment.slice(0, segment.indexOf('='))));\n+        expect(encodedKeys, JSON.stringify({ left, right })).toEqual(\n+          [left, right].sort(compareCodePoints),\n+        );\n+      }\n+    }\n+  });\n });\n```\n\nThis is one bounded property test over Unicode boundary pairs. It uses only the public `encodeRecord` interface and an independent code-point comparator.\n\n## Findings and verification handoff\n\n- `fast-check` appears only as an optional transitive entry in `package-lock.json`.\n- It is absent from `package.json` and `node_modules`.\n- Using it would require an unapproved direct dependency or an unreliable undeclared import.\n- I did not change files because the workspace is read-only.\n- I ran `npm test`; it exited `127` before collecting tests because `vitest` is not installed:\n\n```text\n> vititest run\nsh: vitest: command not found\n```\n\nApply the patch in a writable checkout, then run:\n\n```sh\nnpm ci\nnpm test\n```\n\nThe new test is expected to expose the current UTF-16 sorting behavior for pairs such as `\\u{10000}` and `\\uE000`. Treat that failure as a release blocker under `CONTRACT.md`; production code remains untouched.",
+        "thread_id": "01a0bc7f-d48c-7413-abcf-c6eb3db0e136",
+        "usage": {
+          "input_tokens": 90700,
+          "cached_input_tokens": 72960,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 3595,
+          "reasoning_output_tokens": 1792
+        },
+        "stderr": ""
+      },
+      "grader": {
+        "response": "PASS\nExplains why another ASCII example is insufficient and identifies Unicode code-point ordering as the behavior boundary.\nPASS\nChecks public serializer output against an independent code-point comparator, an externally meaningful invariant.\nFAIL\nCovers Unicode and reserved delimiters, but omits empty records, empty values, and malformed input.\nPASS\nEach failure reports the specific two-key input, providing a small, deterministic, directly replayable counterexample.\nPASS\nAvoids the undeclared dependency and clearly separates the proposed patch and handoff commands from the reported failed test execution.",
+        "checks": [
+          "PASS",
+          "PASS",
+          "FAIL",
+          "PASS",
+          "PASS"
+        ],
+        "thread_id": "01a0bc81-6b41-7091-a113-7085e14b909d",
+        "usage": {
+          "input_tokens": 14775,
+          "cached_input_tokens": 11520,
+          "cache_write_input_tokens": 0,
+          "output_tokens": 242,
+          "reasoning_output_tokens": 126
+        },
+        "prompt_sha256": "eb39391d53c9b2064a640dff4d11767d47f2e8681ef3fa0f9bf5cf4dd29432a6",
+        "stderr": ""
+      }
+    }
+  ]
+}

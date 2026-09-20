@@ -1,0 +1,61 @@
+{
+  "scenario": "source-grounded-development",
+  "arm": "baseline",
+  "runs": [
+    {
+      "run": 1,
+      "checks": [
+        "FAIL",
+        "FAIL",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    },
+    {
+      "run": 2,
+      "checks": [
+        "FAIL",
+        "PASS",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    },
+    {
+      "run": 3,
+      "checks": [
+        "FAIL",
+        "FAIL",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    },
+    {
+      "run": 4,
+      "checks": [
+        "FAIL",
+        "FAIL",
+        "PASS",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    },
+    {
+      "run": 5,
+      "checks": [
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "FAIL",
+        "PASS"
+      ],
+      "pass": false
+    }
+  ]
+}

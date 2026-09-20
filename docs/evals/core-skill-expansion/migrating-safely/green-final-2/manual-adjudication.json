@@ -1,0 +1,50 @@
+{
+  "raw_whole_scenario_passes": "3/5",
+  "manual_whole_scenario_passes": "4/5",
+  "raw_itemwise_passes": {
+    "complete_quantified_inventory_before_change": "4/5",
+    "independently_deployable_mixed_version_phases": "4/5",
+    "per_phase_gates_and_isolated_destruction": "5/5",
+    "safe_checkpointed_backfill": "4/5",
+    "zero_use_windows_and_honest_reporting": "5/5"
+  },
+  "manual_itemwise_passes": {
+    "complete_quantified_inventory_before_change": "5/5",
+    "independently_deployable_mixed_version_phases": "4/5",
+    "per_phase_gates_and_isolated_destruction": "5/5",
+    "safe_checkpointed_backfill": "4/5",
+    "zero_use_windows_and_honest_reporting": "5/5"
+  },
+  "adjudications": [
+    {
+      "run": 3,
+      "item": 1,
+      "raw_result": "FAIL",
+      "manual_result": "PASS",
+      "reason": "The worker inventories and quantifies every consumer and usage count supplied by the fixture, explicitly identifies the unavailable per-client and per-event-consumer production breakdowns, makes gathering that telemetry the first phase, and blocks changes until the census is complete. The read-only fixture does not contain those missing measurements, so requiring values would conflict with item 5's honesty requirement."
+    }
+  ],
+  "real_failures": [
+    {
+      "run": 5,
+      "item": 2,
+      "reason": "The proposed expanded event schema immediately requires both displayName and preferredName. Events from an old producer contain only displayName and would therefore fail validation during the rolling mixed-version period."
+    },
+    {
+      "run": 5,
+      "item": 4,
+      "reason": "The plan supplies bounded durable range records and reconciliation, but it leaves production-driven throttling as a reviewer action. Its ledger exposes pending/running/completed/failed only and reports neither retrying and divergent counts nor checkpoint lag, so it misses the refined progress contract."
+    }
+  ],
+  "malformed_grades": "None. Every grader returned exactly five decisions; no regrade was needed.",
+  "source_match": {
+    "combined_skill_sha256": "3de0c5ea94a1c47be288b339bf94c424bfc0dc024e2bec028c68f12a3bce9ecc",
+    "candidate_skill_sha256": "fbe346d04905e67ab0329af81e97109a1071b7a613e19de703f82ff67e3442b8",
+    "worker_prompt_sha256": "bc24f3cf33757936392431b2e99bb900b2f3d3318e75c7897fea333474e2ec7e",
+    "scenario_sha256": "2bdfa4e7269221815d6c9a9b03eed15eaeb5f2429d304fe485743fb2aa603463",
+    "task_sha256": "b753b2d6c68db7c028b95d226e90abecb713c9bde68e73fdfb6de8dd88bc0bc9",
+    "checklist_sha256": "ef8c399a7be8a550b77ba72c0fa5d4a9405d339b375425ca353650a585117573",
+    "harness": "codex-cli 0.155.1"
+  },
+  "preservation": "Original worker and grader output remains unchanged in transcripts.json and results.json."
+}
