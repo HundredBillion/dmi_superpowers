@@ -51,8 +51,14 @@ Before writing any code:
 - [ ] Confirm with user what interface changes are needed
 - [ ] Confirm with user which behaviors to test (prioritize)
 - [ ] Identify opportunities for deep modules (small interface, deep implementation) — run the `dmi-superpowers:codebase-design` skill for the vocabulary and the testability checks
-- [ ] List the behaviors to test (not implementation steps)
+- [ ] List the behaviors to test (not implementation steps). For each one, add its failure path
+      (the dependency errors, times out, or returns empty or malformed data) and its repeat path
+      (a second call, a retry, a failure after an earlier success)
 - [ ] Get user approval on the plan
+
+**An approved approach is not an approved behavior list.** When the user has already approved *how*
+to test, still write the behavior list, failure and repeat paths included, before the tracer bullet.
+Skipping the list is where failure paths get lost: every test passes and the untested path ships.
 
 Ask: "What should the public interface look like? Which behaviors are most important to test?"
 
