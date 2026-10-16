@@ -22,22 +22,7 @@ remain intentionally excluded.
 See [the core-skill evaluation record](docs/evals/core-skill-expansion/README.md)
 for baseline/final scores and documented limitations.
 
-## Unreleased
-
-Adds four evaluated coding-quality skills:
-
-- `variant-analysis` searches for same-family defects after a confirmed root cause.
-- `source-grounded-development` ties version-sensitive decisions to resolved versions
-  and version-matched official sources.
-- `migrating-safely` plans expand–migrate–contract rollouts with consumer inventories,
-  compatibility matrices, backfill ledgers, abort thresholds, and rollback gates.
-- `property-based-testing` selects independent domain properties, non-vacuous generators,
-  deterministic bounds, and minimal replayable counterexamples.
-
-The content simulations and limitations are recorded in
-[the core-skill evaluation record](docs/evals/core-skill-expansion/README.md).
-
-Selected upstream workflow improvements, adapted without adding new skills:
+Also includes selected upstream workflow improvements, adapted without adding new skills:
 
 - Scale brainstorming artifacts to exploratory, bounded, or architectural work.
 - Make inline execution a first-class choice with plan-specific progress and a
@@ -51,7 +36,6 @@ Selected upstream workflow improvements, adapted without adding new skills:
 See [adoption boundaries](docs/upstream-workflows.md) and the
 [evaluation evidence](docs/evals/upstream-workflows/README.md). Content simulations
 do not establish installed triggering, coding-quality gains, or token/time savings.
-No release version bump or installed-plugin update is included.
 
 ## v0.7.0 (2026-08-25)
 
