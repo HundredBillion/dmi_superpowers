@@ -1,5 +1,16 @@
 # dmi_superpowers Release Notes
 
+## v0.8.1 (2026-10-16)
+
+### `test-driven-development`
+
+- An approved test approach is no longer read as an approved behavior list. The Planning
+  checklist now asks for each behavior's failure path and repeat path, and agents write the list
+  before the tracer bullet even when the user has already agreed on how to test.
+- Evaluated in PR #35: with the approach pre-approved, agents wrote the behavior list and tested
+  "failure after an earlier success" in 0/5 baseline runs and 5/5 runs with the change; a second
+  scenario the wording does not name showed no regression (5/5 both arms).
+
 ## v0.8.0 (2026-09-20)
 
 Adds four evaluated coding-quality skills: `variant-analysis`,
