@@ -75,6 +75,10 @@ GREEN: Write minimal code to pass → test passes
 
 This is your tracer bullet - proves the path works end-to-end.
 
+**Verify RED before implementing.** Run the test and confirm it fails because the
+required behavior is missing. Fix setup errors separately; an unrelated exception
+is not evidence. For a regression, observe the failure against the unfixed code.
+
 ### 3. Incremental Loop
 
 For each remaining behavior:
@@ -90,6 +94,27 @@ Rules:
 - Only enough code to pass current test
 - Don't anticipate future tests
 - Keep tests focused on observable behavior
+
+**Check why the test passes.** Could another timeout, fallback, default, or skipped
+assertion produce the same result with the behavior broken? Assert enough through
+the public interface to distinguish the intended behavior. For example, a status
+code shared by a size cap and a deadline does not prove the cap works; hold the
+deadline inactive and assert the bounded body content. If the fix is already
+present, temporarily remove it, observe the intended failure, then restore and
+rerun. A test that stays green needs investigation before it counts as coverage.
+
+**Control time and ordering.** Inject clocks, sleepers, or schedulers where needed
+and advance virtual time explicitly. Coordinate concurrent work through signals,
+not fixed sleeps or assumptions about scheduler speed. For real I/O integration
+tests, use explicit readiness signals and generous bounded waits to catch hangs.
+Shrinking a real deadline to near zero introduces races; one socket write does
+not guarantee the receiver processes headers and body together.
+
+**Maintain tests like production code.** Before adding a fixture or synchronization
+helper, search the test package and shared testing utilities for an existing one.
+Reuse suitable helpers and extract meaningful duplication. Consider runtime paid
+on every suite run: eliminate unnecessary waits while keeping setup readable and
+tests deterministic.
 
 ### 4. Refactor
 
@@ -110,6 +135,10 @@ After all tests pass, look for [refactor candidates](./refactoring.md):
 [ ] Test describes behavior, not implementation
 [ ] Test uses public interface only
 [ ] Test would survive internal refactor
+[ ] Observed RED for the intended missing behavior
+[ ] Test fails with that behavior broken; no alternative mechanism masks it
+[ ] Time and ordering controlled; real integration waits bounded and generous
+[ ] Existing helpers reused; duplication and recurring runtime considered
 [ ] Code is minimal for this test
 [ ] No speculative features added
 ```
