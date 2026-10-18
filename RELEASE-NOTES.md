@@ -1,5 +1,23 @@
 # dmi_superpowers Release Notes
 
+## v0.8.2 (2026-10-18)
+
+### `test-driven-development`
+
+- Tests now explicitly prove the intended behavior: observe the relevant RED
+  failure, check that no fallback or timeout could make a broken implementation
+  pass, and rerun after restoring a temporarily removed fix when needed.
+- Guidance now favors controlled clocks and signals over sleeps and scheduler
+  assumptions, and asks contributors to reuse test helpers and account for
+  recurring suite runtime.
+- The [evaluation record](docs/evals/tdd-proof-and-time/README.md) documents the
+  before/after results and the remaining limits of the content simulation.
+
+### Community reporting
+
+- The Code of Conduct now gives contributors a working private reporting address:
+  `david@creatio.works` (resolves #7).
+
 ## v0.8.1 (2026-10-16)
 
 ### `test-driven-development`
