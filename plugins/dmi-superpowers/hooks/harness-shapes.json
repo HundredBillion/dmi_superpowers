@@ -1,0 +1,14 @@
+{
+  "_comment": "Single source of truth for harness detection and hook output shape. Read by hooks/emit-context (bash, via line-oriented sed) and hooks/ponytail-runtime.js (node, via require). Keep one harness per line: emit-context parses this file without jq, because jq is not a safe dependency inside a session-start hook. Order matters — the first harness whose detect var is set wins, so cursor precedes claude (Cursor may also set CLAUDE_PLUGIN_ROOT).",
+  "harnesses": [
+    { "name": "cursor", "detect": ["CURSOR_PLUGIN_ROOT"], "absent": [], "shape": "additional_context" },
+    { "name": "codex", "detect": ["PLUGIN_ROOT", "PLUGIN_DATA"], "absent": [], "shape": "hookSpecificOutput" },
+    { "name": "claude", "detect": ["CLAUDE_PLUGIN_ROOT"], "absent": ["COPILOT_CLI"], "shape": "hookSpecificOutput" }
+  ],
+  "fallback": { "name": "copilot", "detect": [], "absent": [], "shape": "additionalContext" },
+  "shapes": {
+    "additional_context": "{\n  \"additional_context\": \"%s\"\n}\n",
+    "hookSpecificOutput": "{\n  \"hookSpecificOutput\": {\n    \"hookEventName\": \"%s\",\n    \"additionalContext\": \"%s\"\n  }\n}\n",
+    "additionalContext": "{\n  \"additionalContext\": \"%s\"\n}\n"
+  }
+}

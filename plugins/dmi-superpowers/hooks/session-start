@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# SessionStart hook for superpowers plugin
+
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Tight boot message. The full 'using-superpowers' skill (flowchart, red-flag
+# table, cross-platform notes) is already in the skill listing and loadable via
+# the Skill tool, so we inject only the load-bearing rule here instead of the
+# whole file — this fires on every startup/clear/compact, so size matters.
+using_superpowers_content="Skills are task-specific instruction files that override default behavior, but never override the user's explicit instructions. Before ANY response or action — including clarifying questions or exploring the codebase — check whether a skill applies; if there is even a ~1% chance one does, invoke it with the Skill tool. This is not optional.
+
+Order of use: run process skills first (for example brainstorming or systematic-debugging — they decide HOW to approach the task), then implementation skills. Rigid skills such as test-driven-development and systematic-debugging are followed exactly, not adapted away. When you invoke a skill, announce 'Using [skill] to [purpose]' and turn any checklist it contains into todos.
+
+Priority when guidance conflicts: the user's instructions (CLAUDE.md, AGENTS.md, or direct requests) win first, then skills, then default behavior.
+
+The full guide — decision flowchart, red-flag rationalizations, and cross-platform notes — lives in the 'using-superpowers' skill. Load it with the Skill tool whenever you want the detail."
+
+# Escape string for JSON embedding using bash parameter substitution.
+# Each ${s//old/new} is a single C-level pass - orders of magnitude
+# faster than the character-by-character loop this replaces.
+escape_for_json() {
+    local s="$1"
+    s="${s//\\/\\\\}"
+    s="${s//\"/\\\"}"
+    s="${s//$'\n'/\\n}"
+    s="${s//$'\r'/\\r}"
+    s="${s//$'\t'/\\t}"
+    printf '%s' "$s"
+}
+
+using_superpowers_escaped=$(escape_for_json "$using_superpowers_content")
+session_context="<EXTREMELY_IMPORTANT>\nYou have dmi-superpowers skills.\n\n${using_superpowers_escaped}\n</EXTREMELY_IMPORTANT>"
+
+# Output context injection as JSON. Which envelope each harness consumes, and how
+# each is detected, lives in hooks/harness-shapes.json and is applied by
+# hooks/emit-context — this hook no longer carries its own copy of that rule.
+# Claude Code reads BOTH additional_context and hookSpecificOutput without
+# deduplication, which is why exactly one field is emitted rather than all three.
+printf '%s' "$session_context" | "${SCRIPT_DIR}/emit-context" SessionStart
+
+exit 0

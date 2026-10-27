@@ -1,5 +1,16 @@
 # dmi_superpowers Release Notes
 
+## v0.8.3 (unreleased)
+
+- Codex installs a clean runtime bundle through a dedicated marketplace manifest.
+  Git metadata from the marketplace checkout is outside the installed package,
+  preventing unrelated repository operations from invalidating hook approval.
+- CI verifies that the generated bundle matches the canonical sources.
+  Regression checks cover fingerprint stability, real hook changes, and hook
+  state stored outside the bundle; an optional Codex test checks persisted trust.
+- All harness manifests receive the patch version together; skill and hook
+  behavior is unchanged.
+
 ## v0.8.2 (2026-10-18)
 
 ### `test-driven-development`

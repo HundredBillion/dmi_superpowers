@@ -110,6 +110,23 @@ agy plugin install https://github.com/HundredBillion/dmi_superpowers
 
 - Search for dmi-superpowers and select `Install Plugin`.
 
+Codex installs the generated bundle at `plugins/dmi-superpowers`, discovered
+through `.agents/plugins/marketplace.json`. The bundle excludes repository
+metadata so marketplace Git operations do not invalidate hook trust.
+Review new or changed hooks with `/hooks`; actual package changes still require
+approval. A marketplace pinned to an older Git ref must be advanced to receive
+a newer package.
+
+For contributors, runtime sources remain in `skills/`, `hooks/`, `assets/`,
+and `.codex-plugin/plugin.json`. Run `python3 scripts/build-codex-package.py`
+after changing those sources or bumping versions, and commit the generated
+bundle. CI checks that its bytes and executable permissions match the sources.
+`python3 tests/codex-package.test.py` verifies fingerprint behavior and writable
+hook state. With Codex installed, `node tests/codex-package.integration.mjs`
+checks installation and persisted trust in a disposable profile without a model
+turn or changes to your own approvals. This acceptance check was verified with
+Codex 0.164.0; set `CODEX_BIN` to its executable when multiple versions are installed.
+
 ### Gemini CLI
 
 ```bash

@@ -30,6 +30,12 @@ jobs:
       - name: Workflow helper tests
         run: node --test tests/workflow-helpers.test.js
 
+      - name: Codex package matches runtime sources
+        run: python3 scripts/build-codex-package.py --check
+
+      - name: Codex package trust stability
+        run: python3 tests/codex-package.test.py
+
       # Uses the repo's own entry point rather than calling shellcheck directly,
       # so CI enforces exactly the severity policy lint-shell.sh already sets
       # (--severity=warning) instead of inventing a stricter one.
@@ -41,7 +47,7 @@ jobs:
       - name: Manifests and hook configs parse
         run: |
           for f in hooks/*.json .claude-plugin/*.json .cursor-plugin/*.json \
-                   .codex-plugin/*.json .kimi-plugin/*.json gemini-extension.json package.json; do
+                   .codex-plugin/*.json .agents/plugins/*.json .kimi-plugin/*.json gemini-extension.json package.json; do
             python3 -c "import json,sys; json.load(open('$f'))" || { echo "invalid JSON: $f"; exit 1; }
           done
 

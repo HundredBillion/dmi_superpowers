@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+#
+# emit-context — wrap a context string in the JSON shape the current harness wants.
+#
+# Usage:  printf '%s' "$text" | emit-context <HookEventName>
+#
+# Why this exists: four harnesses want three different JSON envelopes, and before
+# this the same three-way branch was written out in every hook that injects
+# context — session-start, session-start-codex and pretooluse-pr-reminder — plus
+# a fourth copy in ponytail-runtime.js that detected Codex from a different
+# environment variable than the bash hooks did. Adding a harness meant editing
+# every one of them, and the two runtimes could disagree about which harness they
+# were on in the same session.
+#
+# Detection and shape now come from hooks/harness-shapes.json, which node reads
+# too, so the rule is stated once.
+#
+# Parsing note: this reads the table with sed rather than jq. jq is not a safe
+# dependency inside a session-start hook — a user without it would lose the
+# bootstrap entirely — so harness-shapes.json is deliberately kept one harness
+# per line to stay parseable without it.
+#
+# The caller is responsible for escaping the text for JSON (see escape_for_json
+# in hooks/session-start); this script does no escaping of its own.
+
+set -euo pipefail
+
+event="${1:-SessionStart}"
+here="$(cd "$(dirname "$0")" && pwd)"
+table="$here/harness-shapes.json"
+
+context="$(cat)"
+
+# Return the value of the named env var, or empty. Indirect expansion keeps the
+# table data-driven — the var names live in the JSON, not in this script.
+env_value() {
+  eval "printf '%s' \"\${$1:-}\""
+}
+
+# Extract one harness line's field. $1 = harness name, $2 = field.
+field() {
+  sed -n "s/.*\"name\": \"$1\".*\"$2\": \\[\\([^]]*\\)\\].*/\\1/p;
+          s/.*\"name\": \"$1\".*\"$2\": \"\\([^\"]*\\)\".*/\\1/p" "$table" | head -1
+}
+
+harness_names() {
+  sed -n 's/.*{ "name": "\([a-z]*\)".*/\1/p' "$table"
+}
+
+# First harness whose detect var is set and whose absent vars are all unset wins.
+shape=""
+for name in $(harness_names); do
+  [ "$name" = "copilot" ] && continue
+  # Strip quotes, then turn the comma separator into whitespace so a multi-var
+  # detect list stays several words rather than collapsing into one bogus name.
+  detect=$(field "$name" detect | tr -d '"' | tr ',' ' ')
+  absent=$(field "$name" absent | tr -d '"' | tr ',' ' ')
+
+  matched=0
+  for var in $detect; do
+    [ -n "$(env_value "$var")" ] && matched=1
+  done
+  [ "$matched" -eq 1 ] || continue
+
+  blocked=0
+  for var in $absent; do
+    [ -n "$(env_value "$var")" ] && blocked=1
+  done
+  [ "$blocked" -eq 1 ] && continue
+
+  shape=$(field "$name" shape)
+  break
+done
+
+# No harness matched — fall back to the SDK-standard top-level field.
+[ -n "$shape" ] || shape="additionalContext"
+
+case "$shape" in
+  additional_context)
+    printf '{\n  "additional_context": "%s"\n}\n' "$context" ;;
+  hookSpecificOutput)
+    printf '{\n  "hookSpecificOutput": {\n    "hookEventName": "%s",\n    "additionalContext": "%s"\n  }\n}\n' "$event" "$context" ;;
+  *)
+    printf '{\n  "additionalContext": "%s"\n}\n' "$context" ;;
+esac
+
+exit 0
