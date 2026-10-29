@@ -1,0 +1,34 @@
+{
+  "scope": "SHA-256 of the frozen inputs (committed) and of the ten worker transcripts (withheld; see README). Dispatch was manual; outgoing request bytes were not captured, so canonical prompts are the expected inputs, not proof of actual-request equality.",
+  "checks": {
+    "baseline_skill_matches_origin_main_f1a0c48": true,
+    "amended_skill_matches_shipped_skills_writing_plans": true,
+    "blind_map_frozen_before_grading": true,
+    "ten_graders_each_returned_three_grades": true
+  },
+  "inputs": {
+    "scenario.md": "32b22666e2102fb2fd5facb277c308ba07a0385b2089208b2b192b4b7a11926b",
+    "checklist.md": "1ce020598b9528d545c56177c018c94986e0cd263b49c408dc4366fce4c6ef78",
+    "baseline-skill.md": "c8686eefde9d39c37af896eb09fba74c3804cfc76cb483e134f918e0252f21f0",
+    "amended-skill.md": "9e3f5cd21be6e4e65ba96da1b45d4f2c2c9034dd45dbf40a5cd90b70a48f0949",
+    "baseline-canonical-worker-prompt.md": "60f5bb92f253eedee30b59c32399501d3df058d9e302212ad28cf81369302876",
+    "amended-canonical-worker-prompt.md": "aefb474bf7d708e374cf3bc39977353f5bcc2d4fc8203ac2394fe7af2cf1386b",
+    "blind-map.txt": "eec5cfedc486a6d53f1df0c19096cff161f5c3ce5680468907e147b08505bb26",
+    "verification-before-completion-arm/scenario.md": "49822563cb3eb64cc4456a921abe6e2096d9cb613bc1ac9457e628b7f509b981",
+    "verification-before-completion-arm/checklist.md": "07698b626e6b8ec627dc258b2dc2bc056e310d3ab80d6ed160c86dfe52c32584",
+    "verification-before-completion-arm/baseline-skill.md": "fca0da95b68eddb70aae8f524fa1831beffeda8b9461495d9149caac0b7de38c",
+    "verification-before-completion-arm/amended-skill.md": "7cd08b908babe96d5d4a9ce3d0a464bf52925c46345e79d2c853fdfe105777a1"
+  },
+  "withheld_transcripts": {
+    "baseline-1.md": "f9c7075b8dd9050b9367b631552456438a1a462db42a427a06cb9bea7f64cf22",
+    "baseline-2.md": "b1c40ef68b5b3850a2c79e246a82cb6713f236740da5b8e661e578dab99cafbd",
+    "baseline-3.md": "288010077273c38b2b0827cfc4962c13cb127adb91547b20322efd1b6f2d478d",
+    "baseline-4.md": "2e9d44ba69f85165e7a25f4f8b8db9f3bd60ff1674f52c7931df789b3fdc9b6c",
+    "baseline-5.md": "71f8653f1a22930e4472e23cb3fd94a6130b0ae72d6df839446d790a1ce52725",
+    "amended-1.md": "60e5925aaddba8a75f4efe2ee3a19856a45d99a4fb332f5bc5b92d8783cc09e4",
+    "amended-2.md": "84334b0f133530464bf0375a7fe3eee0d81011d0302fa89e7ca3edde79d31e13",
+    "amended-3.md": "0a147e050c40eb19e68ea2fa41c8acbe9d69bd2e1a5955c068d003eb435213a1",
+    "amended-4.md": "491a8fae4a6f1700749bd2ccd51d6a954e9cede816de6481e812540686767c20",
+    "amended-5.md": "3b87d0ddc1fd28accf81252f32f5dae70437e741229b2ed409f4bbbcb9f95097"
+  }
+}

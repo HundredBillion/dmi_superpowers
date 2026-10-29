@@ -154,6 +154,8 @@ After writing the complete TSP, look at the PRD with fresh eyes and check the TS
 
 **3. Type consistency:** Do the types, method signatures, and property names you used in later tasks match what you defined in earlier tasks? A function called `clearLayers()` in Task 3 but `clearFullLayers()` in Task 7 is a bug.
 
+**4. Verification tasks:** For any task that checks one thing against another (docs vs code, spec vs implementation), does it name where the rules are *enforced* (validations, guards, the full call chain), not just where they are declared? Does it also run from that source back: list every rule enforced there and confirm each is stated? And does it send at least one input built to break each rule? A check that only walks the claims cannot find what the claims leave out.
+
 If you find issues, fix them inline. No need to re-review — just fix and move on. If you find a PRD requirement with no task, add the task.
 
 ## Harden TSP

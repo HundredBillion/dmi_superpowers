@@ -20,6 +20,9 @@ graded against each skill's guarantee checklist. Verdict per ADR-0006.
 | writing-code-comments | CC1 | C1 | 2/5 | 5/5 | SHIP (baseline-vs-change, not a trim) |
 | writing-code-comments | CC1 | C2,C3 | 0/5 | 0/5 | DROP — no behaviour change |
 | writing-code-comments | CC1 | C4 | 5/5 | 5/5 | DROP — already followed |
+| writing-plans | WP1 | G3 | 2/5 | 5/5 | SHIP (baseline-vs-change; see `writing-plans-verification-tasks/`) |
+| writing-plans | WP1 | G1,G2 | 5/5 | 5/5 | Already followed; kept, a trimmed item was not tested |
+| verification-before-completion | VB1 | G1–G5 | 5/5 | 5/5 | DROP — already followed |
 
 **All scenarios pass parity.**
 
